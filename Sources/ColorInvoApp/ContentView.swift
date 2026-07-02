@@ -66,13 +66,14 @@ struct ContentView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 24) {
             carrierSection
             colorSection
             widgetSection
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 16)
+        .padding(.horizontal, 24)
+        .padding(.top, 28)
+        .padding(.bottom, 24)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(ColorInvoColor.background.ignoresSafeArea())
         .preferredColorScheme(.light)
@@ -83,7 +84,7 @@ struct ContentView: View {
     }
 
     private var carrierSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
                 Text("手機載具")
                     .font(.headline)
@@ -136,7 +137,7 @@ struct ContentView: View {
             } label: {
                 Label(didSave ? "已儲存" : "儲存載具", systemImage: didSave ? "checkmark" : "tray.and.arrow.down")
                     .font(.headline)
-                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .frame(maxWidth: .infinity, minHeight: 48)
             }
             .buttonStyle(ColorInvoPrimaryButtonStyle())
             .disabled(!canSave)
@@ -155,7 +156,7 @@ struct ContentView: View {
     }
 
     private var colorSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 14) {
             Text("條碼顏色")
                 .font(.headline)
                 .foregroundStyle(ColorInvoColor.text)
@@ -171,11 +172,13 @@ struct ContentView: View {
     }
 
     private var wallpaperColorSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        let pickerTitle = wallpaperPalettes.isEmpty ? "選擇圖片" : "重新選擇"
+
+        return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 Text("從桌布")
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(ColorInvoColor.secondary)
+                    .foregroundStyle(ColorInvoColor.muted)
 
                 Spacer()
 
@@ -185,7 +188,7 @@ struct ContentView: View {
                     photoLibrary: .shared()
                 ) {
                     Label(
-                        wallpaperPalettes.isEmpty ? "選擇圖片" : "重新選擇",
+                        pickerTitle,
                         systemImage: "photo.on.rectangle"
                     )
                     .font(.callout.weight(.semibold))
@@ -242,7 +245,7 @@ struct ContentView: View {
         HStack(spacing: 8) {
             Text("自訂")
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(ColorInvoColor.secondary)
+                .foregroundStyle(ColorInvoColor.muted)
                 .frame(width: 40, alignment: .leading)
 
             compactColorPicker(
@@ -277,8 +280,8 @@ struct ContentView: View {
         ColorPicker(title, selection: color, supportsOpacity: false)
             .font(.callout.weight(.semibold))
             .foregroundStyle(ColorInvoColor.text)
-            .padding(.horizontal, 10)
-            .frame(maxWidth: .infinity, minHeight: 40)
+            .padding(.horizontal, 12)
+            .frame(maxWidth: .infinity, minHeight: 44)
             .background(ColorInvoColor.surface)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .overlay {
@@ -311,7 +314,7 @@ struct ContentView: View {
     }
 
     private var widgetSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 14) {
             Text("小工具預覽")
                 .font(.headline)
                 .foregroundStyle(ColorInvoColor.text)
@@ -337,7 +340,7 @@ struct ContentView: View {
                         }
                     }
             }
-            .frame(height: 128)
+            .frame(height: 136)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
             Button {
@@ -345,7 +348,7 @@ struct ContentView: View {
                 showingWidgetHelp = true
             } label: {
                 Label("加入小工具", systemImage: "plus.rectangle.on.rectangle")
-                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .frame(maxWidth: .infinity, minHeight: 48)
             }
             .buttonStyle(ColorInvoPrimaryButtonStyle())
             .disabled(!canSave)
@@ -460,7 +463,7 @@ private struct ColorChoiceSeparator: View {
                 .fill(ColorInvoColor.hairline)
                 .frame(height: 1)
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 6)
     }
 }
 
@@ -522,16 +525,15 @@ private enum ColorInvoColor {
     static let frozenLake = Color(red: 112 / 255, green: 214 / 255, blue: 255 / 255)
     static let roseKiss = Color(red: 255 / 255, green: 112 / 255, blue: 166 / 255)
     static let primary = Color(red: 0 / 255, green: 126 / 255, blue: 168 / 255)
-    static let secondary = Color(red: 176 / 255, green: 0 / 255, blue: 79 / 255)
+    static let attention = Color(red: 180 / 255, green: 98 / 255, blue: 20 / 255)
     static let background = Color.white
     static let surface = Color.white
     static let primarySoft = Color(red: 234 / 255, green: 248 / 255, blue: 255 / 255)
-    static let secondarySoft = Color(red: 255 / 255, green: 240 / 255, blue: 246 / 255)
     static let hairline = Color(red: 216 / 255, green: 230 / 255, blue: 238 / 255)
     static let text = Color(red: 17 / 255, green: 24 / 255, blue: 39 / 255)
     static let muted = Color(red: 82 / 255, green: 96 / 255, blue: 106 / 255)
     static let success = primary
-    static let warning = secondary
+    static let warning = attention
 }
 
 #Preview {
