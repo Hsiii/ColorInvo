@@ -162,6 +162,8 @@ ios_resolve_release_versions() {
 }
 
 ios_set_app_store_auth_args() {
+    local incomplete_mode="${1:-error}"
+
     APP_STORE_AUTH_ARGS=()
     ios_detect_app_store_key_path
 
@@ -170,6 +172,10 @@ ios_set_app_store_auth_args() {
     fi
 
     if [[ -z "${ASC_KEY_PATH:-}" || -z "${ASC_KEY_ID:-}" || -z "${ASC_ISSUER_ID:-}" ]]; then
+        if [[ "$incomplete_mode" == "ignore" ]]; then
+            return 0
+        fi
+
         ios_die "App Store Connect auth is incomplete. Set ASC_KEY_ID (or ASC_API_KEY), ASC_ISSUER_ID, and ASC_KEY_PATH together."
     fi
 
