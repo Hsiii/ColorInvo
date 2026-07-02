@@ -21,8 +21,8 @@ targets:
     sources:
       - path: Sources/Shared
       - path: Sources/ColorInvoApp
-    resources:
       - path: Resources/ColorInvo/Assets.xcassets
+        buildPhase: resources
     settings:
       base:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

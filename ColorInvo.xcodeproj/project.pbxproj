@@ -13,6 +13,7 @@
 		4A5F52AA87314EC8D4F4E17A /* Code39BarcodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B2B20F5DD5AE3A8E5B68020 /* Code39BarcodeView.swift */; };
 		586A4116D912718B6ED5A1F8 /* CarrierSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BDCB590CA17AAFCAA3289A5 /* CarrierSettings.swift */; };
 		59CB288722FF02E609E98F16 /* CarrierCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A11DF4AD04EC6FA7BB2BD6 /* CarrierCode.swift */; };
+		715C98477B26FD4FBB90FDF0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 913A130A5A4C24D9EEC4D4FD /* Assets.xcassets */; };
 		77D0A0F6AA417D25D083BD28 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F05933D6EBA34CFA44823B /* AppGroup.swift */; };
 		7D1DCA62D6C11DD5D5C5F847 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D6D1E7C856EF7AD232FE89DF /* InfoPlist.strings */; };
 		7FAD7B647CC4791735FDBF52 /* Code39BarcodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B2B20F5DD5AE3A8E5B68020 /* Code39BarcodeView.swift */; };
@@ -64,6 +65,7 @@
 		5C656D39AB9EB12EEFA74BB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		81A46D55AA2AF0EE56B7D10F /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		86C46C6B4737C9DD08E9ED3E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		913A130A5A4C24D9EEC4D4FD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		94F05933D6EBA34CFA44823B /* AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
 		9BDCB590CA17AAFCAA3289A5 /* CarrierSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarrierSettings.swift; sourceTree = "<group>"; };
 		A69AAC56B8350E1A75124EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 		0B7BBD77B2AB15DD130ED6F9 = {
 			isa = PBXGroup;
 			children = (
+				FEE2FE4876DC4104EE37A5F9 /* ColorInvo */,
 				080F7FDBEFC296C916EBFDD2 /* ColorInvoApp */,
 				77B4285981213B31D950AAC4 /* ColorInvoWidget */,
 				24F261E3F9C2BF619F9E6F82 /* Shared */,
@@ -134,6 +137,15 @@
 			);
 			name = ColorInvoWidget;
 			path = Sources/ColorInvoWidget;
+			sourceTree = "<group>";
+		};
+		FEE2FE4876DC4104EE37A5F9 /* ColorInvo */ = {
+			isa = PBXGroup;
+			children = (
+				913A130A5A4C24D9EEC4D4FD /* Assets.xcassets */,
+			);
+			name = ColorInvo;
+			path = Resources/ColorInvo;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -241,6 +253,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				715C98477B26FD4FBB90FDF0 /* Assets.xcassets in Resources */,
 				3E5A6A7B8D6B9D927588305C /* InfoPlist.strings in Resources */,
 				807BD22734D6A8201B194199 /* Localizable.strings in Resources */,
 			);
