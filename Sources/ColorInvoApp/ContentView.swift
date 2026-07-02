@@ -43,10 +43,10 @@ struct ContentView: View {
 
     private var validationText: String {
         if isValid {
-            return "正確"
+            return "格式符合"
         }
 
-        return carrierSuffix.isEmpty ? "未填" : "無效"
+        return carrierSuffix.isEmpty ? "未填" : "格式不符"
     }
 
     init() {
@@ -367,7 +367,7 @@ private struct WidgetHelpSheet: View {
             Button {
                 dismiss()
             } label: {
-                Text("完成")
+                Text("了解")
                     .font(.headline)
                     .frame(maxWidth: .infinity, minHeight: 52)
             }
