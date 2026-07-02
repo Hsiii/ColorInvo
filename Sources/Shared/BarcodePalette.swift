@@ -86,35 +86,6 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
         barColor: RGBAColor(hex: 0x000000),
         backgroundColor: RGBAColor(hex: 0xFFFFFF)
     )
-
-    static let presets: [BarcodePalette] = [
-        .classic,
-        BarcodePalette(
-            name: "櫻粉海軍",
-            barColor: RGBAColor(hex: 0x102A56),
-            backgroundColor: RGBAColor(hex: 0xFADCE8)
-        ),
-        BarcodePalette(
-            name: "霧紫墨藍",
-            barColor: RGBAColor(hex: 0x16213E),
-            backgroundColor: RGBAColor(hex: 0xF0ECFF)
-        ),
-        BarcodePalette(
-            name: "薄荷石墨",
-            barColor: RGBAColor(hex: 0x1E2E29),
-            backgroundColor: RGBAColor(hex: 0xDFF7EC)
-        ),
-        BarcodePalette(
-            name: "奶油深藍",
-            barColor: RGBAColor(hex: 0x172554),
-            backgroundColor: RGBAColor(hex: 0xFFF4C2)
-        ),
-        BarcodePalette(
-            name: "冰藍松綠",
-            barColor: RGBAColor(hex: 0x0F3D2E),
-            backgroundColor: RGBAColor(hex: 0xE1F1FF)
-        ),
-    ]
 }
 
 struct RGBAColor: Codable, Equatable {

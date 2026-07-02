@@ -166,10 +166,6 @@ struct ContentView: View {
 
             ColorChoiceSeparator()
 
-            presetColorSection
-
-            ColorChoiceSeparator()
-
             customColorSection
 
             contrastStatus
@@ -241,16 +237,6 @@ struct ContentView: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel(palette.name)
             }
-        }
-    }
-
-    private var presetColorSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("推薦")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(ColorInvoColor.secondary)
-
-            paletteButtonGrid(BarcodePalette.presets)
         }
     }
 
