@@ -157,67 +157,20 @@ struct ContentView: View {
     }
 
     private var colorSection: some View {
-        VStack(alignment: .leading, spacing: 18) {
+        VStack(alignment: .leading, spacing: 14) {
             Text("條碼顏色")
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(ColorInvoColor.text)
 
             wallpaperColorSection
 
-            Text("推薦")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(ColorInvoColor.secondary)
+            ColorChoiceSeparator()
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    ForEach(BarcodePalette.presets) { preset in
-                        Button {
-                            draftPalette = preset
-                            didSave = false
-                        } label: {
-                            PresetSwatch(
-                                palette: preset,
-                                isSelected: preset == draftPalette
-                            )
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel(preset.name)
-                    }
-                }
-                .padding(.vertical, 2)
-            }
+            presetColorSection
 
-            Text("自訂")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(ColorInvoColor.secondary)
+            ColorChoiceSeparator()
 
-            VStack(spacing: 14) {
-                colorPickerRow(
-                    title: "線條",
-                    color: Binding(
-                        get: { draftPalette.barColor.color },
-                        set: { color in
-                            draftPalette = draftPalette.replacing(
-                                barColor: RGBAColor(color: color)
-                            )
-                            didSave = false
-                        }
-                    )
-                )
-
-                colorPickerRow(
-                    title: "背景",
-                    color: Binding(
-                        get: { draftPalette.backgroundColor.color },
-                        set: { color in
-                            draftPalette = draftPalette.replacing(
-                                backgroundColor: RGBAColor(color: color)
-                            )
-                            didSave = false
-                        }
-                    )
-                )
-            }
+            customColorSection
 
             contrastStatus
         }
@@ -291,17 +244,64 @@ struct ContentView: View {
         }
     }
 
-    private func colorPickerRow(title: String, color: Binding<Color>) -> some View {
-        HStack {
-            Text(title)
-                .font(.title3.weight(.medium))
-                .foregroundStyle(ColorInvoColor.text)
+    private var presetColorSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("推薦")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(ColorInvoColor.secondary)
 
-            Spacer()
-
-            ColorPicker(title, selection: color, supportsOpacity: false)
-                .labelsHidden()
+            paletteButtonGrid(BarcodePalette.presets)
         }
+    }
+
+    private var customColorSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("自訂")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(ColorInvoColor.secondary)
+
+            HStack(spacing: 8) {
+                compactColorPicker(
+                    title: "條碼",
+                    color: Binding(
+                        get: { draftPalette.barColor.color },
+                        set: { color in
+                            draftPalette = draftPalette.replacing(
+                                barColor: RGBAColor(color: color)
+                            )
+                            didSave = false
+                        }
+                    )
+                )
+
+                compactColorPicker(
+                    title: "背景",
+                    color: Binding(
+                        get: { draftPalette.backgroundColor.color },
+                        set: { color in
+                            draftPalette = draftPalette.replacing(
+                                backgroundColor: RGBAColor(color: color)
+                            )
+                            didSave = false
+                        }
+                    )
+                )
+            }
+        }
+    }
+
+    private func compactColorPicker(title: String, color: Binding<Color>) -> some View {
+        ColorPicker(title, selection: color, supportsOpacity: false)
+            .font(.callout.weight(.semibold))
+            .foregroundStyle(ColorInvoColor.text)
+            .padding(.horizontal, 12)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background(ColorInvoColor.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+            }
     }
 
     private var contrastStatus: some View {
@@ -444,7 +444,7 @@ private struct PaletteOptionButtonContent: View {
                 }
                 .frame(height: 48)
             }
-            .aspectRatio(1, contentMode: .fit)
+            .frame(width: 64, height: 64)
             .overlay {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .strokeBorder(
@@ -461,41 +461,27 @@ private struct PaletteOptionButtonContent: View {
                 .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity)
         }
+        .frame(maxWidth: .infinity, minHeight: 88, alignment: .top)
         .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
 
-private struct PresetSwatch: View {
-    let palette: BarcodePalette
-    let isSelected: Bool
-
+private struct ColorChoiceSeparator: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(palette.backgroundColor.color)
+        HStack(spacing: 8) {
+            Rectangle()
+                .fill(ColorInvoColor.hairline)
+                .frame(height: 1)
 
-                HStack(spacing: 3) {
-                    ForEach(0..<7) { index in
-                        RoundedRectangle(cornerRadius: 1)
-                            .fill(palette.barColor.color)
-                            .frame(width: index.isMultiple(of: 3) ? 8 : 3)
-                    }
-                }
-            }
-            .frame(width: 116, height: 52)
-            .overlay {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .strokeBorder(isSelected ? ColorInvoColor.primary : ColorInvoColor.hairline, lineWidth: isSelected ? 4 : 1)
-            }
+            Text("或")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ColorInvoColor.muted)
 
-            Text(palette.name)
-                .font(.callout)
-                .foregroundStyle(ColorInvoColor.text)
-                .lineLimit(1)
-                .minimumScaleFactor(0.86)
+            Rectangle()
+                .fill(ColorInvoColor.hairline)
+                .frame(height: 1)
         }
-        .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .padding(.vertical, 2)
     }
 }
 

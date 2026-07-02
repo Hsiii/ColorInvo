@@ -56,7 +56,7 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
         }
 
         if barColor.isReddish {
-            return "線條勿用紅系"
+            return "條碼勿用紅系"
         }
 
         if backgroundScannerReflectance < Self.minimumBackgroundReflectance {
@@ -64,7 +64,7 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
         }
 
         if barScannerReflectance > backgroundScannerReflectance / 2 {
-            return "線條在紅光下要更深"
+            return "條碼在紅光下要更深"
         }
 
         return "掃描對比不足"
