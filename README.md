@@ -11,11 +11,13 @@ bun run ios:simulator
 
 ## Device Build
 
-Copy `.env.example` to `.env`, set `APPLE_TEAM_ID`, then use:
+Set `APPLE_TEAM_ID` in `.env`, or let the scripts reuse `../OnTrack/.env` when present, then use:
 
 ```bash
 bun run ios:device
 ```
+
+The Apple Developer account must have `group.dev.hsichen.colorinvo` enabled for both `dev.hsichen.colorinvo` and `dev.hsichen.colorinvo.widget`.
 
 ## Release Helpers
 

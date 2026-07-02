@@ -4,14 +4,9 @@ APP_STORE_AUTH_ARGS=()
 IOS_PROVISIONING_ARGS=()
 
 IOS_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-IOS_PROJECT_PATH="${IOS_PROJECT:-$IOS_ROOT_DIR/ColorInvo.xcodeproj}"
-IOS_SCHEME_NAME="${IOS_SCHEME:-ColorInvo}"
-IOS_BUNDLE_ID_VALUE="${IOS_BUNDLE_ID:-dev.hsichen.colorinvo}"
-IOS_WIDGET_BUNDLE_ID_VALUE="${IOS_WIDGET_BUNDLE_ID:-dev.hsichen.colorinvo.widget}"
-IOS_APP_GROUP_ID_VALUE="${IOS_APP_GROUP_ID:-group.dev.hsichen.colorinvo}"
 
-ios_load_env() {
-    local env_path="${IOS_ENV_FILE:-$IOS_ROOT_DIR/.env}"
+ios_load_env_file() {
+    local env_path="$1"
 
     if [[ ! -f "$env_path" ]]; then
         return
@@ -35,7 +30,37 @@ ios_load_env() {
     done <"$env_path"
 }
 
+ios_load_team_id_file() {
+    local env_path="$1"
+
+    if [[ ! -f "$env_path" || -n "${APPLE_TEAM_ID:-}" ]]; then
+        return
+    fi
+
+    local line
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        [[ "$line" == APPLE_TEAM_ID=* ]] || continue
+        APPLE_TEAM_ID="${line#*=}"
+        export APPLE_TEAM_ID
+        return
+    done <"$env_path"
+}
+
+ios_load_env() {
+    ios_load_env_file "${IOS_ENV_FILE:-$IOS_ROOT_DIR/.env}"
+
+    if [[ -z "${APPLE_TEAM_ID:-}" ]]; then
+        ios_load_team_id_file "${IOS_ONTRACK_ENV_FILE:-$IOS_ROOT_DIR/../OnTrack/.env}"
+    fi
+}
+
 ios_load_env
+
+IOS_PROJECT_PATH="${IOS_PROJECT:-$IOS_ROOT_DIR/ColorInvo.xcodeproj}"
+IOS_SCHEME_NAME="${IOS_SCHEME:-ColorInvo}"
+IOS_BUNDLE_ID_VALUE="${IOS_BUNDLE_ID:-dev.hsichen.colorinvo}"
+IOS_WIDGET_BUNDLE_ID_VALUE="${IOS_WIDGET_BUNDLE_ID:-dev.hsichen.colorinvo.widget}"
+IOS_APP_GROUP_ID_VALUE="${IOS_APP_GROUP_ID:-group.dev.hsichen.colorinvo}"
 
 ios_die() {
     echo "$*" >&2

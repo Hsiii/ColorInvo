@@ -189,10 +189,20 @@
 					969412918951C9D460787E70 = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
 					};
 					EA746E034829D9347F840F56 = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
