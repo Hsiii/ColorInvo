@@ -4,6 +4,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "archive": "scripts/ios-archive.sh",
+    "build": "scripts/ios-build.sh",
+    "check": "scripts/ios-check.sh",
+    "device": "scripts/ios-run-device.sh",
+    "export": "scripts/ios-export.sh",
+    "generate": "xcodegen generate",
     "ios:generate": "xcodegen generate",
     "ios:check": "scripts/ios-check.sh",
     "ios:build": "scripts/ios-build.sh",
@@ -12,6 +18,9 @@
     "ios:archive": "scripts/ios-archive.sh",
     "ios:export": "scripts/ios-export.sh",
     "ios:upload": "scripts/ios-upload.sh",
-    "ios:release": "scripts/ios-release.sh"
+    "ios:release": "scripts/ios-release.sh",
+    "release": "scripts/ios-release.sh",
+    "simulator": "scripts/ios-build.sh",
+    "upload": "scripts/ios-upload.sh"
   }
 }
