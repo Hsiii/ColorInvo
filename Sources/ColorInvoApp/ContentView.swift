@@ -66,16 +66,14 @@ struct ContentView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 28) {
-                carrierSection
-                colorSection
-                widgetSection
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 36)
-            .padding(.bottom, 44)
+        VStack(alignment: .leading, spacing: 16) {
+            carrierSection
+            colorSection
+            widgetSection
         }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(ColorInvoColor.background.ignoresSafeArea())
         .preferredColorScheme(.light)
         .tint(ColorInvoColor.primary)
@@ -85,7 +83,7 @@ struct ContentView: View {
     }
 
     private var carrierSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 12) {
                 Text("手機載具")
                     .font(.headline)
@@ -113,7 +111,7 @@ struct ContentView: View {
                     .tint(ColorInvoColor.primary)
                     .padding(.leading, 2)
                     .padding(.trailing, 16)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, 10)
                     .onSubmit {
                         if canSave {
                             saveCarrier()
@@ -138,7 +136,7 @@ struct ContentView: View {
             } label: {
                 Label(didSave ? "已儲存" : "儲存載具", systemImage: didSave ? "checkmark" : "tray.and.arrow.down")
                     .font(.headline)
-                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .frame(maxWidth: .infinity, minHeight: 44)
             }
             .buttonStyle(ColorInvoPrimaryButtonStyle())
             .disabled(!canSave)
@@ -157,9 +155,9 @@ struct ContentView: View {
     }
 
     private var colorSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("條碼顏色")
-                .font(.title2.weight(.semibold))
+                .font(.headline)
                 .foregroundStyle(ColorInvoColor.text)
 
             wallpaperColorSection
@@ -241,38 +239,37 @@ struct ContentView: View {
     }
 
     private var customColorSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        HStack(spacing: 8) {
             Text("自訂")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(ColorInvoColor.secondary)
+                .frame(width: 40, alignment: .leading)
 
-            HStack(spacing: 8) {
-                compactColorPicker(
-                    title: "條碼",
-                    color: Binding(
-                        get: { draftPalette.barColor.color },
-                        set: { color in
-                            draftPalette = draftPalette.replacing(
-                                barColor: RGBAColor(color: color)
-                            )
-                            didSave = false
-                        }
-                    )
+            compactColorPicker(
+                title: "條碼",
+                color: Binding(
+                    get: { draftPalette.barColor.color },
+                    set: { color in
+                        draftPalette = draftPalette.replacing(
+                            barColor: RGBAColor(color: color)
+                        )
+                        didSave = false
+                    }
                 )
+            )
 
-                compactColorPicker(
-                    title: "背景",
-                    color: Binding(
-                        get: { draftPalette.backgroundColor.color },
-                        set: { color in
-                            draftPalette = draftPalette.replacing(
-                                backgroundColor: RGBAColor(color: color)
-                            )
-                            didSave = false
-                        }
-                    )
+            compactColorPicker(
+                title: "背景",
+                color: Binding(
+                    get: { draftPalette.backgroundColor.color },
+                    set: { color in
+                        draftPalette = draftPalette.replacing(
+                            backgroundColor: RGBAColor(color: color)
+                        )
+                        didSave = false
+                    }
                 )
-            }
+            )
         }
     }
 
@@ -280,8 +277,8 @@ struct ContentView: View {
         ColorPicker(title, selection: color, supportsOpacity: false)
             .font(.callout.weight(.semibold))
             .foregroundStyle(ColorInvoColor.text)
-            .padding(.horizontal, 12)
-            .frame(maxWidth: .infinity, minHeight: 44)
+            .padding(.horizontal, 10)
+            .frame(maxWidth: .infinity, minHeight: 40)
             .background(ColorInvoColor.surface)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .overlay {
@@ -291,36 +288,32 @@ struct ContentView: View {
     }
 
     private var contrastStatus: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        HStack(spacing: 8) {
             Label(
                 draftPalette.meetsCommercialGuidance ? "可掃描配色" : draftPalette.standardMessage,
                 systemImage: draftPalette.meetsCommercialGuidance
                     ? "checkmark.circle.fill"
                     : "exclamationmark.triangle.fill"
             )
-            .font(.headline)
+            .font(.subheadline.weight(.semibold))
             .foregroundStyle(draftPalette.meetsCommercialGuidance ? ColorInvoColor.success : ColorInvoColor.warning)
 
-            Text(draftPalette.contrastSummary)
-                .font(.system(.body, design: .monospaced, weight: .semibold))
-                .foregroundStyle(ColorInvoColor.text)
+            Spacer(minLength: 8)
 
-            Text(draftPalette.reflectanceSummary)
-                .font(.caption)
+            Text(draftPalette.contrastSummary)
+                .font(.system(.caption, design: .monospaced, weight: .semibold))
                 .foregroundStyle(ColorInvoColor.muted)
-                .lineLimit(2)
-                .minimumScaleFactor(0.82)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
         }
-        .padding(14)
+        .frame(minHeight: 24)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(draftPalette.meetsCommercialGuidance ? ColorInvoColor.primarySoft : ColorInvoColor.secondarySoft)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
     private var widgetSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("小工具預覽")
-                .font(.title2.weight(.semibold))
+                .font(.headline)
                 .foregroundStyle(ColorInvoColor.text)
 
             Group {
@@ -329,7 +322,7 @@ struct ContentView: View {
                         value: normalizedCode,
                         palette: draftPalette,
                         showsValue: true,
-                        barcodeHeight: 104,
+                        barcodeHeight: 88,
                         horizontalPadding: 0,
                         verticalPadding: 6,
                         fillsAvailableSpace: true
@@ -342,9 +335,9 @@ struct ContentView: View {
                                 .font(.largeTitle)
                                 .foregroundStyle(ColorInvoColor.primary.opacity(0.48))
                         }
-                }
+                    }
             }
-            .frame(height: 150)
+            .frame(height: 128)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
             Button {
@@ -352,7 +345,7 @@ struct ContentView: View {
                 showingWidgetHelp = true
             } label: {
                 Label("加入小工具", systemImage: "plus.rectangle.on.rectangle")
-                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .frame(maxWidth: .infinity, minHeight: 44)
             }
             .buttonStyle(ColorInvoPrimaryButtonStyle())
             .disabled(!canSave)

@@ -35,18 +35,9 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
 
     var contrastSummary: String {
         String(
-            format: "SC %.0f%% / 標準 %.0f%%",
+            format: "符號反差 %.0f%% / 標準 %.0f%%",
             scannerSymbolContrast * 100,
             Self.symbolContrastStandard * 100
-        )
-    }
-
-    var reflectanceSummary: String {
-        String(
-            format: "Rmin %.0f%% <= Rmax/2 %.0f%%，背景 %.0f%%",
-            barScannerReflectance * 100,
-            backgroundScannerReflectance * 50,
-            backgroundScannerReflectance * 100
         )
     }
 
@@ -67,7 +58,7 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
             return "條碼在紅光下要更深"
         }
 
-        return "掃描對比不足"
+        return "符號反差不足"
     }
 
     func replacing(
