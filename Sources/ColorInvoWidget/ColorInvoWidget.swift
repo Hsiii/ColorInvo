@@ -40,19 +40,14 @@ struct CarrierWidgetView: View {
     var body: some View {
         ZStack {
             if CarrierCode.isValid(carrierCode) {
-                VStack(spacing: 12) {
-                    Code39BarcodeView(
-                        value: carrierCode,
-                        barColor: entry.settings.palette.barColor.color,
-                        backgroundColor: entry.settings.palette.backgroundColor.color
-                    )
-                        .frame(height: 78)
-                    Text(carrierCode)
-                        .font(.system(.headline, design: .monospaced, weight: .semibold))
-                        .foregroundStyle(entry.settings.palette.barColor.color)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 14)
+                CarrierBarcodePanel(
+                    value: carrierCode,
+                    palette: entry.settings.palette,
+                    showsValue: true,
+                    barcodeHeight: 74,
+                    horizontalPadding: 14
+                )
+                .padding(8)
             } else {
                 VStack(spacing: 8) {
                     Image(systemName: "barcode.viewfinder")

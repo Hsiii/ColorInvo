@@ -32,6 +32,39 @@ struct Code39BarcodeView: View {
     }
 }
 
+struct CarrierBarcodePanel: View {
+    let value: String
+    let palette: BarcodePalette
+    var showsValue = false
+    var barcodeHeight: CGFloat = 96
+    var horizontalPadding: CGFloat = 18
+
+    var body: some View {
+        VStack(spacing: showsValue ? 10 : 0) {
+            Code39BarcodeView(
+                value: value,
+                barColor: palette.barColor.color,
+                backgroundColor: palette.backgroundColor.color
+            )
+            .frame(height: barcodeHeight)
+
+            if showsValue {
+                Text(value)
+                    .font(.system(.headline, design: .monospaced, weight: .semibold))
+                    .foregroundStyle(palette.barColor.color)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+        }
+        .padding(.horizontal, horizontalPadding)
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity)
+        .background(palette.backgroundColor.color)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .accessibilityElement(children: .combine)
+    }
+}
+
 enum Code39Encoder {
     struct Element: Equatable {
         let isBar: Bool

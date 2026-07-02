@@ -7,14 +7,18 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
     var barColor: RGBAColor
     var backgroundColor: RGBAColor
 
+    static let contrastGate = 4.5
+    static let maximumBarLuminance = 0.18
+    static let minimumBackgroundLuminance = 0.72
+
     var id: String {
         name
     }
 
     var meetsCommercialGuidance: Bool {
-        barColor.relativeLuminance <= 0.18
-            && backgroundColor.relativeLuminance >= 0.72
-            && contrastRatio >= 4.5
+        barColor.relativeLuminance <= Self.maximumBarLuminance
+            && backgroundColor.relativeLuminance >= Self.minimumBackgroundLuminance
+            && contrastRatio >= Self.contrastGate
             && !barColor.isReddish
     }
 
@@ -23,6 +27,24 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
         let darker = min(barColor.relativeLuminance, backgroundColor.relativeLuminance)
 
         return (lighter + 0.05) / (darker + 0.05)
+    }
+
+    var contrastSummary: String {
+        String(
+            format: "對比 %.1f:1 / 門檻 %.1f:1",
+            contrastRatio,
+            Self.contrastGate
+        )
+    }
+
+    var luminanceSummary: String {
+        String(
+            format: "線條亮度 %.2f <= %.2f，背景亮度 %.2f >= %.2f",
+            barColor.relativeLuminance,
+            Self.maximumBarLuminance,
+            backgroundColor.relativeLuminance,
+            Self.minimumBackgroundLuminance
+        )
     }
 
     var standardMessage: String {

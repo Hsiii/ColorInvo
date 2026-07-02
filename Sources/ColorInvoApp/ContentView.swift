@@ -7,6 +7,8 @@ struct ContentView: View {
     @State private var savedCode: String
     @State private var savedPalette: BarcodePalette
     @State private var didSave = false
+    @State private var showingWidgetHelp = false
+    @FocusState private var carrierFieldFocused: Bool
 
     private var normalizedCode: String {
         CarrierCode.normalize(draftCode)
@@ -14,6 +16,10 @@ struct ContentView: View {
 
     private var isValid: Bool {
         CarrierCode.isValid(normalizedCode)
+    }
+
+    private var canSave: Bool {
+        isValid && draftPalette.meetsCommercialGuidance
     }
 
     init() {
@@ -25,99 +31,120 @@ struct ContentView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    barcodePreview
-                    carrierForm
-                    colorControls
-                }
-                .padding(20)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 28) {
+                carrierSection
+                barcodePreview
+                colorSection
+                widgetSection
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("app.title")
+            .padding(.horizontal, 24)
+            .padding(.top, 36)
+            .padding(.bottom, 44)
         }
+        .background(Color.black.ignoresSafeArea())
+        .preferredColorScheme(.dark)
+        .tint(ColorInvoColor.frozenLake)
+        .sheet(isPresented: $showingWidgetHelp) {
+            WidgetHelpSheet()
+        }
+    }
+
+    private var carrierSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("手機發票載具號碼")
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(.white)
+
+            TextField("/2HEE8EZ", text: $draftCode)
+                .textInputAutocapitalization(.characters)
+                .autocorrectionDisabled()
+                .keyboardType(.asciiCapable)
+                .submitLabel(.done)
+                .focused($carrierFieldFocused)
+                .font(.system(.title, design: .monospaced, weight: .semibold))
+                .foregroundStyle(.white)
+                .tint(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .strokeBorder(
+                            isValid ? ColorInvoColor.success : .white.opacity(0.18),
+                            lineWidth: 1
+                        )
+                }
+                .onChange(of: draftCode) { _, newValue in
+                    let normalizedValue = CarrierCode.normalize(newValue)
+                    if normalizedValue != newValue {
+                        draftCode = normalizedValue
+                    }
+                    didSave = false
+                }
+                .onSubmit {
+                    if canSave {
+                        saveCarrier()
+                    }
+                }
+
+            validationRow
+
+            Button {
+                saveCarrier()
+                carrierFieldFocused = false
+            } label: {
+                Label(didSave ? "已儲存" : "儲存載具", systemImage: didSave ? "checkmark" : "tray.and.arrow.down")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, minHeight: 52)
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(!canSave)
+        }
+    }
+
+    private var validationRow: some View {
+        Label {
+            Text(isValid ? "格式正確" : CarrierCode.validationMessage(for: draftCode))
+                .font(.headline)
+        } icon: {
+            Image(systemName: isValid ? "checkmark.circle.fill" : "exclamationmark.circle")
+                .font(.title3)
+        }
+        .foregroundStyle(isValid ? ColorInvoColor.success : .white.opacity(0.62))
     }
 
     private var barcodePreview: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(savedCode.isEmpty ? "尚未儲存載具" : savedCode)
-                .font(.system(.title3, design: .monospaced, weight: .semibold))
-                .foregroundStyle(savedCode.isEmpty ? .secondary : .primary)
-
-            ZStack {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(savedPalette.backgroundColor.color)
-
-                if CarrierCode.isValid(savedCode) {
-                    VStack(spacing: 10) {
-                        Code39BarcodeView(
-                            value: savedCode,
-                            barColor: savedPalette.barColor.color,
-                            backgroundColor: savedPalette.backgroundColor.color
-                        )
-                            .frame(height: 88)
-                        Text(savedCode)
-                            .font(.system(.callout, design: .monospaced, weight: .medium))
-                            .foregroundStyle(savedPalette.barColor.color)
+            if isValid {
+                CarrierBarcodePanel(
+                    value: normalizedCode,
+                    palette: draftPalette,
+                    showsValue: false,
+                    barcodeHeight: 112,
+                    horizontalPadding: 22
+                )
+                .shadow(color: draftPalette.backgroundColor.color.opacity(0.16), radius: 18, x: 0, y: 8)
+            } else {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(.white.opacity(0.08))
+                    .frame(height: 150)
+                    .overlay {
+                        Text("輸入有效載具後顯示條碼")
+                            .font(.headline)
+                            .foregroundStyle(.white.opacity(0.52))
                     }
-                    .padding(16)
-                } else {
-                    Text("儲存後會顯示條碼")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                }
             }
-            .frame(maxWidth: .infinity, minHeight: 144)
-            .shadow(color: .black.opacity(0.08), radius: 18, x: 0, y: 8)
         }
     }
 
-    private var carrierForm: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("手機發票載具號碼")
-                .font(.headline)
-
-            TextField("/AB12+CD", text: $draftCode)
-                .textInputAutocapitalization(.characters)
-                .autocorrectionDisabled()
-                .keyboardType(.asciiCapable)
-                .font(.system(.title3, design: .monospaced, weight: .semibold))
-                .textFieldStyle(.roundedBorder)
-                .onChange(of: draftCode) { _, newValue in
-                    draftCode = CarrierCode.normalize(newValue)
-                    didSave = false
-                }
-
-            Label(
-                isValid ? "格式正確" : CarrierCode.validationMessage(for: draftCode),
-                systemImage: isValid ? "checkmark.circle.fill" : "exclamationmark.circle"
-            )
-            .font(.callout)
-            .foregroundStyle(isValid ? .green : .secondary)
-
-            Button {
-                saveCarrier()
-            } label: {
-                Label(didSave ? "已儲存" : "儲存載具", systemImage: didSave ? "checkmark" : "tray.and.arrow.down")
-                    .frame(maxWidth: .infinity, minHeight: 44)
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(!isValid || !draftPalette.meetsCommercialGuidance)
-        }
-        .padding(16)
-        .background(.background)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .shadow(color: .black.opacity(0.06), radius: 14, x: 0, y: 6)
-    }
-
-    private var colorControls: some View {
-        VStack(alignment: .leading, spacing: 16) {
+    private var colorSection: some View {
+        VStack(alignment: .leading, spacing: 18) {
             Text("條碼顏色")
-                .font(.headline)
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(.white)
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
+                HStack(spacing: 16) {
                     ForEach(BarcodePalette.presets) { preset in
                         Button {
                             draftPalette = preset
@@ -135,10 +162,10 @@ struct ContentView: View {
                 .padding(.vertical, 2)
             }
 
-            VStack(spacing: 12) {
-                ColorPicker(
-                    "線條",
-                    selection: Binding(
+            VStack(spacing: 14) {
+                colorPickerRow(
+                    title: "線條",
+                    color: Binding(
                         get: { draftPalette.barColor.color },
                         set: { color in
                             draftPalette = draftPalette.replacing(
@@ -146,13 +173,12 @@ struct ContentView: View {
                             )
                             didSave = false
                         }
-                    ),
-                    supportsOpacity: false
+                    )
                 )
 
-                ColorPicker(
-                    "背景",
-                    selection: Binding(
+                colorPickerRow(
+                    title: "背景",
+                    color: Binding(
                         get: { draftPalette.backgroundColor.color },
                         set: { color in
                             draftPalette = draftPalette.replacing(
@@ -160,28 +186,109 @@ struct ContentView: View {
                             )
                             didSave = false
                         }
-                    ),
-                    supportsOpacity: false
+                    )
                 )
             }
 
-            Label(
-                draftPalette.standardMessage,
-                systemImage: draftPalette.meetsCommercialGuidance
-                    ? "checkmark.shield.fill"
-                    : "exclamationmark.triangle"
-            )
-            .font(.callout)
-            .foregroundStyle(draftPalette.meetsCommercialGuidance ? .green : .orange)
+            contrastStatus
         }
-        .padding(16)
-        .background(.background)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .shadow(color: .black.opacity(0.06), radius: 14, x: 0, y: 6)
+    }
+
+    private func colorPickerRow(title: String, color: Binding<Color>) -> some View {
+        HStack {
+            Text(title)
+                .font(.title3.weight(.medium))
+                .foregroundStyle(.white)
+
+            Spacer()
+
+            ColorPicker(title, selection: color, supportsOpacity: false)
+                .labelsHidden()
+        }
+    }
+
+    private var contrastStatus: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label(
+                draftPalette.meetsCommercialGuidance ? "可掃描配色" : draftPalette.standardMessage,
+                systemImage: draftPalette.meetsCommercialGuidance
+                    ? "checkmark.circle.fill"
+                    : "exclamationmark.triangle.fill"
+            )
+            .font(.headline)
+            .foregroundStyle(draftPalette.meetsCommercialGuidance ? ColorInvoColor.success : ColorInvoColor.warning)
+
+            Text(draftPalette.contrastSummary)
+                .font(.system(.body, design: .monospaced, weight: .semibold))
+                .foregroundStyle(.white)
+
+            Text(draftPalette.luminanceSummary)
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.58))
+                .lineLimit(2)
+                .minimumScaleFactor(0.82)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.white.opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private var widgetSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Widget 預覽")
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(.white)
+
+            Group {
+                if isValid {
+                    CarrierBarcodePanel(
+                        value: normalizedCode,
+                        palette: draftPalette,
+                        showsValue: true,
+                        barcodeHeight: 74,
+                        horizontalPadding: 14
+                    )
+                } else {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(.white.opacity(0.08))
+                        .overlay {
+                            Image(systemName: "barcode.viewfinder")
+                                .font(.largeTitle)
+                                .foregroundStyle(.white.opacity(0.38))
+                        }
+                }
+            }
+            .frame(height: 150)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+            HStack(spacing: 12) {
+                Button {
+                    saveCarrier()
+                    showingWidgetHelp = true
+                } label: {
+                    Label("加入 Widget", systemImage: "plus.rectangle.on.rectangle")
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(!canSave)
+
+                Button {
+                    WidgetCenter.shared.reloadAllTimelines()
+                    didSave = savedCode == normalizedCode && savedPalette == draftPalette
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.bordered)
+                .disabled(savedCode.isEmpty)
+                .accessibilityLabel("重新整理 Widget")
+            }
+        }
     }
 
     private func saveCarrier() {
-        guard let carrierCode = CarrierCode(normalizedCode) else {
+        guard canSave, let carrierCode = CarrierCode(normalizedCode) else {
             return
         }
 
@@ -204,32 +311,78 @@ private struct PresetSwatch: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .fill(palette.backgroundColor.color)
 
                 HStack(spacing: 3) {
                     ForEach(0..<7) { index in
                         RoundedRectangle(cornerRadius: 1)
                             .fill(palette.barColor.color)
-                            .frame(width: index.isMultiple(of: 3) ? 7 : 3)
+                            .frame(width: index.isMultiple(of: 3) ? 8 : 3)
                     }
                 }
             }
-            .frame(width: 96, height: 44)
+            .frame(width: 116, height: 52)
             .overlay {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(isSelected ? Color.accentColor : .clear, lineWidth: 3)
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(isSelected ? ColorInvoColor.frozenLake : .white.opacity(0.18), lineWidth: isSelected ? 4 : 1)
             }
 
             Text(palette.name)
-                .font(.caption)
-                .foregroundStyle(.primary)
+                .font(.callout)
+                .foregroundStyle(.white)
                 .lineLimit(1)
+                .minimumScaleFactor(0.86)
         }
-        .padding(6)
-        .background(.background)
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
+}
+
+private struct WidgetHelpSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 22) {
+            Image(systemName: "rectangle.grid.1x2")
+                .font(.system(size: 48, weight: .semibold))
+                .foregroundStyle(ColorInvoColor.frozenLake)
+
+            Text("加入 Widget")
+                .font(.largeTitle.weight(.bold))
+
+            VStack(alignment: .leading, spacing: 14) {
+                helpRow("長按主畫面空白處")
+                helpRow("點左上角 +")
+                helpRow("選擇條色盤")
+                helpRow("加入中尺寸 Widget")
+            }
+            .font(.title3.weight(.medium))
+
+            Spacer()
+
+            Button {
+                dismiss()
+            } label: {
+                Text("完成")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, minHeight: 52)
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .padding(24)
+        .presentationDetents([.medium])
+    }
+
+    private func helpRow(_ text: String) -> some View {
+        Label(text, systemImage: "checkmark.circle.fill")
+            .foregroundStyle(.primary)
+    }
+}
+
+private enum ColorInvoColor {
+    static let frozenLake = Color(red: 112 / 255, green: 214 / 255, blue: 255 / 255)
+    static let success = Color(red: 48 / 255, green: 209 / 255, blue: 88 / 255)
+    static let warning = Color(red: 255 / 255, green: 214 / 255, blue: 112 / 255)
 }
 
 #Preview {
