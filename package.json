@@ -10,6 +10,7 @@
     "device": "scripts/ios-run-device.sh",
     "export": "scripts/ios-export.sh",
     "generate": "xcodegen generate",
+    "ios": "scripts/ios-run-device.sh",
     "ios:generate": "xcodegen generate",
     "ios:check": "scripts/ios-check.sh",
     "ios:build": "scripts/ios-build.sh",
