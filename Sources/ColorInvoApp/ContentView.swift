@@ -42,9 +42,9 @@ struct ContentView: View {
             .padding(.top, 36)
             .padding(.bottom, 44)
         }
-        .background(Color.black.ignoresSafeArea())
-        .preferredColorScheme(.dark)
-        .tint(ColorInvoColor.frozenLake)
+        .background(ColorInvoColor.background.ignoresSafeArea())
+        .preferredColorScheme(.light)
+        .tint(ColorInvoColor.primary)
         .sheet(isPresented: $showingWidgetHelp) {
             WidgetHelpSheet()
         }
@@ -54,7 +54,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 14) {
             Text("手機發票載具號碼")
                 .font(.title2.weight(.semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(ColorInvoColor.text)
 
             TextField("/2HEE8EZ", text: $draftCode)
                 .textInputAutocapitalization(.characters)
@@ -63,16 +63,20 @@ struct ContentView: View {
                 .submitLabel(.done)
                 .focused($carrierFieldFocused)
                 .font(.system(.title, design: .monospaced, weight: .semibold))
-                .foregroundStyle(.white)
-                .tint(.white)
+                .foregroundStyle(ColorInvoColor.text)
+                .tint(ColorInvoColor.primary)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
                 .background {
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .strokeBorder(
-                            isValid ? ColorInvoColor.success : .white.opacity(0.18),
-                            lineWidth: 1
-                        )
+                        .fill(ColorInvoColor.surface)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .strokeBorder(
+                                    isValid ? ColorInvoColor.primary : ColorInvoColor.hairline,
+                                    lineWidth: 1
+                                )
+                        }
                 }
                 .onChange(of: draftCode) { _, newValue in
                     let normalizedValue = CarrierCode.normalize(newValue)
@@ -110,7 +114,7 @@ struct ContentView: View {
             Image(systemName: isValid ? "checkmark.circle.fill" : "exclamationmark.circle")
                 .font(.title3)
         }
-        .foregroundStyle(isValid ? ColorInvoColor.success : .white.opacity(0.62))
+        .foregroundStyle(isValid ? ColorInvoColor.success : ColorInvoColor.muted)
     }
 
     private var barcodePreview: some View {
@@ -126,12 +130,12 @@ struct ContentView: View {
                 .shadow(color: draftPalette.backgroundColor.color.opacity(0.16), radius: 18, x: 0, y: 8)
             } else {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(.white.opacity(0.08))
+                    .fill(ColorInvoColor.primarySoft)
                     .frame(height: 150)
                     .overlay {
                         Text("輸入有效載具後顯示條碼")
                             .font(.headline)
-                            .foregroundStyle(.white.opacity(0.52))
+                            .foregroundStyle(ColorInvoColor.muted)
                     }
             }
         }
@@ -141,7 +145,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 18) {
             Text("條碼顏色")
                 .font(.title2.weight(.semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(ColorInvoColor.text)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
@@ -198,7 +202,7 @@ struct ContentView: View {
         HStack {
             Text(title)
                 .font(.title3.weight(.medium))
-                .foregroundStyle(.white)
+                .foregroundStyle(ColorInvoColor.text)
 
             Spacer()
 
@@ -220,17 +224,17 @@ struct ContentView: View {
 
             Text(draftPalette.contrastSummary)
                 .font(.system(.body, design: .monospaced, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(ColorInvoColor.text)
 
             Text(draftPalette.luminanceSummary)
                 .font(.caption)
-                .foregroundStyle(.white.opacity(0.58))
+                .foregroundStyle(ColorInvoColor.muted)
                 .lineLimit(2)
                 .minimumScaleFactor(0.82)
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.white.opacity(0.08))
+        .background(draftPalette.meetsCommercialGuidance ? ColorInvoColor.primarySoft : ColorInvoColor.secondarySoft)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
@@ -238,7 +242,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Widget 預覽")
                 .font(.title2.weight(.semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(ColorInvoColor.text)
 
             Group {
                 if isValid {
@@ -251,11 +255,11 @@ struct ContentView: View {
                     )
                 } else {
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(.white.opacity(0.08))
+                        .fill(ColorInvoColor.primarySoft)
                         .overlay {
                             Image(systemName: "barcode.viewfinder")
                                 .font(.largeTitle)
-                                .foregroundStyle(.white.opacity(0.38))
+                                .foregroundStyle(ColorInvoColor.primary.opacity(0.48))
                         }
                 }
             }
@@ -325,12 +329,12 @@ private struct PresetSwatch: View {
             .frame(width: 116, height: 52)
             .overlay {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .strokeBorder(isSelected ? ColorInvoColor.frozenLake : .white.opacity(0.18), lineWidth: isSelected ? 4 : 1)
+                    .strokeBorder(isSelected ? ColorInvoColor.primary : ColorInvoColor.hairline, lineWidth: isSelected ? 4 : 1)
             }
 
             Text(palette.name)
                 .font(.callout)
-                .foregroundStyle(.white)
+                .foregroundStyle(ColorInvoColor.text)
                 .lineLimit(1)
                 .minimumScaleFactor(0.86)
         }
@@ -345,7 +349,7 @@ private struct WidgetHelpSheet: View {
         VStack(alignment: .leading, spacing: 22) {
             Image(systemName: "rectangle.grid.1x2")
                 .font(.system(size: 48, weight: .semibold))
-                .foregroundStyle(ColorInvoColor.frozenLake)
+                .foregroundStyle(ColorInvoColor.primary)
 
             Text("加入 Widget")
                 .font(.largeTitle.weight(.bold))
@@ -370,6 +374,7 @@ private struct WidgetHelpSheet: View {
             .buttonStyle(.borderedProminent)
         }
         .padding(24)
+        .tint(ColorInvoColor.primary)
         .presentationDetents([.medium])
     }
 
@@ -381,8 +386,18 @@ private struct WidgetHelpSheet: View {
 
 private enum ColorInvoColor {
     static let frozenLake = Color(red: 112 / 255, green: 214 / 255, blue: 255 / 255)
-    static let success = Color(red: 48 / 255, green: 209 / 255, blue: 88 / 255)
-    static let warning = Color(red: 255 / 255, green: 214 / 255, blue: 112 / 255)
+    static let roseKiss = Color(red: 255 / 255, green: 112 / 255, blue: 166 / 255)
+    static let primary = Color(red: 0 / 255, green: 126 / 255, blue: 168 / 255)
+    static let secondary = Color(red: 176 / 255, green: 0 / 255, blue: 79 / 255)
+    static let background = Color.white
+    static let surface = Color.white
+    static let primarySoft = Color(red: 234 / 255, green: 248 / 255, blue: 255 / 255)
+    static let secondarySoft = Color(red: 255 / 255, green: 240 / 255, blue: 246 / 255)
+    static let hairline = Color(red: 216 / 255, green: 230 / 255, blue: 238 / 255)
+    static let text = Color(red: 17 / 255, green: 24 / 255, blue: 39 / 255)
+    static let muted = Color(red: 82 / 255, green: 96 / 255, blue: 106 / 255)
+    static let success = primary
+    static let warning = secondary
 }
 
 #Preview {
