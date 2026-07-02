@@ -7,64 +7,67 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
     var barColor: RGBAColor
     var backgroundColor: RGBAColor
 
-    static let contrastGate = 4.5
-    static let maximumBarLuminance = 0.18
-    static let minimumBackgroundLuminance = 0.72
+    static let symbolContrastStandard = 0.70
+    static let minimumBackgroundReflectance = 0.70
 
     var id: String {
         name
     }
 
     var meetsCommercialGuidance: Bool {
-        barColor.relativeLuminance <= Self.maximumBarLuminance
-            && backgroundColor.relativeLuminance >= Self.minimumBackgroundLuminance
-            && contrastRatio >= Self.contrastGate
+        backgroundScannerReflectance >= Self.minimumBackgroundReflectance
+            && barScannerReflectance <= backgroundScannerReflectance / 2
+            && scannerSymbolContrast >= Self.symbolContrastStandard
             && !barColor.isReddish
     }
 
-    var contrastRatio: Double {
-        let lighter = max(barColor.relativeLuminance, backgroundColor.relativeLuminance)
-        let darker = min(barColor.relativeLuminance, backgroundColor.relativeLuminance)
+    var barScannerReflectance: Double {
+        barColor.scannerReflectance
+    }
 
-        return (lighter + 0.05) / (darker + 0.05)
+    var backgroundScannerReflectance: Double {
+        backgroundColor.scannerReflectance
+    }
+
+    var scannerSymbolContrast: Double {
+        max(0, backgroundScannerReflectance - barScannerReflectance)
     }
 
     var contrastSummary: String {
         String(
-            format: "對比 %.1f:1 / 門檻 %.1f:1",
-            contrastRatio,
-            Self.contrastGate
+            format: "SC %.0f%% / 標準 %.0f%%",
+            scannerSymbolContrast * 100,
+            Self.symbolContrastStandard * 100
         )
     }
 
-    var luminanceSummary: String {
+    var reflectanceSummary: String {
         String(
-            format: "線條亮度 %.2f <= %.2f，背景亮度 %.2f >= %.2f",
-            barColor.relativeLuminance,
-            Self.maximumBarLuminance,
-            backgroundColor.relativeLuminance,
-            Self.minimumBackgroundLuminance
+            format: "Rmin %.0f%% <= Rmax/2 %.0f%%，背景 %.0f%%",
+            barScannerReflectance * 100,
+            backgroundScannerReflectance * 50,
+            backgroundScannerReflectance * 100
         )
     }
 
     var standardMessage: String {
         if meetsCommercialGuidance {
-            return "符合條碼配色：深色條、淺色底"
+            return "符合掃描標準"
         }
 
         if barColor.isReddish {
-            return "條碼線條請避免紅色或偏紅色"
+            return "線條勿用紅系"
         }
 
-        if barColor.relativeLuminance > 0.18 {
-            return "條碼線條需要更深"
+        if backgroundScannerReflectance < Self.minimumBackgroundReflectance {
+            return "背景與靜區要更亮"
         }
 
-        if backgroundColor.relativeLuminance < 0.72 {
-            return "背景需要更淺"
+        if barScannerReflectance > backgroundScannerReflectance / 2 {
+            return "線條在紅光下要更深"
         }
 
-        return "條碼與背景需要更高對比"
+        return "掃描對比不足"
     }
 
     func replacing(
@@ -169,6 +172,11 @@ struct RGBAColor: Codable, Equatable {
         return 0.2126 * linearRed
             + 0.7152 * linearGreen
             + 0.0722 * linearBlue
+    }
+
+    var scannerReflectance: Double {
+        // Approximate red-light scanner reflectance for color-picking guidance.
+        red
     }
 
     var isReddish: Bool {

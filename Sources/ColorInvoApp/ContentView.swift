@@ -4,8 +4,6 @@ import WidgetKit
 struct ContentView: View {
     @State private var draftCode: String
     @State private var draftPalette: BarcodePalette
-    @State private var savedCode: String
-    @State private var savedPalette: BarcodePalette
     @State private var didSave = false
     @State private var showingWidgetHelp = false
     @FocusState private var carrierFieldFocused: Bool
@@ -22,19 +20,45 @@ struct ContentView: View {
         isValid && draftPalette.meetsCommercialGuidance
     }
 
+    private var carrierSuffix: String {
+        let code = CarrierCode.normalize(draftCode)
+        guard code.hasPrefix("/") else {
+            return code
+        }
+
+        return String(code.dropFirst())
+    }
+
+    private var carrierSuffixBinding: Binding<String> {
+        Binding(
+            get: { carrierSuffix },
+            set: { newValue in
+                let suffix = CarrierCode.normalize(newValue)
+                    .replacingOccurrences(of: "/", with: "")
+                draftCode = suffix.isEmpty ? "" : "/\(suffix)"
+                didSave = false
+            }
+        )
+    }
+
+    private var validationText: String {
+        if isValid {
+            return "正確"
+        }
+
+        return carrierSuffix.isEmpty ? "未填" : "無效"
+    }
+
     init() {
         let settings = CarrierStore.load()
         _draftCode = State(initialValue: settings.carrierCode)
         _draftPalette = State(initialValue: settings.palette)
-        _savedCode = State(initialValue: settings.carrierCode)
-        _savedPalette = State(initialValue: settings.palette)
     }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
                 carrierSection
-                barcodePreview
                 colorSection
                 widgetSection
             }
@@ -52,46 +76,51 @@ struct ContentView: View {
 
     private var carrierSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("手機發票載具號碼")
-                .font(.title2.weight(.semibold))
-                .foregroundStyle(ColorInvoColor.text)
+            HStack(spacing: 12) {
+                Text("手機載具")
+                    .font(.headline)
+                    .foregroundStyle(ColorInvoColor.text)
 
-            TextField("/2HEE8EZ", text: $draftCode)
-                .textInputAutocapitalization(.characters)
-                .autocorrectionDisabled()
-                .keyboardType(.asciiCapable)
-                .submitLabel(.done)
-                .focused($carrierFieldFocused)
-                .font(.system(.title, design: .monospaced, weight: .semibold))
-                .foregroundStyle(ColorInvoColor.text)
-                .tint(ColorInvoColor.primary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(ColorInvoColor.surface)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .strokeBorder(
-                                    isValid ? ColorInvoColor.primary : ColorInvoColor.hairline,
-                                    lineWidth: 1
-                                )
+                Spacer()
+
+                validationBadge
+            }
+
+            HStack(spacing: 0) {
+                Text("/")
+                    .font(.system(.body, design: .monospaced, weight: .semibold))
+                    .foregroundStyle(ColorInvoColor.text)
+                    .padding(.leading, 16)
+
+                TextField("請輸入", text: carrierSuffixBinding)
+                    .textInputAutocapitalization(.characters)
+                    .autocorrectionDisabled()
+                    .keyboardType(.asciiCapable)
+                    .submitLabel(.done)
+                    .focused($carrierFieldFocused)
+                    .font(.system(.body, design: .monospaced, weight: .semibold))
+                    .foregroundStyle(ColorInvoColor.text)
+                    .tint(ColorInvoColor.primary)
+                    .padding(.leading, 2)
+                    .padding(.trailing, 16)
+                    .padding(.vertical, 12)
+                    .onSubmit {
+                        if canSave {
+                            saveCarrier()
                         }
-                }
-                .onChange(of: draftCode) { _, newValue in
-                    let normalizedValue = CarrierCode.normalize(newValue)
-                    if normalizedValue != newValue {
-                        draftCode = normalizedValue
                     }
-                    didSave = false
-                }
-                .onSubmit {
-                    if canSave {
-                        saveCarrier()
+            }
+            .background {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(ColorInvoColor.surface)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .strokeBorder(
+                                isValid ? ColorInvoColor.primary : ColorInvoColor.hairline,
+                                lineWidth: 1
+                            )
                     }
-                }
-
-            validationRow
+            }
 
             Button {
                 saveCarrier()
@@ -101,44 +130,20 @@ struct ContentView: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity, minHeight: 52)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(ColorInvoPrimaryButtonStyle())
             .disabled(!canSave)
         }
     }
 
-    private var validationRow: some View {
+    private var validationBadge: some View {
         Label {
-            Text(isValid ? "格式正確" : CarrierCode.validationMessage(for: draftCode))
-                .font(.headline)
+            Text(validationText)
+                .font(.subheadline.weight(.semibold))
         } icon: {
             Image(systemName: isValid ? "checkmark.circle.fill" : "exclamationmark.circle")
-                .font(.title3)
+                .font(.subheadline)
         }
         .foregroundStyle(isValid ? ColorInvoColor.success : ColorInvoColor.muted)
-    }
-
-    private var barcodePreview: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            if isValid {
-                CarrierBarcodePanel(
-                    value: normalizedCode,
-                    palette: draftPalette,
-                    showsValue: false,
-                    barcodeHeight: 112,
-                    horizontalPadding: 22
-                )
-                .shadow(color: draftPalette.backgroundColor.color.opacity(0.16), radius: 18, x: 0, y: 8)
-            } else {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(ColorInvoColor.primarySoft)
-                    .frame(height: 150)
-                    .overlay {
-                        Text("輸入有效載具後顯示條碼")
-                            .font(.headline)
-                            .foregroundStyle(ColorInvoColor.muted)
-                    }
-            }
-        }
     }
 
     private var colorSection: some View {
@@ -146,6 +151,10 @@ struct ContentView: View {
             Text("條碼顏色")
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(ColorInvoColor.text)
+
+            Text("推薦")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(ColorInvoColor.secondary)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
@@ -165,6 +174,10 @@ struct ContentView: View {
                 }
                 .padding(.vertical, 2)
             }
+
+            Text("自訂")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(ColorInvoColor.secondary)
 
             VStack(spacing: 14) {
                 colorPickerRow(
@@ -226,7 +239,7 @@ struct ContentView: View {
                 .font(.system(.body, design: .monospaced, weight: .semibold))
                 .foregroundStyle(ColorInvoColor.text)
 
-            Text(draftPalette.luminanceSummary)
+            Text(draftPalette.reflectanceSummary)
                 .font(.caption)
                 .foregroundStyle(ColorInvoColor.muted)
                 .lineLimit(2)
@@ -240,7 +253,7 @@ struct ContentView: View {
 
     private var widgetSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Widget 預覽")
+            Text("小工具預覽")
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(ColorInvoColor.text)
 
@@ -250,8 +263,9 @@ struct ContentView: View {
                         value: normalizedCode,
                         palette: draftPalette,
                         showsValue: true,
-                        barcodeHeight: 74,
-                        horizontalPadding: 14
+                        barcodeHeight: 88,
+                        horizontalPadding: 0,
+                        verticalPadding: 8
                     )
                 } else {
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -266,28 +280,15 @@ struct ContentView: View {
             .frame(height: 150)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-            HStack(spacing: 12) {
-                Button {
-                    saveCarrier()
-                    showingWidgetHelp = true
-                } label: {
-                    Label("加入 Widget", systemImage: "plus.rectangle.on.rectangle")
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(!canSave)
-
-                Button {
-                    WidgetCenter.shared.reloadAllTimelines()
-                    didSave = savedCode == normalizedCode && savedPalette == draftPalette
-                } label: {
-                    Image(systemName: "arrow.clockwise")
-                        .frame(width: 44, height: 44)
-                }
-                .buttonStyle(.bordered)
-                .disabled(savedCode.isEmpty)
-                .accessibilityLabel("重新整理 Widget")
+            Button {
+                saveCarrier()
+                showingWidgetHelp = true
+            } label: {
+                Label("加入小工具", systemImage: "plus.rectangle.on.rectangle")
+                    .frame(maxWidth: .infinity, minHeight: 52)
             }
+            .buttonStyle(ColorInvoPrimaryButtonStyle())
+            .disabled(!canSave)
         }
     }
 
@@ -301,8 +302,6 @@ struct ContentView: View {
             palette: draftPalette
         )
         CarrierStore.save(settings)
-        savedCode = carrierCode.value
-        savedPalette = draftPalette
         didSave = true
         WidgetCenter.shared.reloadAllTimelines()
     }
@@ -351,14 +350,14 @@ private struct WidgetHelpSheet: View {
                 .font(.system(size: 48, weight: .semibold))
                 .foregroundStyle(ColorInvoColor.primary)
 
-            Text("加入 Widget")
+            Text("加入小工具")
                 .font(.largeTitle.weight(.bold))
 
             VStack(alignment: .leading, spacing: 14) {
                 helpRow("長按主畫面空白處")
                 helpRow("點左上角 +")
                 helpRow("選擇條色盤")
-                helpRow("加入中尺寸 Widget")
+                helpRow("加入中尺寸小工具")
             }
             .font(.title3.weight(.medium))
 
@@ -371,7 +370,7 @@ private struct WidgetHelpSheet: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity, minHeight: 52)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(ColorInvoPrimaryButtonStyle())
         }
         .padding(24)
         .tint(ColorInvoColor.primary)
@@ -381,6 +380,18 @@ private struct WidgetHelpSheet: View {
     private func helpRow(_ text: String) -> some View {
         Label(text, systemImage: "checkmark.circle.fill")
             .foregroundStyle(.primary)
+    }
+}
+
+private struct ColorInvoPrimaryButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(.white)
+            .background(isEnabled ? ColorInvoColor.primary : ColorInvoColor.hairline)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .opacity(configuration.isPressed ? 0.82 : 1)
     }
 }
 

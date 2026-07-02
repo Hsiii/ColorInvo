@@ -44,10 +44,11 @@ struct CarrierWidgetView: View {
                     value: carrierCode,
                     palette: entry.settings.palette,
                     showsValue: true,
-                    barcodeHeight: 74,
-                    horizontalPadding: 14
+                    barcodeHeight: 88,
+                    horizontalPadding: 0,
+                    verticalPadding: 8
                 )
-                .padding(8)
+                .padding(4)
             } else {
                 VStack(spacing: 8) {
                     Image(systemName: "barcode.viewfinder")

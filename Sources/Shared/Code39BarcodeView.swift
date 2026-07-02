@@ -38,9 +38,10 @@ struct CarrierBarcodePanel: View {
     var showsValue = false
     var barcodeHeight: CGFloat = 96
     var horizontalPadding: CGFloat = 18
+    var verticalPadding: CGFloat = 16
 
     var body: some View {
-        VStack(spacing: showsValue ? 10 : 0) {
+        VStack(spacing: showsValue ? 6 : 0) {
             Code39BarcodeView(
                 value: value,
                 barColor: palette.barColor.color,
@@ -50,14 +51,14 @@ struct CarrierBarcodePanel: View {
 
             if showsValue {
                 Text(value)
-                    .font(.system(.headline, design: .monospaced, weight: .semibold))
+                    .font(.system(.subheadline, design: .monospaced, weight: .semibold))
                     .foregroundStyle(palette.barColor.color)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
             }
         }
         .padding(.horizontal, horizontalPadding)
-        .padding(.vertical, 16)
+        .padding(.vertical, verticalPadding)
         .frame(maxWidth: .infinity)
         .background(palette.backgroundColor.color)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
