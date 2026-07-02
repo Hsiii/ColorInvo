@@ -5,6 +5,16 @@ Minimal iOS app for storing a Taiwan mobile invoice carrier barcode with color p
 ## Build
 
 ```bash
-xcodegen generate
-xcodebuild -project ColorInvo.xcodeproj -scheme ColorInvo -destination 'platform=iOS Simulator,name=iPhone 16' build
+bun run ios:check
+bun run ios:simulator
+```
+
+## Release Helpers
+
+Copy `.env.example` to `.env`, fill the Apple credentials, then use:
+
+```bash
+bun run ios:archive
+bun run ios:export
+bun run ios:upload
 ```

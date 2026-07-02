@@ -1,6 +1,12 @@
 .DS_Store
 build/
 DerivedData/
+*.xcarchive
+*.xcresult
+*.ipa
 *.xcuserdata/
 *.xcuserstate
 *.moved-aside
+xcuserdata/
+.env
+*.local

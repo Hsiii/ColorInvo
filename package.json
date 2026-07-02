@@ -1,0 +1,17 @@
+{
+  "name": "colorinvo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "ios:generate": "xcodegen generate",
+    "ios:check": "scripts/ios-check.sh",
+    "ios:build": "scripts/ios-build.sh",
+    "ios:simulator": "scripts/ios-build.sh",
+    "ios:device": "scripts/ios-run-device.sh",
+    "ios:archive": "scripts/ios-archive.sh",
+    "ios:export": "scripts/ios-export.sh",
+    "ios:upload": "scripts/ios-upload.sh",
+    "ios:release": "scripts/ios-release.sh"
+  }
+}
