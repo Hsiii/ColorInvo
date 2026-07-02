@@ -7,19 +7,53 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D6C44FEEB78CD0E32E92DE2 /* InvoiceCarrierWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 68347F0381D36E135D1E25E9 /* InvoiceCarrierWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		27E4D53085D07A43F3CE8259 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF82784CB3888897BFF57363 /* ContentView.swift */; };
+		5AC97276D313397A8CEB5B09 /* InvoiceCarrierWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0292C673AA239D7C155E04DA /* InvoiceCarrierWidget.swift */; };
 		747A6CDEF4A65B64B4257AD0 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = D895202D24854C18FC22EE7F /* AppGroup.swift */; };
 		8BD928D90762F09459E689A5 /* CarrierSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E406BABE939688D9176F863 /* CarrierSettings.swift */; };
+		AF87F3E96E39121DCB3DB893 /* CarrierCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82561772FE9966FFD27552C8 /* CarrierCode.swift */; };
 		C5679AA439ED61583641C4C1 /* InvoiceCarrierApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE79AB7BDE58A4064B3D1462 /* InvoiceCarrierApp.swift */; };
 		CED25DCF345BC2BEB6D03530 /* CarrierCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82561772FE9966FFD27552C8 /* CarrierCode.swift */; };
+		D7458FB099DDEDF49E74F5D5 /* Code39BarcodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B0ECCB5E31F4BE1F1A660C /* Code39BarcodeView.swift */; };
 		DE637F7F0CFCB150E5464607 /* Code39BarcodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B0ECCB5E31F4BE1F1A660C /* Code39BarcodeView.swift */; };
+		E4E4B97EB40B0F5267996541 /* CarrierSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E406BABE939688D9176F863 /* CarrierSettings.swift */; };
+		EA72C686AF712FF9CDA68FB4 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = D895202D24854C18FC22EE7F /* AppGroup.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		7D61F056ED84AE4434F515CE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F62BB13DF365664FD70B8B6D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0D6F90886CB42373108D9F67;
+			remoteInfo = InvoiceCarrierWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		89D12EC88E86A942D3C2C76F /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				1D6C44FEEB78CD0E32E92DE2 /* InvoiceCarrierWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		0292C673AA239D7C155E04DA /* InvoiceCarrierWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoiceCarrierWidget.swift; sourceTree = "<group>"; };
+		68347F0381D36E135D1E25E9 /* InvoiceCarrierWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = InvoiceCarrierWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		6E406BABE939688D9176F863 /* CarrierSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarrierSettings.swift; sourceTree = "<group>"; };
 		7E1DFF0B0A50310B2DE2F827 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		82561772FE9966FFD27552C8 /* CarrierCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarrierCode.swift; sourceTree = "<group>"; };
 		82B0ECCB5E31F4BE1F1A660C /* Code39BarcodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Code39BarcodeView.swift; sourceTree = "<group>"; };
+		9D4924C752F3E474A9A45A76 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		A3F3B8D35F1CD67D1928C12D /* InvoiceCarrierWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvoiceCarrierWidget.entitlements; sourceTree = "<group>"; };
 		B0F950FE1480C123418B7804 /* InvoiceCarrier.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = InvoiceCarrier.entitlements; sourceTree = "<group>"; };
 		D895202D24854C18FC22EE7F /* AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
 		DE79AB7BDE58A4064B3D1462 /* InvoiceCarrierApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoiceCarrierApp.swift; sourceTree = "<group>"; };
@@ -56,14 +90,27 @@
 			isa = PBXGroup;
 			children = (
 				FCFEF9349B5763E6B07330E8 /* InvoiceCarrier.app */,
+				68347F0381D36E135D1E25E9 /* InvoiceCarrierWidget.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A374CB5E3C03A4C46D60D89A /* InvoiceCarrierWidget */ = {
+			isa = PBXGroup;
+			children = (
+				9D4924C752F3E474A9A45A76 /* Info.plist */,
+				A3F3B8D35F1CD67D1928C12D /* InvoiceCarrierWidget.entitlements */,
+				0292C673AA239D7C155E04DA /* InvoiceCarrierWidget.swift */,
+			);
+			name = InvoiceCarrierWidget;
+			path = Sources/InvoiceCarrierWidget;
 			sourceTree = "<group>";
 		};
 		A492549053C85A7F59B3D8CB = {
 			isa = PBXGroup;
 			children = (
 				2DA7718C0F6E40DB5D68901B /* InvoiceCarrierApp */,
+				A374CB5E3C03A4C46D60D89A /* InvoiceCarrierWidget */,
 				24FFC5D12DD9C6A7AF7F7D25 /* Shared */,
 				9E8CB71447A26AC3C11006BB /* Products */,
 			);
@@ -72,15 +119,34 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		0D6F90886CB42373108D9F67 /* InvoiceCarrierWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 82C074028F34622E01E4C078 /* Build configuration list for PBXNativeTarget "InvoiceCarrierWidget" */;
+			buildPhases = (
+				EC073A867BCE8A3231575ECC /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = InvoiceCarrierWidget;
+			packageProductDependencies = (
+			);
+			productName = InvoiceCarrierWidget;
+			productReference = 68347F0381D36E135D1E25E9 /* InvoiceCarrierWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		34120B67534706A01F1F57D8 /* InvoiceCarrier */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3E165321FAB86D4E3289DCBB /* Build configuration list for PBXNativeTarget "InvoiceCarrier" */;
 			buildPhases = (
 				4ACB9E4A82949E9A4A96E138 /* Sources */,
+				89D12EC88E86A942D3C2C76F /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				9BDC94EB2CF65F98A7EC1257 /* PBXTargetDependency */,
 			);
 			name = InvoiceCarrier;
 			packageProductDependencies = (
@@ -98,6 +164,10 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					0D6F90886CB42373108D9F67 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
 					34120B67534706A01F1F57D8 = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
@@ -119,6 +189,7 @@
 			projectRoot = "";
 			targets = (
 				34120B67534706A01F1F57D8 /* InvoiceCarrier */,
+				0D6F90886CB42373108D9F67 /* InvoiceCarrierWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -137,9 +208,69 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EC073A867BCE8A3231575ECC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA72C686AF712FF9CDA68FB4 /* AppGroup.swift in Sources */,
+				AF87F3E96E39121DCB3DB893 /* CarrierCode.swift in Sources */,
+				E4E4B97EB40B0F5267996541 /* CarrierSettings.swift in Sources */,
+				D7458FB099DDEDF49E74F5D5 /* Code39BarcodeView.swift in Sources */,
+				5AC97276D313397A8CEB5B09 /* InvoiceCarrierWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		9BDC94EB2CF65F98A7EC1257 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0D6F90886CB42373108D9F67 /* InvoiceCarrierWidget */;
+			targetProxy = 7D61F056ED84AE4434F515CE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		256BCAF99E76DFE3B3D4F918 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Sources/InvoiceCarrierWidget/InvoiceCarrierWidget.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = Sources/InvoiceCarrierWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hsichen.invoicecarrier.widget;
+				PRODUCT_NAME = "載具條碼Widget";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		29D800D401AF2F6EE374BB91 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Sources/InvoiceCarrierWidget/InvoiceCarrierWidget.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = Sources/InvoiceCarrierWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hsichen.invoicecarrier.widget;
+				PRODUCT_NAME = "載具條碼Widget";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		3F8E22A4A9160A0EA1C1B43E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -320,6 +451,15 @@
 			buildConfigurations = (
 				A7469C9A1A2B70450CC8059A /* Debug */,
 				3F8E22A4A9160A0EA1C1B43E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		82C074028F34622E01E4C078 /* Build configuration list for PBXNativeTarget "InvoiceCarrierWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				29D800D401AF2F6EE374BB91 /* Debug */,
+				256BCAF99E76DFE3B3D4F918 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

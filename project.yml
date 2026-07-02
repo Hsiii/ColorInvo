@@ -38,3 +38,30 @@ targets:
       properties:
         com.apple.security.application-groups:
           - group.dev.hsichen.invoicecarrier
+    dependencies:
+      - target: InvoiceCarrierWidget
+        embed: true
+  InvoiceCarrierWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Sources/Shared
+      - path: Sources/InvoiceCarrierWidget
+    settings:
+      base:
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 0.1.0
+        PRODUCT_BUNDLE_IDENTIFIER: dev.hsichen.invoicecarrier.widget
+        PRODUCT_NAME: 載具條碼Widget
+        SKIP_INSTALL: YES
+    info:
+      path: Sources/InvoiceCarrierWidget/Info.plist
+      properties:
+        CFBundleDisplayName: 載具條碼
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Sources/InvoiceCarrierWidget/InvoiceCarrierWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.dev.hsichen.invoicecarrier

@@ -1,4 +1,5 @@
 import SwiftUI
+import WidgetKit
 
 struct ContentView: View {
     @State private var draftCode: String
@@ -110,6 +111,7 @@ struct ContentView: View {
         CarrierStore.save(settings)
         savedCode = carrierCode.value
         didSave = true
+        WidgetCenter.shared.reloadAllTimelines()
     }
 }
 
