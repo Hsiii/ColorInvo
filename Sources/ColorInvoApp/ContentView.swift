@@ -1,4 +1,6 @@
+import PhotosUI
 import SwiftUI
+import UIKit
 import WidgetKit
 
 struct ContentView: View {
@@ -6,6 +8,10 @@ struct ContentView: View {
     @State private var draftPalette: BarcodePalette
     @State private var didSave = false
     @State private var showingWidgetHelp = false
+    @State private var wallpaperPickerItem: PhotosPickerItem?
+    @State private var wallpaperPalettes: [BarcodePalette] = []
+    @State private var wallpaperStatusText: String?
+    @State private var isAnalyzingWallpaper = false
     @FocusState private var carrierFieldFocused: Bool
 
     private var normalizedCode: String {
@@ -18,6 +24,10 @@ struct ContentView: View {
 
     private var canSave: Bool {
         isValid && draftPalette.meetsCommercialGuidance
+    }
+
+    private var paletteGridColumns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 8), count: 3)
     }
 
     private var carrierSuffix: String {
@@ -152,6 +162,8 @@ struct ContentView: View {
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(ColorInvoColor.text)
 
+            wallpaperColorSection
+
             Text("推薦")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(ColorInvoColor.secondary)
@@ -208,6 +220,74 @@ struct ContentView: View {
             }
 
             contrastStatus
+        }
+    }
+
+    private var wallpaperColorSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Text("從桌布")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(ColorInvoColor.secondary)
+
+                Spacer()
+
+                PhotosPicker(
+                    selection: $wallpaperPickerItem,
+                    matching: .images,
+                    photoLibrary: .shared()
+                ) {
+                    Label(
+                        wallpaperPalettes.isEmpty ? "選擇圖片" : "重新選擇",
+                        systemImage: "photo.on.rectangle"
+                    )
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(ColorInvoColor.primary)
+                    .padding(.horizontal, 12)
+                    .frame(minHeight: 40)
+                    .background(ColorInvoColor.primarySoft)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .disabled(isAnalyzingWallpaper)
+            }
+
+            if isAnalyzingWallpaper {
+                Label("分析中", systemImage: "sparkles")
+                    .font(.callout.weight(.medium))
+                    .foregroundStyle(ColorInvoColor.muted)
+                    .frame(minHeight: 40, alignment: .leading)
+            } else if !wallpaperPalettes.isEmpty {
+                paletteButtonGrid(wallpaperPalettes)
+            } else if let wallpaperStatusText {
+                Text(wallpaperStatusText)
+                    .font(.callout)
+                    .foregroundStyle(ColorInvoColor.muted)
+                    .frame(minHeight: 40, alignment: .leading)
+            }
+        }
+        .onChange(of: wallpaperPickerItem) { _, item in
+            Task {
+                await loadWallpaperPalettes(from: item)
+            }
+        }
+    }
+
+    private func paletteButtonGrid(_ palettes: [BarcodePalette]) -> some View {
+        LazyVGrid(columns: paletteGridColumns, spacing: 8) {
+            ForEach(palettes) { palette in
+                Button {
+                    draftPalette = palette
+                    didSave = false
+                } label: {
+                    PaletteOptionButtonContent(
+                        palette: palette,
+                        isSelected: palette == draftPalette
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(palette.name)
+            }
         }
     }
 
@@ -305,6 +385,83 @@ struct ContentView: View {
         CarrierStore.save(settings)
         didSave = true
         WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    @MainActor
+    private func loadWallpaperPalettes(from item: PhotosPickerItem?) async {
+        guard let item else {
+            return
+        }
+
+        isAnalyzingWallpaper = true
+        wallpaperStatusText = nil
+
+        defer {
+            isAnalyzingWallpaper = false
+        }
+
+        do {
+            guard
+                let data = try await item.loadTransferable(type: Data.self),
+                let image = UIImage(data: data),
+                let dominantColor = WallpaperPaletteGenerator.dominantColor(from: image)
+            else {
+                wallpaperPalettes = []
+                wallpaperStatusText = "無法讀取圖片"
+                return
+            }
+
+            let generatedPalettes = WallpaperPaletteGenerator.palettes(from: dominantColor)
+            wallpaperPalettes = generatedPalettes
+
+            if let firstPalette = generatedPalettes.first {
+                draftPalette = firstPalette
+                didSave = false
+            }
+        } catch {
+            wallpaperPalettes = []
+            wallpaperStatusText = "無法讀取圖片"
+        }
+    }
+}
+
+private struct PaletteOptionButtonContent: View {
+    let palette: BarcodePalette
+    let isSelected: Bool
+
+    var body: some View {
+        VStack(spacing: 8) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(palette.backgroundColor.color)
+
+                HStack(spacing: 4) {
+                    ForEach(0..<7) { index in
+                        RoundedRectangle(cornerRadius: 1)
+                            .fill(palette.barColor.color)
+                            .frame(width: index.isMultiple(of: 3) ? 12 : 4)
+                    }
+                }
+                .frame(height: 48)
+            }
+            .aspectRatio(1, contentMode: .fit)
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(
+                        isSelected ? ColorInvoColor.primary : ColorInvoColor.hairline,
+                        lineWidth: isSelected ? 4 : 1
+                    )
+            }
+
+            Text(palette.name)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ColorInvoColor.text)
+                .multilineTextAlignment(.center)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(maxWidth: .infinity)
+        }
+        .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
 
