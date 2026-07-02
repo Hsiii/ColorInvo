@@ -9,6 +9,11 @@ struct CarrierSettings: Codable, Equatable {
         palette: .classic
     )
 
+    static let showcase = CarrierSettings(
+        carrierCode: "/AB12345",
+        palette: .showcase
+    )
+
     init(carrierCode: String, palette: BarcodePalette = .classic) {
         self.carrierCode = carrierCode
         self.palette = palette

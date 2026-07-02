@@ -77,6 +77,26 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
         barColor: RGBAColor(hex: 0x000000),
         backgroundColor: RGBAColor(hex: 0xFFFFFF)
     )
+
+    static let showcase = BarcodePalette(
+        name: "桌布清亮",
+        barColor: RGBAColor(hex: 0x063F52),
+        backgroundColor: RGBAColor(hex: 0xEAF8FF)
+    )
+
+    static let showcaseOptions = [
+        BarcodePalette(
+            name: "桌布對比",
+            barColor: RGBAColor(hex: 0x073B4C),
+            backgroundColor: RGBAColor(hex: 0xECFBF5)
+        ),
+        BarcodePalette(
+            name: "桌布柔光",
+            barColor: RGBAColor(hex: 0x102F5A),
+            backgroundColor: RGBAColor(hex: 0xF1F6FF)
+        ),
+        showcase
+    ]
 }
 
 struct RGBAColor: Codable, Equatable {

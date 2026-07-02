@@ -1,4 +1,4 @@
-.PHONY: all generate check build simulator device archive export upload release clean
+.PHONY: all generate check build simulator device mock screenshots archive export upload release clean
 
 all: check
 
@@ -16,6 +16,12 @@ simulator:
 
 device:
 	bun run ios:device
+
+mock:
+	bun run ios:mock
+
+screenshots:
+	bun run ios:screenshots
 
 archive:
 	bun run ios:archive

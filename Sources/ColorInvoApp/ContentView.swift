@@ -60,9 +60,12 @@ struct ContentView: View {
     }
 
     init() {
-        let settings = CarrierStore.load()
+        let usesShowcaseData = ColorInvoRuntime.showcaseDataEnabled
+        let settings = usesShowcaseData ? .showcase : CarrierStore.load()
         _draftCode = State(initialValue: settings.carrierCode)
         _draftPalette = State(initialValue: settings.palette)
+        _showingWidgetHelp = State(initialValue: ColorInvoRuntime.screenshotTarget == "widget")
+        _wallpaperPalettes = State(initialValue: usesShowcaseData ? BarcodePalette.showcaseOptions : [])
     }
 
     var body: some View {
@@ -534,6 +537,25 @@ private enum ColorInvoColor {
     static let muted = Color(red: 82 / 255, green: 96 / 255, blue: 106 / 255)
     static let success = primary
     static let warning = attention
+}
+
+private enum ColorInvoRuntime {
+    static var showcaseDataEnabled: Bool {
+        ProcessInfo.processInfo.environment["COLORINVO_SHOWCASE_DATA"] == "1"
+            || ProcessInfo.processInfo.arguments.contains("--showcase-data")
+    }
+
+    static var screenshotTarget: String? {
+        if let target = ProcessInfo.processInfo.environment["COLORINVO_SCREENSHOT_TARGET"] {
+            return target
+        }
+
+        if ProcessInfo.processInfo.arguments.contains("--screenshot-widget") {
+            return "widget"
+        }
+
+        return nil
+    }
 }
 
 #Preview {

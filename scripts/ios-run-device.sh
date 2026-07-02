@@ -26,6 +26,15 @@ if [[ "${IOS_ALLOW_DEVICE_REGISTRATION:-1}" != "0" ]]; then
     IOS_PROVISIONING_ARGS+=(-allowProvisioningDeviceRegistration)
 fi
 
+LAUNCH_ENV_ARGS=()
+if [[ "${IOS_MOCK_DATA:-0}" == "1" ]]; then
+    if [[ "$CONFIGURATION" != "Debug" ]]; then
+        ios_die "IOS_MOCK_DATA=1 requires IOS_CONFIGURATION=Debug."
+    fi
+
+    LAUNCH_ENV_ARGS=(--environment-variables '{"COLORINVO_SHOWCASE_DATA":"1"}')
+fi
+
 echo "Building $IOS_SCHEME_NAME for device $DEVICE_ID..."
 xcodebuild \
     -project "$IOS_PROJECT_PATH" \
@@ -57,6 +66,7 @@ echo "Launching $IOS_BUNDLE_ID_VALUE..."
 xcrun devicectl device process launch \
     --device "$DEVICE_ID" \
     --terminate-existing \
+    "${LAUNCH_ENV_ARGS[@]}" \
     "$IOS_BUNDLE_ID_VALUE"
 
 echo "Updated and launched $IOS_BUNDLE_ID_VALUE on $DEVICE_ID."
