@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.dev.hsichen.invoicecarrier</string>
+		<string>group.dev.hsichen.colorinvo</string>
 	</array>
 </dict>
 </plist>

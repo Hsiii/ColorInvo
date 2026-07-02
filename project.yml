@@ -1,4 +1,4 @@
-name: InvoiceCarrier
+name: ColorInvo
 options:
   minimumXcodeGenVersion: 2.42.0
   deploymentTarget:
@@ -10,58 +10,58 @@ settings:
     IPHONEOS_DEPLOYMENT_TARGET: "17.0"
     SWIFT_VERSION: "6.0"
 targets:
-  InvoiceCarrier:
+  ColorInvo:
     type: application
     platform: iOS
     sources:
       - path: Sources/Shared
-      - path: Sources/InvoiceCarrierApp
+      - path: Sources/ColorInvoApp
     resources:
-      - path: Resources/InvoiceCarrier/Assets.xcassets
+      - path: Resources/ColorInvo/Assets.xcassets
     settings:
       base:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CURRENT_PROJECT_VERSION: 1
         MARKETING_VERSION: 0.1.0
-        PRODUCT_BUNDLE_IDENTIFIER: dev.hsichen.invoicecarrier
-        PRODUCT_NAME: 載具條碼
+        PRODUCT_BUNDLE_IDENTIFIER: dev.hsichen.colorinvo
+        PRODUCT_NAME: ColorInvo
         TARGETED_DEVICE_FAMILY: 1
     info:
-      path: Sources/InvoiceCarrierApp/Info.plist
+      path: Sources/ColorInvoApp/Info.plist
       properties:
-        CFBundleDisplayName: 載具條碼
+        CFBundleDisplayName: ColorInvo
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
     entitlements:
-      path: Sources/InvoiceCarrierApp/InvoiceCarrier.entitlements
+      path: Sources/ColorInvoApp/ColorInvo.entitlements
       properties:
         com.apple.security.application-groups:
-          - group.dev.hsichen.invoicecarrier
+          - group.dev.hsichen.colorinvo
     dependencies:
-      - target: InvoiceCarrierWidget
+      - target: ColorInvoWidget
         embed: true
-  InvoiceCarrierWidget:
+  ColorInvoWidget:
     type: app-extension
     platform: iOS
     sources:
       - path: Sources/Shared
-      - path: Sources/InvoiceCarrierWidget
+      - path: Sources/ColorInvoWidget
     settings:
       base:
         CURRENT_PROJECT_VERSION: 1
         MARKETING_VERSION: 0.1.0
-        PRODUCT_BUNDLE_IDENTIFIER: dev.hsichen.invoicecarrier.widget
-        PRODUCT_NAME: 載具條碼Widget
+        PRODUCT_BUNDLE_IDENTIFIER: dev.hsichen.colorinvo.widget
+        PRODUCT_NAME: ColorInvoWidget
         SKIP_INSTALL: YES
     info:
-      path: Sources/InvoiceCarrierWidget/Info.plist
+      path: Sources/ColorInvoWidget/Info.plist
       properties:
-        CFBundleDisplayName: 載具條碼
+        CFBundleDisplayName: ColorInvo
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     entitlements:
-      path: Sources/InvoiceCarrierWidget/InvoiceCarrierWidget.entitlements
+      path: Sources/ColorInvoWidget/ColorInvoWidget.entitlements
       properties:
         com.apple.security.application-groups:
-          - group.dev.hsichen.invoicecarrier
+          - group.dev.hsichen.colorinvo

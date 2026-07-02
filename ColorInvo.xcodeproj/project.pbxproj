@@ -1,0 +1,555 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		19E0FE47E92A4AB2852A8DEF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3E156DE3C3A6C9028CD52432 /* Localizable.strings */; };
+		2F6D6D68F6213B211A1CBECD /* ColorInvoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BA0A795276F4F92700B1549 /* ColorInvoApp.swift */; };
+		3E5A6A7B8D6B9D927588305C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2BBDA9BEC927485A857E737C /* InfoPlist.strings */; };
+		4A5F52AA87314EC8D4F4E17A /* Code39BarcodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B2B20F5DD5AE3A8E5B68020 /* Code39BarcodeView.swift */; };
+		586A4116D912718B6ED5A1F8 /* CarrierSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BDCB590CA17AAFCAA3289A5 /* CarrierSettings.swift */; };
+		59CB288722FF02E609E98F16 /* CarrierCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A11DF4AD04EC6FA7BB2BD6 /* CarrierCode.swift */; };
+		77D0A0F6AA417D25D083BD28 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F05933D6EBA34CFA44823B /* AppGroup.swift */; };
+		7D1DCA62D6C11DD5D5C5F847 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D6D1E7C856EF7AD232FE89DF /* InfoPlist.strings */; };
+		7FAD7B647CC4791735FDBF52 /* Code39BarcodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B2B20F5DD5AE3A8E5B68020 /* Code39BarcodeView.swift */; };
+		807BD22734D6A8201B194199 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FF28C2EB6F943C7612EF7F0C /* Localizable.strings */; };
+		87144DB2203B8129385E424D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E60FD679A095710988F6C9E /* ContentView.swift */; };
+		93EC4DB9295378B794DD9CF4 /* CarrierCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A11DF4AD04EC6FA7BB2BD6 /* CarrierCode.swift */; };
+		9AB9EC9138B41414015A4C66 /* ColorInvoWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4A5A4E48BE5EB27BDA9FBD1D /* ColorInvoWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		9F305F1286745FFACF52F445 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F05933D6EBA34CFA44823B /* AppGroup.swift */; };
+		CA90A39D51DDC1BB7CD9827F /* BarcodePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2F02F307BBF02B927FF459 /* BarcodePalette.swift */; };
+		E14954B2C1BCDF758CD46336 /* CarrierSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BDCB590CA17AAFCAA3289A5 /* CarrierSettings.swift */; };
+		E34174EE6F1F473078394658 /* BarcodePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2F02F307BBF02B927FF459 /* BarcodePalette.swift */; };
+		F8EC1ADA203EABA403979A00 /* ColorInvoWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E694B10230223879CC7FC315 /* ColorInvoWidget.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8F99926A7192FDB9EAF1FC80 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3F24B9CC2DF6611062BCC64F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 969412918951C9D460787E70;
+			remoteInfo = ColorInvoWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		5068793CDA46E199E7D3A237 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				9AB9EC9138B41414015A4C66 /* ColorInvoWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		059B55A6EF683CBE0DF63113 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		06D02F28A6B3B574AF4F3F8E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		095E3AD8411360B054ACB0AB /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		0BA0A795276F4F92700B1549 /* ColorInvoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorInvoApp.swift; sourceTree = "<group>"; };
+		1B2B20F5DD5AE3A8E5B68020 /* Code39BarcodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Code39BarcodeView.swift; sourceTree = "<group>"; };
+		4A5A4E48BE5EB27BDA9FBD1D /* ColorInvoWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ColorInvoWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E60FD679A095710988F6C9E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		4EF79ECC71E150A7F226266A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		536E0BD6F9389D36DDE17F2C /* ColorInvo.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ColorInvo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C656D39AB9EB12EEFA74BB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		81A46D55AA2AF0EE56B7D10F /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		86C46C6B4737C9DD08E9ED3E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		94F05933D6EBA34CFA44823B /* AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
+		9BDCB590CA17AAFCAA3289A5 /* CarrierSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarrierSettings.swift; sourceTree = "<group>"; };
+		A69AAC56B8350E1A75124EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		B9A11DF4AD04EC6FA7BB2BD6 /* CarrierCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarrierCode.swift; sourceTree = "<group>"; };
+		CD2F02F307BBF02B927FF459 /* BarcodePalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarcodePalette.swift; sourceTree = "<group>"; };
+		D7F0064CF706CA1FB9D0127E /* ColorInvoWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ColorInvoWidget.entitlements; sourceTree = "<group>"; };
+		E0CB209F84455580DC4D770B /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		E694B10230223879CC7FC315 /* ColorInvoWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorInvoWidget.swift; sourceTree = "<group>"; };
+		EA50C0ED47F81804F40188AB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F05E3CC563318EDDFBE31B22 /* ColorInvo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ColorInvo.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		080F7FDBEFC296C916EBFDD2 /* ColorInvoApp */ = {
+			isa = PBXGroup;
+			children = (
+				F05E3CC563318EDDFBE31B22 /* ColorInvo.entitlements */,
+				0BA0A795276F4F92700B1549 /* ColorInvoApp.swift */,
+				4E60FD679A095710988F6C9E /* ContentView.swift */,
+				5C656D39AB9EB12EEFA74BB5 /* Info.plist */,
+				2BBDA9BEC927485A857E737C /* InfoPlist.strings */,
+				FF28C2EB6F943C7612EF7F0C /* Localizable.strings */,
+			);
+			name = ColorInvoApp;
+			path = Sources/ColorInvoApp;
+			sourceTree = "<group>";
+		};
+		0B7BBD77B2AB15DD130ED6F9 = {
+			isa = PBXGroup;
+			children = (
+				080F7FDBEFC296C916EBFDD2 /* ColorInvoApp */,
+				77B4285981213B31D950AAC4 /* ColorInvoWidget */,
+				24F261E3F9C2BF619F9E6F82 /* Shared */,
+				751BDCDBEE26C0636081F5F2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		24F261E3F9C2BF619F9E6F82 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				94F05933D6EBA34CFA44823B /* AppGroup.swift */,
+				CD2F02F307BBF02B927FF459 /* BarcodePalette.swift */,
+				B9A11DF4AD04EC6FA7BB2BD6 /* CarrierCode.swift */,
+				9BDCB590CA17AAFCAA3289A5 /* CarrierSettings.swift */,
+				1B2B20F5DD5AE3A8E5B68020 /* Code39BarcodeView.swift */,
+			);
+			name = Shared;
+			path = Sources/Shared;
+			sourceTree = "<group>";
+		};
+		751BDCDBEE26C0636081F5F2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				536E0BD6F9389D36DDE17F2C /* ColorInvo.app */,
+				4A5A4E48BE5EB27BDA9FBD1D /* ColorInvoWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		77B4285981213B31D950AAC4 /* ColorInvoWidget */ = {
+			isa = PBXGroup;
+			children = (
+				D7F0064CF706CA1FB9D0127E /* ColorInvoWidget.entitlements */,
+				E694B10230223879CC7FC315 /* ColorInvoWidget.swift */,
+				06D02F28A6B3B574AF4F3F8E /* Info.plist */,
+				D6D1E7C856EF7AD232FE89DF /* InfoPlist.strings */,
+				3E156DE3C3A6C9028CD52432 /* Localizable.strings */,
+			);
+			name = ColorInvoWidget;
+			path = Sources/ColorInvoWidget;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		969412918951C9D460787E70 /* ColorInvoWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 09DABC3A5175FD8F55CF3B4A /* Build configuration list for PBXNativeTarget "ColorInvoWidget" */;
+			buildPhases = (
+				4C71F04C16E286C5D6A1DFAC /* Sources */,
+				4EA5137172D1FBC95F5948F1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ColorInvoWidget;
+			packageProductDependencies = (
+			);
+			productName = ColorInvoWidget;
+			productReference = 4A5A4E48BE5EB27BDA9FBD1D /* ColorInvoWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		EA746E034829D9347F840F56 /* ColorInvo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 94142F269B627C77AB2C951A /* Build configuration list for PBXNativeTarget "ColorInvo" */;
+			buildPhases = (
+				968CD666BC63FDAA68372B63 /* Sources */,
+				4ED5691A2054FA39A103094D /* Resources */,
+				5068793CDA46E199E7D3A237 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				585F8E00D9BCCCCD8C223487 /* PBXTargetDependency */,
+			);
+			name = ColorInvo;
+			packageProductDependencies = (
+			);
+			productName = ColorInvo;
+			productReference = 536E0BD6F9389D36DDE17F2C /* ColorInvo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3F24B9CC2DF6611062BCC64F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					969412918951C9D460787E70 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					EA746E034829D9347F840F56 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = D387AA8B5295EBF0B0CB2DA8 /* Build configuration list for PBXProject "ColorInvo" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+				"zh-Hant",
+			);
+			mainGroup = 0B7BBD77B2AB15DD130ED6F9;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 751BDCDBEE26C0636081F5F2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EA746E034829D9347F840F56 /* ColorInvo */,
+				969412918951C9D460787E70 /* ColorInvoWidget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4EA5137172D1FBC95F5948F1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7D1DCA62D6C11DD5D5C5F847 /* InfoPlist.strings in Resources */,
+				19E0FE47E92A4AB2852A8DEF /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4ED5691A2054FA39A103094D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3E5A6A7B8D6B9D927588305C /* InfoPlist.strings in Resources */,
+				807BD22734D6A8201B194199 /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4C71F04C16E286C5D6A1DFAC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9F305F1286745FFACF52F445 /* AppGroup.swift in Sources */,
+				CA90A39D51DDC1BB7CD9827F /* BarcodePalette.swift in Sources */,
+				93EC4DB9295378B794DD9CF4 /* CarrierCode.swift in Sources */,
+				E14954B2C1BCDF758CD46336 /* CarrierSettings.swift in Sources */,
+				4A5F52AA87314EC8D4F4E17A /* Code39BarcodeView.swift in Sources */,
+				F8EC1ADA203EABA403979A00 /* ColorInvoWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		968CD666BC63FDAA68372B63 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				77D0A0F6AA417D25D083BD28 /* AppGroup.swift in Sources */,
+				E34174EE6F1F473078394658 /* BarcodePalette.swift in Sources */,
+				59CB288722FF02E609E98F16 /* CarrierCode.swift in Sources */,
+				586A4116D912718B6ED5A1F8 /* CarrierSettings.swift in Sources */,
+				7FAD7B647CC4791735FDBF52 /* Code39BarcodeView.swift in Sources */,
+				2F6D6D68F6213B211A1CBECD /* ColorInvoApp.swift in Sources */,
+				87144DB2203B8129385E424D /* ContentView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		585F8E00D9BCCCCD8C223487 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 969412918951C9D460787E70 /* ColorInvoWidget */;
+			targetProxy = 8F99926A7192FDB9EAF1FC80 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		2BBDA9BEC927485A857E737C /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A69AAC56B8350E1A75124EED /* en */,
+				059B55A6EF683CBE0DF63113 /* zh-Hant */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		3E156DE3C3A6C9028CD52432 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				86C46C6B4737C9DD08E9ED3E /* en */,
+				E0CB209F84455580DC4D770B /* zh-Hant */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		D6D1E7C856EF7AD232FE89DF /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EA50C0ED47F81804F40188AB /* en */,
+				81A46D55AA2AF0EE56B7D10F /* zh-Hant */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		FF28C2EB6F943C7612EF7F0C /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4EF79ECC71E150A7F226266A /* en */,
+				095E3AD8411360B054ACB0AB /* zh-Hant */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		09C09DEC95F94C657E782E0F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/ColorInvoApp/ColorInvo.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = Sources/ColorInvoApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hsichen.colorinvo;
+				PRODUCT_NAME = ColorInvo;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		245A52C82ECA7CD376AD62E8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		7B01BA35856A2055EC34E65A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Sources/ColorInvoWidget/ColorInvoWidget.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = Sources/ColorInvoWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hsichen.colorinvo.widget;
+				PRODUCT_NAME = ColorInvoWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A549885675CE1900E2F3ABFA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Sources/ColorInvoWidget/ColorInvoWidget.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = Sources/ColorInvoWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hsichen.colorinvo.widget;
+				PRODUCT_NAME = ColorInvoWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F0E9885862751EA5F20BBC9F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/ColorInvoApp/ColorInvo.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = Sources/ColorInvoApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hsichen.colorinvo;
+				PRODUCT_NAME = ColorInvo;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		FE1C918026C6581CE2003588 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		09DABC3A5175FD8F55CF3B4A /* Build configuration list for PBXNativeTarget "ColorInvoWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7B01BA35856A2055EC34E65A /* Debug */,
+				A549885675CE1900E2F3ABFA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		94142F269B627C77AB2C951A /* Build configuration list for PBXNativeTarget "ColorInvo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F0E9885862751EA5F20BBC9F /* Debug */,
+				09C09DEC95F94C657E782E0F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D387AA8B5295EBF0B0CB2DA8 /* Build configuration list for PBXProject "ColorInvo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE1C918026C6581CE2003588 /* Debug */,
+				245A52C82ECA7CD376AD62E8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3F24B9CC2DF6611062BCC64F /* Project object */;
+}

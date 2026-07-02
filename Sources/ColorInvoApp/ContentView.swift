@@ -35,7 +35,7 @@ struct ContentView: View {
                 .padding(20)
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("載具條碼")
+            .navigationTitle("app.title")
         }
     }
 

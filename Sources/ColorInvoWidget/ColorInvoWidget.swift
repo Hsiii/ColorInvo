@@ -67,28 +67,28 @@ struct CarrierWidgetView: View {
     }
 }
 
-struct InvoiceCarrierWidget: Widget {
-    let kind = "InvoiceCarrierWidget"
+struct ColorInvoWidget: Widget {
+    let kind = "ColorInvoWidget"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: CarrierProvider()) { entry in
             CarrierWidgetView(entry: entry)
         }
-        .configurationDisplayName("載具條碼")
-        .description("在中尺寸 Widget 顯示手機發票載具一維條碼。")
+        .configurationDisplayName("app.title")
+        .description("widget.description")
         .supportedFamilies([.systemMedium])
     }
 }
 
 @main
-struct InvoiceCarrierWidgetBundle: WidgetBundle {
+struct ColorInvoWidgetBundle: WidgetBundle {
     var body: some Widget {
-        InvoiceCarrierWidget()
+        ColorInvoWidget()
     }
 }
 
 #Preview(as: .systemMedium) {
-    InvoiceCarrierWidget()
+    ColorInvoWidget()
 } timeline: {
     CarrierEntry(
         date: .now,

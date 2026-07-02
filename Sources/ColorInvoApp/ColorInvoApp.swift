@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct InvoiceCarrierApp: App {
+struct ColorInvoApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
