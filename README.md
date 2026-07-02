@@ -71,6 +71,8 @@ The Apple Developer account must have `group.dev.hsichen.colorinvo` enabled for 
 
 ## Release
 
+This project is being prepared for a possible App Store release, so the archive, export, and upload helpers are kept reproducible while listing and review details are finalized.
+
 Set the same `APPLE_TEAM_ID` plus App Store Connect API key values in `.env` or `.env.local`:
 
 ```bash

@@ -71,6 +71,8 @@ Apple Developer 帳號必須替 `dev.hsichen.colorinvo` 與 `dev.hsichen.colorin
 
 ## 發佈
 
+這個專案正在評估提交 App Store，因此封存、匯出與上傳流程會維持可重現，方便後續整理上架資訊與審查材料。
+
 在 `.env` 或 `.env.local` 設定同一組 `APPLE_TEAM_ID`，並補上 App Store Connect API key：
 
 ```bash
