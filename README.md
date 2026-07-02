@@ -1,10 +1,13 @@
 <h1 align="center">ColorInvo</h1>
 <div align="center">
 
-  Taiwan mobile invoice carrier barcode storage with scan-safe color palettes and a WidgetKit preview.
+  Make your Taiwan mobile invoice carrier barcode match your wallpaper.
+  Pick an image, let ColorInvo build the palette, and keep a beautiful scan-ready barcode on your Home Screen.
 
   <img src="Resources/ColorInvo/Assets.xcassets/AppIcon.appiconset/AppIcon-10241024-1x.png" alt="ColorInvo app icon" width="96" />
 
+  <a href="#how-it-works">How it works</a>
+   ·
   <a href="#development">Development</a>
    ·
   <a href="#release">Release</a>
@@ -14,11 +17,19 @@
 
 ## Why
 
-- **Carrier first:** Store a Taiwan mobile invoice carrier code and keep the barcode ready.
-- **Widget ready:** Preview the barcode in-app before adding the iOS widget.
-- **Scan-safe colors:** Presets and custom colors are checked against scanner-oriented contrast guidance.
-- **Wallpaper palettes:** Generate three color combinations from a selected wallpaper image.
-- **Local storage:** Carrier settings are stored in the app group for the app and widget.
+- **Wallpaper-matched:** Choose the wallpaper image you already like, and ColorInvo turns it into barcode colors that feel at home on your screen.
+- **Autonomous color work:** The app analyzes the image, generates matching palettes, and applies the first usable result so you are not tuning colors by hand.
+- **Quick setup:** Enter the Taiwan mobile invoice carrier code, pick a wallpaper image, save, and the widget reloads with the same settings.
+- **Beautiful by source:** The palette comes from your own wallpaper instead of generic theme presets, so the barcode looks intentional beside your icons.
+- **Scanner-aware:** ColorInvo checks barcode and background colors against scanner-oriented reflectance guidance before saving.
+- **Private by default:** Carrier settings and wallpaper-derived colors stay in the shared app group on device.
+
+## How It Works
+
+1. Enter your Taiwan mobile invoice carrier code.
+2. Select the wallpaper image you want the barcode to match.
+3. ColorInvo extracts a dominant color and builds scan-conscious barcode palettes from it.
+4. Save once, then add the medium iOS widget for a matching Home Screen barcode.
 
 ## Requirements
 
@@ -97,7 +108,7 @@ make release
 
 ## Privacy
 
-ColorInvo stores the carrier code and palette in the shared app group so the app and widget can read the same settings. Wallpaper-derived palettes are generated from the image selected by the user on device.
+ColorInvo stores the carrier code and palette in the shared app group so the app and widget can read the same settings. Wallpaper-derived palettes are generated on device from the image selected by the user.
 
 ## Troubleshooting
 
