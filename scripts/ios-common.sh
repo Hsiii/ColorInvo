@@ -47,11 +47,39 @@ ios_load_team_id_file() {
 }
 
 ios_load_env() {
-    ios_load_env_file "${IOS_ENV_FILE:-$IOS_ROOT_DIR/.env}"
+    if [[ -n "${IOS_ENV_FILE:-}" ]]; then
+        ios_load_env_file "$IOS_ENV_FILE"
+    else
+        ios_load_env_file "$IOS_ROOT_DIR/.env.local"
+        ios_load_env_file "$IOS_ROOT_DIR/.env"
+    fi
+
+    ios_apply_env_aliases
 
     if [[ -z "${APPLE_TEAM_ID:-}" ]]; then
         ios_load_team_id_file "${IOS_ONTRACK_ENV_FILE:-$IOS_ROOT_DIR/../OnTrack/.env}"
     fi
+}
+
+ios_export_if_missing() {
+    local target="$1"
+    local source="$2"
+    local source_value="${!source-}"
+    local target_value="${!target-}"
+
+    if [[ -n "$target_value" || -z "$source_value" ]]; then
+        return 0
+    fi
+
+    printf -v "$target" '%s' "$source_value"
+    export "$target"
+}
+
+ios_apply_env_aliases() {
+    ios_export_if_missing ASC_KEY_ID ASC_API_KEY
+    ios_export_if_missing ASC_KEY_ID ASC_API_KEY_ID
+    ios_export_if_missing ASC_KEY_PATH ASC_API_KEY_PATH
+    ios_export_if_missing ASC_ISSUER_ID ASC_API_ISSUER_ID
 }
 
 ios_load_env
@@ -135,13 +163,14 @@ ios_resolve_release_versions() {
 
 ios_set_app_store_auth_args() {
     APP_STORE_AUTH_ARGS=()
+    ios_detect_app_store_key_path
 
     if [[ -z "${ASC_KEY_PATH:-}${ASC_KEY_ID:-}${ASC_ISSUER_ID:-}" ]]; then
         return
     fi
 
     if [[ -z "${ASC_KEY_PATH:-}" || -z "${ASC_KEY_ID:-}" || -z "${ASC_ISSUER_ID:-}" ]]; then
-        ios_die "ASC_KEY_PATH, ASC_KEY_ID, and ASC_ISSUER_ID must be set together."
+        ios_die "App Store Connect auth is incomplete. Set ASC_KEY_ID (or ASC_API_KEY), ASC_ISSUER_ID, and ASC_KEY_PATH together."
     fi
 
     APP_STORE_AUTH_ARGS=(
@@ -149,6 +178,22 @@ ios_set_app_store_auth_args() {
         -authenticationKeyID "$ASC_KEY_ID"
         -authenticationKeyIssuerID "$ASC_ISSUER_ID"
     )
+}
+
+ios_detect_app_store_key_path() {
+    [[ -z "${ASC_KEY_ID:-}" || -n "${ASC_KEY_PATH:-}" ]] && return
+
+    local candidate
+    for candidate in \
+        "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8" \
+        "$HOME/Downloads/AuthKey_${ASC_KEY_ID}.p8"
+    do
+        if [[ -f "$candidate" ]]; then
+            ASC_KEY_PATH="$candidate"
+            export ASC_KEY_PATH
+            return
+        fi
+    done
 }
 
 ios_set_provisioning_args() {

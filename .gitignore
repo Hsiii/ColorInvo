@@ -9,4 +9,5 @@ DerivedData/
 *.moved-aside
 xcuserdata/
 .env
+.env.local
 *.local

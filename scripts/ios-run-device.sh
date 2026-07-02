@@ -19,6 +19,7 @@ DESTINATION="${IOS_DESTINATION:-id=$DEVICE_ID}"
 APP_PATH="${IOS_APP_PATH:-$DERIVED_DATA_PATH/Build/Products/$CONFIGURATION-iphoneos/$IOS_SCHEME_NAME.app}"
 
 ios_generate_project
+ios_set_app_store_auth_args
 ios_set_provisioning_args
 
 if [[ "${IOS_ALLOW_DEVICE_REGISTRATION:-1}" != "0" ]]; then
@@ -34,6 +35,7 @@ xcodebuild \
     -destination "$DESTINATION" \
     -derivedDataPath "$DERIVED_DATA_PATH" \
     "${IOS_PROVISIONING_ARGS[@]}" \
+    "${APP_STORE_AUTH_ARGS[@]}" \
     DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
     build
 
