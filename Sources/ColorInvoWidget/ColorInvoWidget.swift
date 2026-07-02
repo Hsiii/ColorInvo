@@ -44,11 +44,11 @@ struct CarrierWidgetView: View {
                     value: carrierCode,
                     palette: entry.settings.palette,
                     showsValue: true,
-                    barcodeHeight: 88,
+                    barcodeHeight: 104,
                     horizontalPadding: 0,
-                    verticalPadding: 8
+                    verticalPadding: 6,
+                    fillsAvailableSpace: true
                 )
-                .padding(4)
             } else {
                 VStack(spacing: 8) {
                     Image(systemName: "barcode.viewfinder")
@@ -73,6 +73,7 @@ struct ColorInvoWidget: Widget {
         .configurationDisplayName("app.title")
         .description("widget.description")
         .supportedFamilies([.systemMedium])
+        .contentMarginsDisabled()
     }
 }
 

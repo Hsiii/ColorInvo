@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct Code39BarcodeView: View {
+    @Environment(\.displayScale) private var displayScale
+
     let value: String
     var barColor: Color = .black
     var backgroundColor: Color = .white
@@ -13,19 +15,26 @@ struct Code39BarcodeView: View {
             }
 
             let totalUnits = elements.reduce(0) { $0 + $1.units }
-            let unitWidth = max(1, floor(size.width / CGFloat(totalUnits)))
-            let barcodeWidth = CGFloat(totalUnits) * unitWidth
-            var x = (size.width - barcodeWidth) / 2
+            let totalPixels = max(1, floor(size.width * displayScale))
+            let pixelsPerUnit = totalPixels / CGFloat(totalUnits)
+            var unitOffset = 0
 
             context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(backgroundColor))
 
             for element in elements {
-                let width = CGFloat(element.units) * unitWidth
+                let startPixel = (CGFloat(unitOffset) * pixelsPerUnit).rounded()
+                unitOffset += element.units
+                let endPixel = (CGFloat(unitOffset) * pixelsPerUnit).rounded()
+
                 if element.isBar {
-                    let rect = CGRect(x: x, y: 0, width: width, height: size.height)
+                    let rect = CGRect(
+                        x: startPixel / displayScale,
+                        y: 0,
+                        width: max(1 / displayScale, (endPixel - startPixel) / displayScale),
+                        height: size.height
+                    )
                     context.fill(Path(rect), with: .color(barColor))
                 }
-                x += width
             }
         }
         .accessibilityLabel("手機條碼 \(value)")
@@ -39,6 +48,7 @@ struct CarrierBarcodePanel: View {
     var barcodeHeight: CGFloat = 96
     var horizontalPadding: CGFloat = 18
     var verticalPadding: CGFloat = 16
+    var fillsAvailableSpace = false
 
     var body: some View {
         VStack(spacing: showsValue ? 6 : 0) {
@@ -59,7 +69,10 @@ struct CarrierBarcodePanel: View {
         }
         .padding(.horizontal, horizontalPadding)
         .padding(.vertical, verticalPadding)
-        .frame(maxWidth: .infinity)
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: fillsAvailableSpace ? .infinity : nil
+        )
         .background(palette.backgroundColor.color)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .accessibilityElement(children: .combine)

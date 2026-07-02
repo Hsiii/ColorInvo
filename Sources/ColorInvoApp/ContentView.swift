@@ -263,9 +263,10 @@ struct ContentView: View {
                         value: normalizedCode,
                         palette: draftPalette,
                         showsValue: true,
-                        barcodeHeight: 88,
+                        barcodeHeight: 104,
                         horizontalPadding: 0,
-                        verticalPadding: 8
+                        verticalPadding: 6,
+                        fillsAvailableSpace: true
                     )
                 } else {
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
