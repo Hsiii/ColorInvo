@@ -35,7 +35,7 @@ xcodebuild \
     -destination "$DESTINATION" \
     -derivedDataPath "$DERIVED_DATA_PATH" \
     "${IOS_PROVISIONING_ARGS[@]}" \
-    "${APP_STORE_AUTH_ARGS[@]}" \
+    ${APP_STORE_AUTH_ARGS[@]+"${APP_STORE_AUTH_ARGS[@]}"} \
     DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
     build
 
