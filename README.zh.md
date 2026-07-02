@@ -1,9 +1,9 @@
-<h1 align="center">ColorInvo</h1>
+<h1 align="center">條色盤</h1>
 <div align="center">
 
   台灣手機載具條碼保存工具，支援安全掃描配色與 WidgetKit 預覽。
 
-  <img src="Resources/ColorInvo/Assets.xcassets/AppIcon.appiconset/AppIcon-10241024-1x.png" alt="ColorInvo app icon" width="96" />
+  <img src="Resources/ColorInvo/Assets.xcassets/AppIcon.appiconset/AppIcon-10241024-1x.png" alt="條色盤 app icon" width="96" />
 
   <a href="./README.md">English</a>
    ·
@@ -95,7 +95,7 @@ make release
 
 ## 隱私
 
-ColorInvo 會把載具號碼與配色存在 shared app group，讓 App 與 Widget 讀取同一份設定。桌布配色只會從使用者於裝置上選取的圖片產生。
+條色盤會把載具號碼與配色存在 shared app group，讓 App 與 Widget 讀取同一份設定。桌布配色只會從使用者於裝置上選取的圖片產生。
 
 ## 疑難排解
 
