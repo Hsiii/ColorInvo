@@ -41,11 +41,15 @@ struct CarrierWidgetView: View {
         ZStack {
             if CarrierCode.isValid(carrierCode) {
                 VStack(spacing: 12) {
-                    Code39BarcodeView(value: carrierCode)
+                    Code39BarcodeView(
+                        value: carrierCode,
+                        barColor: entry.settings.palette.barColor.color,
+                        backgroundColor: entry.settings.palette.backgroundColor.color
+                    )
                         .frame(height: 78)
                     Text(carrierCode)
                         .font(.system(.headline, design: .monospaced, weight: .semibold))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(entry.settings.palette.barColor.color)
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 14)
@@ -59,7 +63,7 @@ struct CarrierWidgetView: View {
                 .foregroundStyle(.secondary)
             }
         }
-        .containerBackground(.white, for: .widget)
+        .containerBackground(entry.settings.palette.backgroundColor.color, for: .widget)
     }
 }
 

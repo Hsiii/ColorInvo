@@ -3,7 +3,9 @@ import WidgetKit
 
 struct ContentView: View {
     @State private var draftCode: String
+    @State private var draftPalette: BarcodePalette
     @State private var savedCode: String
+    @State private var savedPalette: BarcodePalette
     @State private var didSave = false
 
     private var normalizedCode: String {
@@ -17,7 +19,9 @@ struct ContentView: View {
     init() {
         let settings = CarrierStore.load()
         _draftCode = State(initialValue: settings.carrierCode)
+        _draftPalette = State(initialValue: settings.palette)
         _savedCode = State(initialValue: settings.carrierCode)
+        _savedPalette = State(initialValue: settings.palette)
     }
 
     var body: some View {
@@ -26,6 +30,7 @@ struct ContentView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     barcodePreview
                     carrierForm
+                    colorControls
                 }
                 .padding(20)
             }
@@ -42,15 +47,19 @@ struct ContentView: View {
 
             ZStack {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(.white)
+                    .fill(savedPalette.backgroundColor.color)
 
                 if CarrierCode.isValid(savedCode) {
                     VStack(spacing: 10) {
-                        Code39BarcodeView(value: savedCode)
+                        Code39BarcodeView(
+                            value: savedCode,
+                            barColor: savedPalette.barColor.color,
+                            backgroundColor: savedPalette.backgroundColor.color
+                        )
                             .frame(height: 88)
                         Text(savedCode)
                             .font(.system(.callout, design: .monospaced, weight: .medium))
-                            .foregroundStyle(.black)
+                            .foregroundStyle(savedPalette.barColor.color)
                     }
                     .padding(16)
                 } else {
@@ -94,7 +103,76 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity, minHeight: 44)
             }
             .buttonStyle(.borderedProminent)
-            .disabled(!isValid)
+            .disabled(!isValid || !draftPalette.meetsCommercialGuidance)
+        }
+        .padding(16)
+        .background(.background)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .shadow(color: .black.opacity(0.06), radius: 14, x: 0, y: 6)
+    }
+
+    private var colorControls: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("條碼顏色")
+                .font(.headline)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(BarcodePalette.presets) { preset in
+                        Button {
+                            draftPalette = preset
+                            didSave = false
+                        } label: {
+                            PresetSwatch(
+                                palette: preset,
+                                isSelected: preset == draftPalette
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(preset.name)
+                    }
+                }
+                .padding(.vertical, 2)
+            }
+
+            VStack(spacing: 12) {
+                ColorPicker(
+                    "線條",
+                    selection: Binding(
+                        get: { draftPalette.barColor.color },
+                        set: { color in
+                            draftPalette = draftPalette.replacing(
+                                barColor: RGBAColor(color: color)
+                            )
+                            didSave = false
+                        }
+                    ),
+                    supportsOpacity: false
+                )
+
+                ColorPicker(
+                    "背景",
+                    selection: Binding(
+                        get: { draftPalette.backgroundColor.color },
+                        set: { color in
+                            draftPalette = draftPalette.replacing(
+                                backgroundColor: RGBAColor(color: color)
+                            )
+                            didSave = false
+                        }
+                    ),
+                    supportsOpacity: false
+                )
+            }
+
+            Label(
+                draftPalette.standardMessage,
+                systemImage: draftPalette.meetsCommercialGuidance
+                    ? "checkmark.shield.fill"
+                    : "exclamationmark.triangle"
+            )
+            .font(.callout)
+            .foregroundStyle(draftPalette.meetsCommercialGuidance ? .green : .orange)
         }
         .padding(16)
         .background(.background)
@@ -107,11 +185,50 @@ struct ContentView: View {
             return
         }
 
-        let settings = CarrierSettings(carrierCode: carrierCode.value)
+        let settings = CarrierSettings(
+            carrierCode: carrierCode.value,
+            palette: draftPalette
+        )
         CarrierStore.save(settings)
         savedCode = carrierCode.value
+        savedPalette = draftPalette
         didSave = true
         WidgetCenter.shared.reloadAllTimelines()
+    }
+}
+
+private struct PresetSwatch: View {
+    let palette: BarcodePalette
+    let isSelected: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(palette.backgroundColor.color)
+
+                HStack(spacing: 3) {
+                    ForEach(0..<7) { index in
+                        RoundedRectangle(cornerRadius: 1)
+                            .fill(palette.barColor.color)
+                            .frame(width: index.isMultiple(of: 3) ? 7 : 3)
+                    }
+                }
+            }
+            .frame(width: 96, height: 44)
+            .overlay {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(isSelected ? Color.accentColor : .clear, lineWidth: 3)
+            }
+
+            Text(palette.name)
+                .font(.caption)
+                .foregroundStyle(.primary)
+                .lineLimit(1)
+        }
+        .padding(6)
+        .background(.background)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 

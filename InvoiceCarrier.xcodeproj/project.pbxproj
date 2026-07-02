@@ -9,8 +9,10 @@
 /* Begin PBXBuildFile section */
 		1D6C44FEEB78CD0E32E92DE2 /* InvoiceCarrierWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 68347F0381D36E135D1E25E9 /* InvoiceCarrierWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		27E4D53085D07A43F3CE8259 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF82784CB3888897BFF57363 /* ContentView.swift */; };
+		4AF52EBDB2C81DCF7348D475 /* BarcodePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434452A9729B495646E30E69 /* BarcodePalette.swift */; };
 		5AC97276D313397A8CEB5B09 /* InvoiceCarrierWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0292C673AA239D7C155E04DA /* InvoiceCarrierWidget.swift */; };
 		747A6CDEF4A65B64B4257AD0 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = D895202D24854C18FC22EE7F /* AppGroup.swift */; };
+		831E9683A9B9EE0C3FEC3537 /* BarcodePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434452A9729B495646E30E69 /* BarcodePalette.swift */; };
 		8BD928D90762F09459E689A5 /* CarrierSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E406BABE939688D9176F863 /* CarrierSettings.swift */; };
 		AF87F3E96E39121DCB3DB893 /* CarrierCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82561772FE9966FFD27552C8 /* CarrierCode.swift */; };
 		C5679AA439ED61583641C4C1 /* InvoiceCarrierApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE79AB7BDE58A4064B3D1462 /* InvoiceCarrierApp.swift */; };
@@ -47,6 +49,7 @@
 
 /* Begin PBXFileReference section */
 		0292C673AA239D7C155E04DA /* InvoiceCarrierWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoiceCarrierWidget.swift; sourceTree = "<group>"; };
+		434452A9729B495646E30E69 /* BarcodePalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarcodePalette.swift; sourceTree = "<group>"; };
 		68347F0381D36E135D1E25E9 /* InvoiceCarrierWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = InvoiceCarrierWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		6E406BABE939688D9176F863 /* CarrierSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarrierSettings.swift; sourceTree = "<group>"; };
 		7E1DFF0B0A50310B2DE2F827 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -66,6 +69,7 @@
 			isa = PBXGroup;
 			children = (
 				D895202D24854C18FC22EE7F /* AppGroup.swift */,
+				434452A9729B495646E30E69 /* BarcodePalette.swift */,
 				82561772FE9966FFD27552C8 /* CarrierCode.swift */,
 				6E406BABE939688D9176F863 /* CarrierSettings.swift */,
 				82B0ECCB5E31F4BE1F1A660C /* Code39BarcodeView.swift */,
@@ -200,6 +204,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				747A6CDEF4A65B64B4257AD0 /* AppGroup.swift in Sources */,
+				831E9683A9B9EE0C3FEC3537 /* BarcodePalette.swift in Sources */,
 				CED25DCF345BC2BEB6D03530 /* CarrierCode.swift in Sources */,
 				8BD928D90762F09459E689A5 /* CarrierSettings.swift in Sources */,
 				DE637F7F0CFCB150E5464607 /* Code39BarcodeView.swift in Sources */,
@@ -213,6 +218,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA72C686AF712FF9CDA68FB4 /* AppGroup.swift in Sources */,
+				4AF52EBDB2C81DCF7348D475 /* BarcodePalette.swift in Sources */,
 				AF87F3E96E39121DCB3DB893 /* CarrierCode.swift in Sources */,
 				E4E4B97EB40B0F5267996541 /* CarrierSettings.swift in Sources */,
 				D7458FB099DDEDF49E74F5D5 /* Code39BarcodeView.swift in Sources */,

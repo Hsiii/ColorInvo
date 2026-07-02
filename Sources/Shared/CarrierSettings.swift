@@ -2,8 +2,25 @@ import Foundation
 
 struct CarrierSettings: Codable, Equatable {
     var carrierCode: String
+    var palette: BarcodePalette
 
-    static let empty = CarrierSettings(carrierCode: "")
+    static let empty = CarrierSettings(
+        carrierCode: "",
+        palette: .classic
+    )
+
+    init(carrierCode: String, palette: BarcodePalette = .classic) {
+        self.carrierCode = carrierCode
+        self.palette = palette
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        carrierCode = try container.decode(String.self, forKey: .carrierCode)
+        palette = try container.decodeIfPresent(BarcodePalette.self, forKey: .palette)
+            ?? .classic
+    }
 }
 
 enum CarrierStore {
