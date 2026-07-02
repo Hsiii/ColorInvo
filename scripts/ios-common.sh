@@ -134,6 +134,14 @@ ios_set_provisioning_args() {
     fi
 }
 
+ios_require_development_team() {
+    local action="$1"
+
+    [[ -n "${APPLE_TEAM_ID:-}" ]] && return
+
+    ios_die "APPLE_TEAM_ID is required for $action. Copy .env.example to .env and set APPLE_TEAM_ID to your Apple Developer Team ID."
+}
+
 ios_detect_device_id() {
     local devices_json
     devices_json="$(mktemp)"

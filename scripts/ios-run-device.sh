@@ -6,6 +6,8 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/ios-common.sh"
 CONFIGURATION="${IOS_CONFIGURATION:-Debug}"
 DERIVED_DATA_PATH="${IOS_DERIVED_DATA_PATH:-$IOS_ROOT_DIR/build/DeviceDerivedData}"
 
+ios_require_development_team "building on a physical iOS device"
+
 DEVICE_ID="${IOS_DEVICE_ID:-}"
 if [[ -z "$DEVICE_ID" ]]; then
     DEVICE_ID="$(ios_detect_device_id || true)"
@@ -19,6 +21,10 @@ APP_PATH="${IOS_APP_PATH:-$DERIVED_DATA_PATH/Build/Products/$CONFIGURATION-iphon
 ios_generate_project
 ios_set_provisioning_args
 
+if [[ "${IOS_ALLOW_DEVICE_REGISTRATION:-1}" != "0" ]]; then
+    IOS_PROVISIONING_ARGS+=(-allowProvisioningDeviceRegistration)
+fi
+
 echo "Building $IOS_SCHEME_NAME for device $DEVICE_ID..."
 xcodebuild \
     -project "$IOS_PROJECT_PATH" \
@@ -28,6 +34,7 @@ xcodebuild \
     -destination "$DESTINATION" \
     -derivedDataPath "$DERIVED_DATA_PATH" \
     "${IOS_PROVISIONING_ARGS[@]}" \
+    DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
     build
 
 if [[ ! -d "$APP_PATH" ]]; then

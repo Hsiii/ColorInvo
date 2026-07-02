@@ -9,8 +9,8 @@ ios_resolve_release_versions
 MARKETING_VERSION="$IOS_MARKETING_VERSION"
 BUILD_NUMBER="$IOS_BUILD_NUMBER"
 
-[[ -n "${APPLE_TEAM_ID:-}" ]] || ios_die "APPLE_TEAM_ID is required for signing an iOS archive."
 ios_generate_project
+ios_require_development_team "signing an iOS archive"
 ios_set_app_store_auth_args
 ios_set_provisioning_args
 
