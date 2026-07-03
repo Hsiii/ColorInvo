@@ -3,6 +3,21 @@ import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
 
+// UIImage is decoded off the MainActor and then treated as immutable render input.
+struct WallpaperPreviewImage: Identifiable, Equatable, @unchecked Sendable {
+    let id: UUID
+    let image: UIImage
+
+    init(image: UIImage) {
+        id = UUID()
+        self.image = image
+    }
+
+    static func == (lhs: WallpaperPreviewImage, rhs: WallpaperPreviewImage) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
 struct WallpaperImageAnalysis: Sendable {
     let previewData: Data
     let sourceColors: [RGBAColor]
@@ -71,7 +86,7 @@ enum WallpaperPreviewStore {
     private static let fileName = "wallpaper-preview.jpg"
     private static let maximumPixelLength: CGFloat = 900
 
-    static func load() -> UIImage? {
+    static func load() -> WallpaperPreviewImage? {
         guard
             let fileURL,
             let data = try? Data(contentsOf: fileURL)
@@ -79,26 +94,11 @@ enum WallpaperPreviewStore {
             return nil
         }
 
-        return UIImage(data: data)
+        return decodedPreviewImage(from: data)
     }
 
-    static func save(_ image: UIImage) -> UIImage? {
-        guard let previewImage = previewImage(from: image) else {
-            return nil
-        }
-
-        if
-            let fileURL,
-            let data = previewImage.jpegData(compressionQuality: 0.76)
-        {
-            try? data.write(to: fileURL, options: .atomic)
-        }
-
-        return previewImage
-    }
-
-    static func savePreviewData(_ data: Data) -> UIImage? {
-        guard let previewImage = UIImage(data: data) else {
+    static func savePreviewData(_ data: Data) -> WallpaperPreviewImage? {
+        guard let previewImage = decodedPreviewImage(from: data) else {
             return nil
         }
 
@@ -109,13 +109,13 @@ enum WallpaperPreviewStore {
         return previewImage
     }
 
-    static func showcaseImage() -> UIImage {
+    static func showcaseImage() -> WallpaperPreviewImage {
         let size = CGSize(width: 900, height: 1600)
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
         format.opaque = true
 
-        return UIGraphicsImageRenderer(size: size, format: format).image { context in
+        let image = UIGraphicsImageRenderer(size: size, format: format).image { context in
             UIColor(red: 232 / 255, green: 248 / 255, blue: 252 / 255, alpha: 1).setFill()
             context.fill(CGRect(origin: .zero, size: size))
 
@@ -140,6 +140,8 @@ enum WallpaperPreviewStore {
                 thickness: 220
             ).fill()
         }
+
+        return WallpaperPreviewImage(image: image)
     }
 
     private static var fileURL: URL? {
@@ -171,6 +173,17 @@ enum WallpaperPreviewStore {
             context.fill(CGRect(origin: .zero, size: targetSize))
             image.draw(in: CGRect(origin: .zero, size: targetSize))
         }
+    }
+
+    private static func decodedPreviewImage(from data: Data) -> WallpaperPreviewImage? {
+        guard
+            let image = UIImage(data: data),
+            let previewImage = previewImage(from: image)
+        else {
+            return nil
+        }
+
+        return WallpaperPreviewImage(image: previewImage)
     }
 
     private static func diagonalBand(

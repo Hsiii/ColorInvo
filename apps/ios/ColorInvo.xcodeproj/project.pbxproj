@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0F6878D8321B36425B233EFA /* CarrierEditorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67251E362FF2569A95AE0E78 /* CarrierEditorModel.swift */; };
 		19E0FE47E92A4AB2852A8DEF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3E156DE3C3A6C9028CD52432 /* Localizable.strings */; };
 		2100D44CFC1E548F4F541DF9 /* CarrierWidgetKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D32EAE07191D482043DFF71 /* CarrierWidgetKind.swift */; };
 		2F6D6D68F6213B211A1CBECD /* ColorInvoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BA0A795276F4F92700B1549 /* ColorInvoApp.swift */; };
@@ -70,6 +71,7 @@
 		4EF79ECC71E150A7F226266A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		536E0BD6F9389D36DDE17F2C /* ColorInvo.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ColorInvo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C656D39AB9EB12EEFA74BB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		67251E362FF2569A95AE0E78 /* CarrierEditorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarrierEditorModel.swift; sourceTree = "<group>"; };
 		7208AE85AD7B21303DCE5955 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		81A46D55AA2AF0EE56B7D10F /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		86C46C6B4737C9DD08E9ED3E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 		080F7FDBEFC296C916EBFDD2 /* ColorInvoApp */ = {
 			isa = PBXGroup;
 			children = (
+				67251E362FF2569A95AE0E78 /* CarrierEditorModel.swift */,
 				F05E3CC563318EDDFBE31B22 /* ColorInvo.entitlements */,
 				0BA0A795276F4F92700B1549 /* ColorInvoApp.swift */,
 				4E60FD679A095710988F6C9E /* ContentView.swift */,
@@ -298,6 +301,7 @@
 				77D0A0F6AA417D25D083BD28 /* AppGroup.swift in Sources */,
 				E34174EE6F1F473078394658 /* BarcodePalette.swift in Sources */,
 				59CB288722FF02E609E98F16 /* CarrierCode.swift in Sources */,
+				0F6878D8321B36425B233EFA /* CarrierEditorModel.swift in Sources */,
 				586A4116D912718B6ED5A1F8 /* CarrierSettings.swift in Sources */,
 				2100D44CFC1E548F4F541DF9 /* CarrierWidgetKind.swift in Sources */,
 				7FAD7B647CC4791735FDBF52 /* Code39BarcodeView.swift in Sources */,

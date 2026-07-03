@@ -1,116 +1,28 @@
 import PhotosUI
 import SwiftUI
 import UIKit
-import WidgetKit
 
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
 
-    @State private var draftCode: String
-    @State private var draftPalette: BarcodePalette
-    @State private var savedSettings: CarrierSettings
-    @State private var wallpaperPickerItem: PhotosPickerItem?
-    @State private var wallpaperPreviewImage: UIImage?
-    @State private var wallpaperPalettes: [BarcodePalette] = []
-    @State private var wallpaperDominantColors: [RGBAColor]
-    @State private var wallpaperStatusText: String?
-    @State private var isAnalyzingWallpaper = false
-    @State private var widgetNeedsReload = false
+    @StateObject private var model: CarrierEditorModel
     @FocusState private var carrierFieldFocused: Bool
-
-    private var normalizedCode: String {
-        CarrierCode.normalize(draftCode)
-    }
-
-    private var isValid: Bool {
-        CarrierCode.isValid(normalizedCode)
-    }
-
-    private var hasCarrierInput: Bool {
-        !carrierSuffix.isEmpty
-    }
-
-    private var canAutoSave: Bool {
-        isValid && draftPalette.meetsCommercialGuidance
-    }
-
-    private var draftSettings: CarrierSettings? {
-        guard canAutoSave, let carrierCode = CarrierCode(normalizedCode) else {
-            return nil
-        }
-
-        return CarrierSettings(
-            carrierCode: carrierCode.value,
-            palette: draftPalette,
-            wallpaperDominantColors: wallpaperDominantColors
-        )
-    }
-
-    private var widgetIsReady: Bool {
-        draftSettings == savedSettings
-    }
-
-    private var widgetStatusText: String {
-        if widgetIsReady {
-            return "小工具已準備好，可在主畫面加入"
-        }
-
-        if !isValid {
-            return "填入載具以產生小工具"
-        }
-
-        if !draftPalette.meetsCommercialGuidance {
-            return "配色可掃描後會自動更新小工具"
-        }
-
-        return "小工具設定會自動更新"
-    }
 
     private var paletteGridColumns: [GridItem] {
         Array(repeating: GridItem(.flexible(), spacing: 8), count: 3)
     }
 
-    private var carrierSuffix: String {
-        let code = CarrierCode.normalize(draftCode)
-        guard code.hasPrefix("/") else {
-            return code
-        }
-
-        return String(code.dropFirst())
-    }
-
     private var carrierSuffixBinding: Binding<String> {
         Binding(
-            get: { carrierSuffix },
-            set: { newValue in
-                let suffix = CarrierCode.normalize(newValue)
-                    .replacingOccurrences(of: "/", with: "")
-                draftCode = suffix.isEmpty ? "" : "/\(suffix)"
+            get: { model.carrierSuffix },
+            set: { value in
+                model.updateCarrierSuffix(value)
             }
         )
     }
 
-    private var validationText: String {
-        if isValid {
-            return "格式符合"
-        }
-
-        return carrierSuffix.isEmpty ? "未填" : "格式不符"
-    }
-
-    init() {
-        let usesShowcaseData = ColorInvoRuntime.showcaseDataEnabled
-        let settings = usesShowcaseData ? .showcase : CarrierStore.load()
-        _draftCode = State(initialValue: settings.carrierCode)
-        _draftPalette = State(initialValue: settings.palette)
-        _savedSettings = State(initialValue: settings)
-        _wallpaperDominantColors = State(initialValue: settings.wallpaperDominantColors)
-        _wallpaperPreviewImage = State(
-            initialValue: usesShowcaseData
-                ? WallpaperPreviewStore.showcaseImage()
-                : WallpaperPreviewStore.load()
-        )
-        _wallpaperPalettes = State(initialValue: usesShowcaseData ? BarcodePalette.showcaseOptions : [])
+    init(model: CarrierEditorModel = CarrierEditorModel()) {
+        _model = StateObject(wrappedValue: model)
     }
 
     var body: some View {
@@ -126,15 +38,15 @@ struct ContentView: View {
         .background(ColorInvoColor.background.ignoresSafeArea())
         .preferredColorScheme(.light)
         .tint(ColorInvoColor.primary)
-        .task(id: draftSettings) {
-            await persistCarrierIfReady()
+        .task {
+            await model.start()
         }
         .onChange(of: scenePhase) { _, phase in
             guard phase != .active else {
                 return
             }
 
-            reloadWidgetIfNeeded()
+            model.reloadWidgetIfNeeded()
         }
     }
 
@@ -175,7 +87,7 @@ struct ContentView: View {
                     .overlay {
                         RoundedRectangle(cornerRadius: 8, style: .continuous)
                             .strokeBorder(
-                                isValid ? ColorInvoColor.primary : ColorInvoColor.hairline,
+                                model.isValid ? ColorInvoColor.primary : ColorInvoColor.hairline,
                                 lineWidth: 1
                             )
                     }
@@ -184,14 +96,14 @@ struct ContentView: View {
     }
 
     private var validationBadge: some View {
-        let statusColor = isValid ? ColorInvoColor.success : ColorInvoColor.muted
+        let statusColor = model.isValid ? ColorInvoColor.success : ColorInvoColor.muted
 
         return Label {
-            Text(validationText)
+            Text(model.validationText)
                 .colorInvoText(.control)
                 .foregroundStyle(statusColor)
         } icon: {
-            Image(systemName: isValid ? "checkmark.circle.fill" : "exclamationmark.circle")
+            Image(systemName: model.isValid ? "checkmark.circle.fill" : "exclamationmark.circle")
                 .font(.callout)
                 .foregroundStyle(statusColor)
         }
@@ -207,7 +119,7 @@ struct ContentView: View {
 
     private var wallpaperColorSection: some View {
         PhotosPicker(
-            selection: $wallpaperPickerItem,
+            selection: $model.wallpaperPickerItem,
             matching: .images,
             photoLibrary: .shared()
         ) {
@@ -222,23 +134,21 @@ struct ContentView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
         .buttonStyle(.plain)
-        .disabled(isAnalyzingWallpaper)
-        .onChange(of: wallpaperPickerItem) { _, item in
-            Task {
-                await loadWallpaperPalettes(from: item)
-            }
+        .disabled(model.isAnalyzingWallpaper)
+        .onChange(of: model.wallpaperPickerItem) { _, item in
+            model.loadWallpaperPalettes(from: item)
         }
     }
 
     @ViewBuilder
     private var wallpaperPaletteChoices: some View {
-        if isAnalyzingWallpaper {
+        if model.isAnalyzingWallpaper {
             Label("分析中", systemImage: "sparkles")
                 .colorInvoText(.secondary)
                 .frame(minHeight: 40, alignment: .leading)
-        } else if !wallpaperPalettes.isEmpty {
-            paletteButtonGrid(wallpaperPalettes)
-        } else if let wallpaperStatusText {
+        } else if !model.wallpaperPalettes.isEmpty {
+            paletteButtonGrid(model.wallpaperPalettes)
+        } else if let wallpaperStatusText = model.wallpaperStatusText {
             Text(wallpaperStatusText)
                 .colorInvoText(.secondary)
                 .frame(minHeight: 40, alignment: .leading)
@@ -249,11 +159,11 @@ struct ContentView: View {
         LazyVGrid(columns: paletteGridColumns, spacing: 8) {
             ForEach(palettes) { palette in
                 Button {
-                    draftPalette = palette
+                    model.selectPalette(palette)
                 } label: {
                     PaletteOptionButtonContent(
                         palette: palette,
-                        isSelected: palette == draftPalette
+                        isSelected: palette == model.draftPalette
                     )
                 }
                 .buttonStyle(.plain)
@@ -267,11 +177,9 @@ struct ContentView: View {
             compactColorPicker(
                 title: "背景",
                 color: Binding(
-                    get: { draftPalette.backgroundColor.color },
+                    get: { model.draftPalette.backgroundColor.color },
                     set: { color in
-                        draftPalette = draftPalette.replacing(
-                            backgroundColor: RGBAColor(color: color)
-                        )
+                        model.updateBackgroundColor(color)
                     }
                 )
             )
@@ -279,11 +187,9 @@ struct ContentView: View {
             compactColorPicker(
                 title: "條碼",
                 color: Binding(
-                    get: { draftPalette.barColor.color },
+                    get: { model.draftPalette.barColor.color },
                     set: { color in
-                        draftPalette = draftPalette.replacing(
-                            barColor: RGBAColor(color: color)
-                        )
+                        model.updateBarColor(color)
                     }
                 )
             )
@@ -312,12 +218,12 @@ struct ContentView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 ZStack {
-                    WallpaperPreviewBackground(image: wallpaperPreviewImage)
+                    WallpaperPreviewBackground(preview: model.wallpaperPreviewImage)
 
                     CarrierWidgetContentView(
-                        carrierCode: normalizedCode,
-                        palette: draftPalette,
-                        dominantColors: wallpaperDominantColors
+                        carrierCode: model.normalizedCode,
+                        palette: model.draftPalette,
+                        dominantColors: model.wallpaperDominantColors
                     )
                     .aspectRatio(329 / 155, contentMode: .fit)
                     .frame(maxWidth: .infinity)
@@ -332,94 +238,14 @@ struct ContentView: View {
                         .strokeBorder(.black.opacity(0.10), lineWidth: 1)
                 }
 
-                Text(widgetStatusText)
+                Text(model.widgetStatusText)
                     .colorInvoText(.secondary)
-                    .foregroundStyle(widgetIsReady ? ColorInvoColor.success : ColorInvoColor.muted)
+                    .foregroundStyle(model.widgetIsReady ? ColorInvoColor.success : ColorInvoColor.muted)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(minHeight: 40, alignment: .leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-        }
-    }
-
-    @MainActor
-    private func persistCarrierIfReady() async {
-        guard let settings = draftSettings, settings != savedSettings else {
-            return
-        }
-
-        do {
-            try await Task.sleep(nanoseconds: 300_000_000)
-        } catch {
-            return
-        }
-
-        await Task.detached(priority: .utility) {
-            CarrierStore.save(settings)
-        }.value
-
-        guard !Task.isCancelled, draftSettings == settings else {
-            return
-        }
-
-        savedSettings = settings
-        widgetNeedsReload = true
-    }
-
-    private func reloadWidgetIfNeeded() {
-        guard widgetNeedsReload else {
-            return
-        }
-
-        widgetNeedsReload = false
-        Task.detached(priority: .utility) {
-            WidgetCenter.shared.reloadTimelines(ofKind: CarrierWidgetKind.colorInvo)
-        }
-    }
-
-    @MainActor
-    private func loadWallpaperPalettes(from item: PhotosPickerItem?) async {
-        guard let item else {
-            return
-        }
-
-        isAnalyzingWallpaper = true
-        wallpaperStatusText = nil
-
-        defer {
-            isAnalyzingWallpaper = false
-        }
-
-        do {
-            guard
-                let data = try await item.loadTransferable(type: Data.self)
-            else {
-                wallpaperPalettes = []
-                wallpaperStatusText = "無法讀取圖片"
-                return
-            }
-
-            let analysis = await Task.detached(priority: .userInitiated) {
-                WallpaperImageAnalyzer.analyze(data)
-            }.value
-
-            guard let analysis else {
-                wallpaperPalettes = []
-                wallpaperStatusText = "無法讀取圖片"
-                return
-            }
-
-            wallpaperPreviewImage = WallpaperPreviewStore.savePreviewData(analysis.previewData)
-            wallpaperDominantColors = analysis.sourceColors
-            wallpaperPalettes = analysis.palettes
-
-            if let firstPalette = analysis.palettes.first {
-                draftPalette = firstPalette
-            }
-        } catch {
-            wallpaperPalettes = []
-            wallpaperStatusText = "無法讀取圖片"
         }
     }
 }
@@ -474,12 +300,12 @@ private struct PaletteOptionButtonContent: View {
 }
 
 private struct WallpaperPreviewBackground: View {
-    let image: UIImage?
+    let preview: WallpaperPreviewImage?
 
     var body: some View {
         ZStack {
-            if let image {
-                Image(uiImage: image)
+            if let preview {
+                Image(uiImage: preview.image)
                     .resizable()
                     .scaledToFill()
 
@@ -524,7 +350,7 @@ private struct ColorInvoTextStyleModifier: ViewModifier {
 }
 
 private extension View {
-    func colorInvoText(_ style: ColorInvoTextStyle) -> some View {
+    nonisolated func colorInvoText(_ style: ColorInvoTextStyle) -> some View {
         modifier(ColorInvoTextStyleModifier(style: style))
     }
 }
