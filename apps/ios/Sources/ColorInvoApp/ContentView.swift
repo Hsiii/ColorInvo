@@ -4,6 +4,8 @@ import UIKit
 import WidgetKit
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
+
     @State private var draftCode: String
     @State private var draftPalette: BarcodePalette
     @State private var savedSettings: CarrierSettings
@@ -13,6 +15,7 @@ struct ContentView: View {
     @State private var wallpaperDominantColors: [RGBAColor]
     @State private var wallpaperStatusText: String?
     @State private var isAnalyzingWallpaper = false
+    @State private var widgetNeedsReload = false
     @FocusState private var carrierFieldFocused: Bool
 
     private var normalizedCode: String {
@@ -125,6 +128,13 @@ struct ContentView: View {
         .tint(ColorInvoColor.primary)
         .task(id: draftSettings) {
             await persistCarrierIfReady()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase != .active else {
+                return
+            }
+
+            reloadWidgetIfNeeded()
         }
     }
 
@@ -365,7 +375,6 @@ struct ContentView: View {
 
         await Task.detached(priority: .utility) {
             CarrierStore.save(settings)
-            WidgetCenter.shared.reloadAllTimelines()
         }.value
 
         guard !Task.isCancelled, draftSettings == settings else {
@@ -373,6 +382,18 @@ struct ContentView: View {
         }
 
         savedSettings = settings
+        widgetNeedsReload = true
+    }
+
+    private func reloadWidgetIfNeeded() {
+        guard widgetNeedsReload else {
+            return
+        }
+
+        widgetNeedsReload = false
+        Task.detached(priority: .utility) {
+            WidgetCenter.shared.reloadTimelines(ofKind: "ColorInvoWidget")
+        }
     }
 
     @MainActor
