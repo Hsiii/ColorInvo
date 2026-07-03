@@ -34,9 +34,14 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
     }
 
     var contrastSummary: String {
-        String(
-            format: "符號反差 %.0f%% / 標準 %.0f%%",
+        let comparisonOperator = scannerSymbolContrast >= Self.symbolContrastStandard
+            ? "≥"
+            : "<"
+
+        return String(
+            format: "符號反差 %.0f%% %@ %.0f%%",
             scannerSymbolContrast * 100,
+            comparisonOperator,
             Self.symbolContrastStandard * 100
         )
     }

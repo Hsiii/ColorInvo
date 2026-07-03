@@ -90,8 +90,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
                 Text("手機載具")
-                    .font(.headline)
-                    .foregroundStyle(ColorInvoColor.text)
+                    .colorInvoText(.heading)
 
                 Spacer()
 
@@ -100,8 +99,7 @@ struct ContentView: View {
 
             HStack(spacing: 0) {
                 Text("/")
-                    .font(.system(.body, design: .monospaced, weight: .semibold))
-                    .foregroundStyle(ColorInvoColor.text)
+                    .colorInvoText(.code)
                     .padding(.leading, 16)
 
                 TextField("請輸入", text: carrierSuffixBinding)
@@ -110,8 +108,7 @@ struct ContentView: View {
                     .keyboardType(.asciiCapable)
                     .submitLabel(.done)
                     .focused($carrierFieldFocused)
-                    .font(.system(.body, design: .monospaced, weight: .semibold))
-                    .foregroundStyle(ColorInvoColor.text)
+                    .colorInvoText(.code)
                     .tint(ColorInvoColor.primary)
                     .padding(.leading, 2)
                     .padding(.trailing, 16)
@@ -139,7 +136,7 @@ struct ContentView: View {
                 carrierFieldFocused = false
             } label: {
                 Label(didSave ? "已儲存" : "儲存載具", systemImage: didSave ? "checkmark" : "tray.and.arrow.down")
-                    .font(.headline)
+                    .colorInvoText(.heading)
                     .frame(maxWidth: .infinity, minHeight: 48)
             }
             .buttonStyle(ColorInvoPrimaryButtonStyle())
@@ -148,29 +145,35 @@ struct ContentView: View {
     }
 
     private var validationBadge: some View {
-        Label {
+        let statusColor = isValid ? ColorInvoColor.success : ColorInvoColor.muted
+
+        return Label {
             Text(validationText)
-                .font(.subheadline.weight(.semibold))
+                .colorInvoText(.control)
+                .foregroundStyle(statusColor)
         } icon: {
             Image(systemName: isValid ? "checkmark.circle.fill" : "exclamationmark.circle")
-                .font(.subheadline)
+                .font(.callout)
+                .foregroundStyle(statusColor)
         }
-        .foregroundStyle(isValid ? ColorInvoColor.success : ColorInvoColor.muted)
     }
 
     private var colorSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("條碼顏色")
-                .font(.headline)
-                .foregroundStyle(ColorInvoColor.text)
+            HStack(spacing: 12) {
+                Text("條碼顏色")
+                    .colorInvoText(.heading)
+
+                Spacer()
+
+                contrastStatus
+            }
 
             wallpaperColorSection
 
             ColorChoiceSeparator()
 
             customColorSection
-
-            contrastStatus
         }
     }
 
@@ -180,8 +183,7 @@ struct ContentView: View {
         return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 Text("從桌布")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(ColorInvoColor.muted)
+                    .colorInvoText(.secondary)
 
                 Spacer()
 
@@ -194,7 +196,7 @@ struct ContentView: View {
                         pickerTitle,
                         systemImage: "photo.on.rectangle"
                     )
-                    .font(.callout.weight(.semibold))
+                    .colorInvoText(.control)
                     .foregroundStyle(ColorInvoColor.primary)
                     .padding(.horizontal, 12)
                     .frame(minHeight: 40)
@@ -207,15 +209,13 @@ struct ContentView: View {
 
             if isAnalyzingWallpaper {
                 Label("分析中", systemImage: "sparkles")
-                    .font(.callout.weight(.medium))
-                    .foregroundStyle(ColorInvoColor.muted)
+                    .colorInvoText(.secondary)
                     .frame(minHeight: 40, alignment: .leading)
             } else if !wallpaperPalettes.isEmpty {
                 paletteButtonGrid(wallpaperPalettes)
             } else if let wallpaperStatusText {
                 Text(wallpaperStatusText)
-                    .font(.callout)
-                    .foregroundStyle(ColorInvoColor.muted)
+                    .colorInvoText(.secondary)
                     .frame(minHeight: 40, alignment: .leading)
             }
         }
@@ -247,8 +247,7 @@ struct ContentView: View {
     private var customColorSection: some View {
         HStack(spacing: 8) {
             Text("自訂")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(ColorInvoColor.muted)
+                .colorInvoText(.secondary)
                 .frame(width: 40, alignment: .leading)
 
             compactColorPicker(
@@ -281,8 +280,7 @@ struct ContentView: View {
 
     private func compactColorPicker(title: String, color: Binding<Color>) -> some View {
         ColorPicker(title, selection: color, supportsOpacity: false)
-            .font(.callout.weight(.semibold))
-            .foregroundStyle(ColorInvoColor.text)
+            .colorInvoText(.control)
             .padding(.horizontal, 12)
             .frame(maxWidth: .infinity, minHeight: 44)
             .background(ColorInvoColor.surface)
@@ -294,33 +292,34 @@ struct ContentView: View {
     }
 
     private var contrastStatus: some View {
-        HStack(spacing: 8) {
-            Label(
-                draftPalette.meetsCommercialGuidance ? "可掃描配色" : draftPalette.standardMessage,
-                systemImage: draftPalette.meetsCommercialGuidance
+        let statusColor = draftPalette.meetsCommercialGuidance
+            ? ColorInvoColor.success
+            : ColorInvoColor.warning
+
+        return HStack(spacing: 6) {
+            Image(
+                systemName: draftPalette.meetsCommercialGuidance
                     ? "checkmark.circle.fill"
                     : "exclamationmark.triangle.fill"
             )
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(draftPalette.meetsCommercialGuidance ? ColorInvoColor.success : ColorInvoColor.warning)
-
-            Spacer(minLength: 8)
+            .font(.callout)
+            .foregroundStyle(statusColor)
 
             Text(draftPalette.contrastSummary)
-                .font(.system(.caption, design: .monospaced, weight: .semibold))
-                .foregroundStyle(ColorInvoColor.muted)
+                .colorInvoText(.secondary)
+                .foregroundStyle(statusColor)
+                .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
-        .frame(minHeight: 24)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(draftPalette.standardMessage)
     }
 
     private var widgetSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("小工具預覽")
-                .font(.headline)
-                .foregroundStyle(ColorInvoColor.text)
+                .colorInvoText(.heading)
 
             Group {
                 if isValid {
@@ -351,6 +350,7 @@ struct ContentView: View {
                 showingWidgetHelp = true
             } label: {
                 Label("加入小工具", systemImage: "plus.rectangle.on.rectangle")
+                    .colorInvoText(.control)
                     .frame(maxWidth: .infinity, minHeight: 48)
             }
             .buttonStyle(ColorInvoPrimaryButtonStyle())
@@ -426,34 +426,41 @@ private struct PaletteOptionButtonContent: View {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .fill(palette.backgroundColor.color)
 
-                HStack(spacing: 4) {
-                    ForEach(0..<7) { index in
-                        RoundedRectangle(cornerRadius: 1)
-                            .fill(palette.barColor.color)
-                            .frame(width: index.isMultiple(of: 3) ? 12 : 4)
-                    }
-                }
-                .frame(height: 48)
+                Code39BarcodeView(
+                    value: "/A1B2",
+                    barColor: palette.barColor.color,
+                    backgroundColor: palette.backgroundColor.color
+                )
+                .padding(.horizontal, 8)
+                .padding(.vertical, 10)
             }
             .frame(width: 64, height: 64)
             .overlay {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .strokeBorder(
-                        isSelected ? ColorInvoColor.primary : ColorInvoColor.hairline,
-                        lineWidth: isSelected ? 4 : 1
-                    )
+                    .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
             }
 
             Text(palette.name)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(ColorInvoColor.text)
+                .colorInvoText(.secondary)
                 .multilineTextAlignment(.center)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity, minHeight: 88, alignment: .top)
-        .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .padding(4)
+        .frame(maxWidth: .infinity, minHeight: 96, alignment: .top)
+        .background {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(isSelected ? ColorInvoColor.primarySoft : .clear)
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(
+                    isSelected ? ColorInvoColor.primary : .clear,
+                    lineWidth: 2
+                )
+        }
+        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
@@ -465,8 +472,7 @@ private struct ColorChoiceSeparator: View {
                 .frame(height: 1)
 
             Text("或")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(ColorInvoColor.muted)
+                .colorInvoText(.secondary)
 
             Rectangle()
                 .fill(ColorInvoColor.hairline)
@@ -527,6 +533,44 @@ private struct ColorInvoPrimaryButtonStyle: ButtonStyle {
             .background(isEnabled ? ColorInvoColor.primary : ColorInvoColor.hairline)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .opacity(configuration.isPressed ? 0.82 : 1)
+    }
+}
+
+private enum ColorInvoTextStyle {
+    case heading
+    case control
+    case secondary
+    case code
+}
+
+private struct ColorInvoTextStyleModifier: ViewModifier {
+    let style: ColorInvoTextStyle
+
+    func body(content: Content) -> some View {
+        switch style {
+        case .heading:
+            content
+                .font(.headline)
+                .foregroundStyle(ColorInvoColor.text)
+        case .control:
+            content
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(ColorInvoColor.text)
+        case .secondary:
+            content
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(ColorInvoColor.muted)
+        case .code:
+            content
+                .font(.system(.body, design: .monospaced, weight: .semibold))
+                .foregroundStyle(ColorInvoColor.text)
+        }
+    }
+}
+
+private extension View {
+    func colorInvoText(_ style: ColorInvoTextStyle) -> some View {
+        modifier(ColorInvoTextStyleModifier(style: style))
     }
 }
 
