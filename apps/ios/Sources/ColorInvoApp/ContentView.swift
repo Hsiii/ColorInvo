@@ -23,6 +23,10 @@ struct ContentView: View {
         CarrierCode.isValid(normalizedCode)
     }
 
+    private var hasCarrierInput: Bool {
+        !carrierSuffix.isEmpty
+    }
+
     private var canAutoSave: Bool {
         isValid && draftPalette.meetsCommercialGuidance
     }
@@ -195,6 +199,8 @@ struct ContentView: View {
             wallpaperPaletteChoices
             customColorSection
         }
+        .disabled(!hasCarrierInput)
+        .opacity(hasCarrierInput ? 1 : 0.48)
     }
 
     private var wallpaperColorSection: some View {

@@ -11,7 +11,7 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
     static let minimumBackgroundReflectance = 0.70
 
     var id: String {
-        name
+        "\(name)-\(barColor.identity)-\(backgroundColor.identity)"
     }
 
     var meetsCommercialGuidance: Bool {
@@ -193,6 +193,17 @@ struct RGBAColor: Codable, Equatable {
         let normalizedHue = hue < 0 ? hue + 360 : hue
 
         return normalizedHue <= 40 || normalizedHue >= 340
+    }
+
+    var identity: String {
+        [
+            red,
+            green,
+            blue,
+            alpha,
+        ]
+        .map { String(Int(($0 * 10_000).rounded())) }
+        .joined(separator: ",")
     }
 
     private func linearized(_ channel: Double) -> Double {
