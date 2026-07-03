@@ -190,66 +190,50 @@ struct ContentView: View {
     }
 
     private var colorSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 12) {
-                Text("條碼顏色")
-                    .colorInvoText(.heading)
-
-                Spacer()
-
-                contrastStatus
-            }
-
-            VStack(alignment: .leading, spacing: 12) {
-                wallpaperColorSection
-                customColorSection
-            }
+        VStack(alignment: .leading, spacing: 12) {
+            wallpaperColorSection
+            wallpaperPaletteChoices
+            customColorSection
         }
     }
 
     private var wallpaperColorSection: some View {
-        let pickerTitle = wallpaperPalettes.isEmpty ? "選擇圖片" : "重新選擇"
-
-        return colorChoicePanel(title: "先從桌布", minHeight: 160) {
-            VStack(alignment: .leading, spacing: 12) {
-                PhotosPicker(
-                    selection: $wallpaperPickerItem,
-                    matching: .images,
-                    photoLibrary: .shared()
-                ) {
-                    Label(
-                        pickerTitle,
-                        systemImage: "photo.on.rectangle"
-                    )
-                    .colorInvoText(.control)
-                    .foregroundStyle(ColorInvoColor.primary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                    .padding(.horizontal, 8)
-                    .frame(maxWidth: .infinity, minHeight: 40)
-                    .background(ColorInvoColor.primarySoft)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                }
-                .buttonStyle(.plain)
-                .disabled(isAnalyzingWallpaper)
-
-                if isAnalyzingWallpaper {
-                    Label("分析中", systemImage: "sparkles")
-                        .colorInvoText(.secondary)
-                        .frame(minHeight: 40, alignment: .leading)
-                } else if !wallpaperPalettes.isEmpty {
-                    paletteButtonGrid(wallpaperPalettes)
-                } else if let wallpaperStatusText {
-                    Text(wallpaperStatusText)
-                        .colorInvoText(.secondary)
-                        .frame(minHeight: 40, alignment: .leading)
-                }
-            }
+        PhotosPicker(
+            selection: $wallpaperPickerItem,
+            matching: .images,
+            photoLibrary: .shared()
+        ) {
+            Label("選擇桌布", systemImage: "photo.on.rectangle")
+                .colorInvoText(.control)
+                .foregroundStyle(ColorInvoColor.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .padding(.horizontal, 12)
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .background(ColorInvoColor.primarySoft)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
+        .buttonStyle(.plain)
+        .disabled(isAnalyzingWallpaper)
         .onChange(of: wallpaperPickerItem) { _, item in
             Task {
                 await loadWallpaperPalettes(from: item)
             }
+        }
+    }
+
+    @ViewBuilder
+    private var wallpaperPaletteChoices: some View {
+        if isAnalyzingWallpaper {
+            Label("分析中", systemImage: "sparkles")
+                .colorInvoText(.secondary)
+                .frame(minHeight: 40, alignment: .leading)
+        } else if !wallpaperPalettes.isEmpty {
+            paletteButtonGrid(wallpaperPalettes)
+        } else if let wallpaperStatusText {
+            Text(wallpaperStatusText)
+                .colorInvoText(.secondary)
+                .frame(minHeight: 40, alignment: .leading)
         }
     }
 
@@ -271,53 +255,30 @@ struct ContentView: View {
     }
 
     private var customColorSection: some View {
-        colorChoicePanel(title: "需要時微調") {
-            HStack(spacing: 8) {
-                compactColorPicker(
-                    title: "條碼",
-                    color: Binding(
-                        get: { draftPalette.barColor.color },
-                        set: { color in
-                            draftPalette = draftPalette.replacing(
-                                barColor: RGBAColor(color: color)
-                            )
-                        }
-                    )
+        HStack(spacing: 8) {
+            compactColorPicker(
+                title: "背景",
+                color: Binding(
+                    get: { draftPalette.backgroundColor.color },
+                    set: { color in
+                        draftPalette = draftPalette.replacing(
+                            backgroundColor: RGBAColor(color: color)
+                        )
+                    }
                 )
+            )
 
-                compactColorPicker(
-                    title: "背景",
-                    color: Binding(
-                        get: { draftPalette.backgroundColor.color },
-                        set: { color in
-                            draftPalette = draftPalette.replacing(
-                                backgroundColor: RGBAColor(color: color)
-                            )
-                        }
-                    )
+            compactColorPicker(
+                title: "條碼",
+                color: Binding(
+                    get: { draftPalette.barColor.color },
+                    set: { color in
+                        draftPalette = draftPalette.replacing(
+                            barColor: RGBAColor(color: color)
+                        )
+                    }
                 )
-            }
-        }
-    }
-
-    private func colorChoicePanel<Content: View>(
-        title: String,
-        minHeight: CGFloat = 0,
-        @ViewBuilder content: () -> Content
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(title)
-                .colorInvoText(.secondary)
-
-            content()
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .topLeading)
-        .background(ColorInvoColor.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+            )
         }
     }
 
@@ -334,31 +295,6 @@ struct ContentView: View {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
             }
-    }
-
-    private var contrastStatus: some View {
-        let statusColor = draftPalette.meetsCommercialGuidance
-            ? ColorInvoColor.success
-            : ColorInvoColor.warning
-
-        return HStack(spacing: 6) {
-            Image(
-                systemName: draftPalette.meetsCommercialGuidance
-                    ? "checkmark.circle.fill"
-                    : "exclamationmark.triangle.fill"
-            )
-            .font(.callout)
-            .foregroundStyle(statusColor)
-
-            Text(draftPalette.contrastSummary)
-                .colorInvoText(.secondary)
-                .foregroundStyle(statusColor)
-                .monospacedDigit()
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(draftPalette.standardMessage)
     }
 
     private var widgetSection: some View {
@@ -697,7 +633,6 @@ private enum ColorInvoColor {
     static let frozenLake = Color(red: 112 / 255, green: 214 / 255, blue: 255 / 255)
     static let roseKiss = Color(red: 255 / 255, green: 112 / 255, blue: 166 / 255)
     static let primary = Color(red: 0 / 255, green: 126 / 255, blue: 168 / 255)
-    static let attention = Color(red: 180 / 255, green: 98 / 255, blue: 20 / 255)
     static let background = Color.white
     static let surface = Color.white
     static let primarySoft = Color(red: 234 / 255, green: 248 / 255, blue: 255 / 255)
@@ -705,7 +640,6 @@ private enum ColorInvoColor {
     static let text = Color(red: 17 / 255, green: 24 / 255, blue: 39 / 255)
     static let muted = Color(red: 82 / 255, green: 96 / 255, blue: 106 / 255)
     static let success = primary
-    static let warning = attention
 }
 
 private enum ColorInvoRuntime {
