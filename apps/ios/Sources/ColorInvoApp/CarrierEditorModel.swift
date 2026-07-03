@@ -6,6 +6,8 @@ import WidgetKit
 
 @MainActor
 final class CarrierEditorModel: ObservableObject {
+    private static let autosaveDelayNanoseconds: UInt64 = 350_000_000
+
     @Published private(set) var draftCode = ""
     @Published private(set) var draftPalette: BarcodePalette = .classic
     @Published private(set) var savedSettings: CarrierSettings = .empty
@@ -21,6 +23,7 @@ final class CarrierEditorModel: ObservableObject {
 
     private let pipeline: CarrierAppPipeline
     private var wallpaperTask: Task<Void, Never>?
+    private var autosaveTask: Task<Void, Never>?
     private var wallpaperRequestID = UUID()
     private var hasLoadedInitialState = false
     private var isLoadingInitialState = false
@@ -32,6 +35,7 @@ final class CarrierEditorModel: ObservableObject {
 
     deinit {
         wallpaperTask?.cancel()
+        autosaveTask?.cancel()
     }
 
     var normalizedCode: String {
@@ -64,33 +68,9 @@ final class CarrierEditorModel: ObservableObject {
         draftSettings == savedSettings
     }
 
-    var canSaveSettings: Bool {
-        draftSettings != nil && !isSavingSettings
-    }
-
-    var saveButtonText: String {
-        if isSavingSettings {
-            return "儲存中"
-        }
-
-        if widgetIsReady {
-            return "重新儲存"
-        }
-
-        return "儲存載具"
-    }
-
-    var saveButtonSystemImage: String {
-        widgetIsReady ? "arrow.clockwise" : "square.and.arrow.down"
-    }
-
     var widgetStatusText: String {
         if isSavingSettings {
-            return "正在儲存小工具設定"
-        }
-
-        if widgetIsReady {
-            return "小工具已準備好，可重新儲存以更新"
+            return "正在更新小工具設定"
         }
 
         if !isValid {
@@ -98,10 +78,14 @@ final class CarrierEditorModel: ObservableObject {
         }
 
         if !draftPalette.meetsCommercialGuidance {
-            return "配色可掃描後即可儲存小工具"
+            return "配色可掃描後即可更新小工具"
         }
 
-        return "按下儲存以更新小工具"
+        if widgetIsReady {
+            return "小工具已準備好，可在主畫面加入"
+        }
+
+        return "正在等待更新小工具"
     }
 
     var carrierSuffix: String {
@@ -149,6 +133,7 @@ final class CarrierEditorModel: ObservableObject {
         }
 
         draftCode = nextCode
+        scheduleSettingsSave()
     }
 
     func selectPalette(_ palette: BarcodePalette) {
@@ -158,6 +143,7 @@ final class CarrierEditorModel: ObservableObject {
 
         draftPalette = palette
         paletteRevision += 1
+        scheduleSettingsSave()
     }
 
     func updateBackgroundColor(_ color: Color) {
@@ -174,6 +160,7 @@ final class CarrierEditorModel: ObservableObject {
         }
 
         self.showsWave = showsWave
+        scheduleSettingsSave()
     }
 
     func setShowsBarcodeValue(_ showsBarcodeValue: Bool) {
@@ -182,19 +169,7 @@ final class CarrierEditorModel: ObservableObject {
         }
 
         self.showsBarcodeValue = showsBarcodeValue
-    }
-
-    func saveSettings() {
-        guard let settings = draftSettings else {
-            return
-        }
-
-        isSavingSettings = true
-        Task { [weak self, pipeline] in
-            await pipeline.save(settings)
-            await pipeline.reloadWidgetTimeline()
-            await self?.finishSave(settings)
-        }
+        scheduleSettingsSave()
     }
 
     func loadWallpaperPalettes(from item: PhotosPickerItem?) {
@@ -247,6 +222,7 @@ final class CarrierEditorModel: ObservableObject {
     }
 
     private func apply(_ snapshot: CarrierEditorSnapshot) {
+        autosaveTask?.cancel()
         savedSettings = snapshot.settings
         draftCode = snapshot.settings.carrierCode
         draftPalette = snapshot.settings.palette
@@ -268,11 +244,50 @@ final class CarrierEditorModel: ObservableObject {
 
         draftPalette = palette
         paletteRevision += 1
+        scheduleSettingsSave()
     }
 
-    private func finishSave(_ settings: CarrierSettings) {
+    private func scheduleSettingsSave() {
+        autosaveTask?.cancel()
+        guard let settings = draftSettings, settings != savedSettings else {
+            isSavingSettings = false
+            return
+        }
+
+        isSavingSettings = true
+        let delay = Self.autosaveDelayNanoseconds
+        autosaveTask = Task { [weak self, pipeline] in
+            do {
+                try await Task.sleep(nanoseconds: delay)
+            } catch {
+                return
+            }
+
+            guard !Task.isCancelled else {
+                return
+            }
+
+            await pipeline.save(settings)
+            guard !Task.isCancelled else {
+                return
+            }
+
+            await pipeline.reloadWidgetTimeline()
+            guard !Task.isCancelled else {
+                return
+            }
+
+            await self?.finishAutosave(settings)
+        }
+    }
+
+    private func finishAutosave(_ settings: CarrierSettings) {
         savedSettings = settings
-        isSavingSettings = false
+        isSavingSettings = draftSettings != settings
+
+        if !isSavingSettings {
+            autosaveTask = nil
+        }
     }
 
     private func applyWallpaperResult(
@@ -293,6 +308,8 @@ final class CarrierEditorModel: ObservableObject {
         if paletteRevision == paletteRevisionAtStart, let firstPalette = result.palettes.first {
             draftPalette = firstPalette
         }
+
+        scheduleSettingsSave()
     }
 
     private func showWallpaperFailure(requestID: UUID) {
