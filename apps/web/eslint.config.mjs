@@ -32,6 +32,13 @@ export default [
     },
 
     {
+        files: ['src/app/**/*.ts', 'src/app/**/*.tsx'],
+        rules: {
+            'complete/require-ascii': 'off',
+        },
+    },
+
+    {
         files: ['src/app/**/*.tsx'],
         rules: {
             'complete/no-mutable-return': 'off',

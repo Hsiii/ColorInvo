@@ -8,7 +8,7 @@ import './global.css';
 export const metadata: Metadata = {
     metadataBase: new URL(SITE.url),
     title: {
-        default: `${SITE.name} - Taiwan carrier barcode widgets`,
+        default: `${SITE.localName} ${SITE.name} - 台灣手機條碼桌面小工具`,
         template: `%s | ${SITE.name}`,
     },
     description: SITE.description,
@@ -22,10 +22,10 @@ export const metadata: Metadata = {
         siteName: SITE.name,
         images: [
             {
-                url: '/colorinvo-icon.png',
-                width: 1024,
-                height: 1024,
-                alt: `${SITE.name} app icon`,
+                url: '/colorinvo-demo.png',
+                width: 1284,
+                height: 2778,
+                alt: `${SITE.localName} App 畫面示意`,
             },
         ],
     },
@@ -41,7 +41,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
     return (
-        <html lang='en'>
+        <html lang='zh-Hant-TW'>
             <body>{children}</body>
         </html>
     );

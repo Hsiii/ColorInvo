@@ -2,7 +2,6 @@
     --ff-body: 'IBM Plex Sans', 'Avenir Next', 'Segoe UI', sans-serif;
     --ff-display: 'Iowan Old Style', 'Palatino Linotype', serif;
 
-    --fs-label: 0.75rem;
     --fs-small: 0.875rem;
     --fs-body: 1rem;
     --fs-body-lg: 1.125rem;
@@ -13,7 +12,6 @@
     --fw-semibold: 600;
     --fw-bold: 700;
 
-    --font-label: var(--fw-semibold) var(--fs-label) / 1.2 var(--ff-body);
     --font-body-md: var(--fw-medium) var(--fs-body) / 1.6 var(--ff-body);
     --font-body-lg: var(--fw-medium) var(--fs-body-lg) / 1.6 var(--ff-body);
     --font-heading: var(--fw-bold) var(--fs-heading) / 1.2 var(--ff-body);
@@ -35,11 +33,17 @@
     --size-outline: 2px;
     --size-content-max: 1120px;
     --size-legal-max: 760px;
-    --size-icon-lg: 112px;
+    --size-demo-width: 256px;
     --measure-copy: 64ch;
 
     --radius-8: 8px;
     --radius-12: 12px;
+}
+
+@media (max-width: 800px) {
+    :root {
+        --size-demo-width: 168px;
+    }
 }
 
 @media (max-width: 720px) {

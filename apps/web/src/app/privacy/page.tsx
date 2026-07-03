@@ -5,9 +5,9 @@ import { LegalPage } from '../LegalPage';
 import { SITE } from '../site';
 
 export const metadata: Metadata = {
-    title: 'Privacy Policy',
+    title: '隱私權政策',
     description:
-        'ColorInvo privacy policy for local carrier settings, wallpaper palette generation, widgets, and support contact.',
+        '條色盤隱私權政策：本機手機條碼設定、桌布取色、小工具與支援聯絡。',
     alternates: {
         canonical: '/privacy',
     },
@@ -15,94 +15,79 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage(): JSX.Element {
     return (
-        <LegalPage
-            active='privacy'
-            eyebrow='Privacy Policy'
-            lede='ColorInvo is designed to work without accounts, ads, analytics SDKs, or a ColorInvo backend.'
-            title='Privacy Policy'
-        >
+        <LegalPage title='隱私權政策'>
             <section className='legalSection'>
-                <h2 className='legalSection__title'>Summary</h2>
+                <h2 className='legalSection__title'>摘要</h2>
                 <p>
-                    ColorInvo stores the Taiwan mobile invoice carrier code,
-                    selected barcode palette, and widget settings locally on
-                    your device. The app does not sell personal data, does not
-                    use third-party advertising, and does not require a
-                    ColorInvo account.
+                    ColorInvo
+                    會把台灣手機條碼、條碼配色與小工具設定儲存在你的裝置上。 App
+                    不販售個人資料、不使用第三方廣告，也不需要 ColorInvo 帳號。
                 </p>
             </section>
             <section className='legalSection'>
-                <h2 className='legalSection__title'>Information Stored</h2>
+                <h2 className='legalSection__title'>儲存的資訊</h2>
                 <ul>
                     <li>
-                        Carrier code and palette settings are stored in the iOS
-                        app group so the app and widget can read the same saved
-                        setup.
+                        手機條碼與配色設定會儲存在 iOS app group， 讓 App
+                        與桌面小工具讀取同一份設定。
                     </li>
                     <li>
-                        Wallpaper-derived palettes are generated on device from
-                        the image you select. ColorInvo saves the derived color
-                        choice and a small local preview copy for the Home
-                        Screen preview.
+                        桌布配色由你選擇的圖片在裝置上產生。ColorInvo
+                        會儲存選定的配色， 以及用於主畫面預覽的小型本機預覽圖。
                     </li>
                     <li>
-                        If you email support, the email address and message
-                        content you send are used to respond to the request.
+                        如果你寄信聯絡支援，寄件地址與信件內容會用於回覆該次請求。
                     </li>
                 </ul>
             </section>
             <section className='legalSection'>
-                <h2 className='legalSection__title'>Photos</h2>
+                <h2 className='legalSection__title'>照片</h2>
                 <p>
-                    ColorInvo uses Apple photo picker access only for the image
-                    you choose. The app does not browse your full photo library
-                    and does not upload selected images to a ColorInvo service.
-                    The preview copy stays on your device.
+                    ColorInvo 只會透過 Apple 照片選擇器讀取你選擇的圖片。 App
+                    不會瀏覽完整照片圖庫，也不會把選取圖片上傳到 ColorInvo
+                    服務。 預覽圖會留在你的裝置上。
                 </p>
             </section>
             <section className='legalSection'>
-                <h2 className='legalSection__title'>Sharing</h2>
+                <h2 className='legalSection__title'>分享</h2>
                 <p>
-                    The widget reads the saved carrier settings from the shared
-                    app group on the same device. ColorInvo does not share those
-                    settings with an external ColorInvo server.
+                    桌面小工具會從同一台裝置的 shared app group 讀取已儲存設定。
+                    ColorInvo 不會把這些設定分享給外部 ColorInvo 伺服器。
                 </p>
                 <p>
-                    Apple may process App Store downloads, purchases,
-                    diagnostics, crash reports, or TestFlight feedback under
-                    Apple policies and user settings.
+                    Apple 可能依照 Apple 政策與使用者設定處理 App Store
+                    下載、購買、 診斷資料、當機報告或 TestFlight 回饋。
                 </p>
             </section>
             <section className='legalSection'>
-                <h2 className='legalSection__title'>Retention And Control</h2>
+                <h2 className='legalSection__title'>保留與控制</h2>
                 <p>
-                    Local settings remain on the device until you change them,
-                    remove them through the app, or uninstall ColorInvo. Support
-                    emails are retained as needed to respond to and track the
-                    support request.
+                    本機設定會留在裝置上，直到你變更設定、在 App
+                    中移除，或解除安裝
+                    ColorInvo。支援信件會視回覆與追蹤請求所需保留。
                 </p>
             </section>
             <section className='legalSection'>
-                <h2 className='legalSection__title'>Website</h2>
+                <h2 className='legalSection__title'>網站</h2>
                 <p>
-                    This website is hosted at {SITE.domain}. Hosting providers
-                    may process basic request information such as IP address,
-                    user agent, and timestamps to operate and secure the site.
+                    本網站託管於 {SITE.domain}
+                    。網站代管服務可能為了營運與保護網站，
+                    處理基本請求資訊，例如 IP 位址、使用者代理與時間戳記。
                 </p>
             </section>
             <section className='legalSection'>
-                <h2 className='legalSection__title'>Contact</h2>
+                <h2 className='legalSection__title'>聯絡方式</h2>
                 <p>
-                    Questions about this policy can be sent to{' '}
+                    對此政策有疑問，請寄信至{' '}
                     <a
                         className='legalLink'
                         href={`mailto:${SITE.supportEmail}?subject=ColorInvo%20Privacy`}
                     >
                         {SITE.supportEmail}
                     </a>
-                    .
+                    。
                 </p>
-                <p>Last updated: {SITE.lastUpdated}</p>
+                <p>最後更新：{SITE.lastUpdated}</p>
             </section>
         </LegalPage>
     );

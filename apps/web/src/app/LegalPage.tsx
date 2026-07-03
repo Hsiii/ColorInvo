@@ -2,30 +2,23 @@ import type { JSX, ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import type { SiteRoute } from './site';
 import { ROUTES, SITE } from './site';
 
 interface SiteShellProps {
-    readonly active: SiteRoute;
     readonly children: ReactNode;
 }
 
-interface LegalPageProps extends SiteShellProps {
-    readonly eyebrow: string;
-    readonly lede: string;
+interface LegalPageProps {
+    readonly children: ReactNode;
     readonly title: string;
 }
 
-const navLinks: ReadonlyArray<{
-    readonly href: string;
-    readonly id: SiteRoute;
-    readonly label: string;
-}> = [
-    { href: ROUTES.support, id: 'support', label: 'Support' },
-    { href: ROUTES.privacy, id: 'privacy', label: 'Privacy' },
-];
+const footerLinks = [
+    { href: ROUTES.support, label: '支援 Support' },
+    { href: ROUTES.privacy, label: '隱私 Privacy' },
+] as const;
 
-export function SiteShell({ active, children }: SiteShellProps): JSX.Element {
+export function SiteShell({ children }: SiteShellProps): JSX.Element {
     return (
         <div className='siteShell'>
             <header className='siteHeader'>
@@ -42,21 +35,6 @@ export function SiteShell({ active, children }: SiteShellProps): JSX.Element {
                         />
                         <span>{SITE.name}</span>
                     </Link>
-                    <div className='siteNav__links'>
-                        {navLinks.map((link) => (
-                            <Link
-                                aria-current={
-                                    active === link.id ? 'page' : undefined
-                                }
-                                className='siteNav__link'
-                                data-active={active === link.id}
-                                href={link.href}
-                                key={link.id}
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
-                    </div>
                 </nav>
             </header>
             <main className='siteMain'>{children}</main>
@@ -66,11 +44,11 @@ export function SiteShell({ active, children }: SiteShellProps): JSX.Element {
                         {SITE.localName} / {SITE.name}
                     </p>
                     <div className='siteFooter__links'>
-                        {navLinks.map((link) => (
+                        {footerLinks.map((link) => (
                             <Link
                                 className='legalLink'
                                 href={link.href}
-                                key={link.id}
+                                key={link.href}
                             >
                                 {link.label}
                             </Link>
@@ -82,19 +60,11 @@ export function SiteShell({ active, children }: SiteShellProps): JSX.Element {
     );
 }
 
-export function LegalPage({
-    eyebrow,
-    lede,
-    title,
-    active,
-    children,
-}: LegalPageProps): JSX.Element {
+export function LegalPage({ children, title }: LegalPageProps): JSX.Element {
     return (
-        <SiteShell active={active}>
+        <SiteShell>
             <section className='legalHero'>
-                <p className='eyebrow'>{eyebrow}</p>
                 <h1 className='legalHero__title'>{title}</h1>
-                <p className='legalHero__lede'>{lede}</p>
             </section>
             <article className='legalContent'>{children}</article>
         </SiteShell>

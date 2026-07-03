@@ -1,6 +1,6 @@
 # ColorInvo Web
 
-Static Next.js support and privacy site for ColorInvo at
+Static Next.js product, support, and privacy site for ColorInvo at
 `https://colorinvo.hsichen.dev`.
 
 ## Install

@@ -1,12 +1,12 @@
 export const SITE = {
     name: 'ColorInvo',
-    localName: '\u689D\u8272\u76E4',
+    localName: '條色盤',
     url: 'https://colorinvo.hsichen.dev',
     domain: 'colorinvo.hsichen.dev',
     supportEmail: 'its.hsichen@gmail.com',
-    lastUpdated: 'July 3, 2026',
+    lastUpdated: '2026 年 7 月 3 日',
     description:
-        'Wallpaper-matched Taiwan mobile invoice carrier barcode widgets for iPhone.',
+        '台灣手機條碼 iPhone 桌面小工具，配色跟著桌布走，設定只留在裝置上。',
 } as const;
 
 export const ROUTES = {
@@ -14,5 +14,3 @@ export const ROUTES = {
     privacy: '/privacy',
     support: '/support',
 } as const;
-
-export type SiteRoute = keyof typeof ROUTES;

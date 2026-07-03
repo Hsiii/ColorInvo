@@ -1,129 +1,65 @@
 import type { JSX } from 'react';
-import type { LucideIcon } from 'lucide-react';
-import {
-    ChevronRight,
-    LifeBuoy,
-    Palette,
-    ShieldCheck,
-    Smartphone,
-} from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 
 import { SiteShell } from './LegalPage';
-import { ROUTES, SITE } from './site';
+import { SITE } from './site';
 
-const panels: ReadonlyArray<{
+const details: ReadonlyArray<{
     readonly body: string;
-    readonly href: string;
-    readonly icon: LucideIcon;
     readonly title: string;
 }> = [
     {
-        body: 'Get help adding the widget, saving your Taiwan mobile invoice carrier, or reporting a scanning issue.',
-        href: ROUTES.support,
-        icon: LifeBuoy,
-        title: 'Support',
+        title: '手機條碼',
+        body: '輸入一次載具號碼，App 會檢查格式並產生適合掃描的 Code 39 條碼。',
     },
     {
-        body: 'ColorInvo keeps the carrier code, palette, and widget settings on device in the shared app group.',
-        href: ROUTES.privacy,
-        icon: ShieldCheck,
-        title: 'Privacy',
+        title: '桌面小工具',
+        body: '儲存後直接放到 iPhone 主畫面，需要結帳時不用再開發票 App。',
     },
     {
-        body: 'Pick a wallpaper image and ColorInvo builds scan-conscious barcode colors from it on device.',
-        href: ROUTES.support,
-        icon: Palette,
-        title: 'Wallpaper palettes',
+        title: '本機處理',
+        body: '桌布取色與小工具設定都在裝置上完成，沒有帳號、廣告或後端服務。',
     },
 ];
 
 export default function HomePage(): JSX.Element {
     return (
-        <SiteShell active='home'>
+        <SiteShell>
             <section className='homeHero'>
                 <div className='homeHero__copy'>
-                    <p className='eyebrow'>{SITE.localName}</p>
-                    <h1 className='homeHero__title'>{SITE.name}</h1>
+                    <h1 className='homeHero__title'>
+                        {SITE.localName} {SITE.name}
+                    </h1>
                     <p className='homeHero__lede'>
-                        Taiwan mobile invoice carrier barcode widgets that match
-                        your wallpaper while keeping setup data local.
+                        台灣手機條碼放進 iPhone 桌面小工具，配色跟著桌布走，
+                        設定只留在裝置上。
                     </p>
-                    <div className='homeHero__actions'>
-                        <Link className='actionLink' href={ROUTES.support}>
-                            <LifeBuoy aria-hidden='true' size={20} />
-                            Support
-                        </Link>
-                        <Link className='secondaryLink' href={ROUTES.privacy}>
-                            <ShieldCheck aria-hidden='true' size={20} />
-                            Privacy
-                        </Link>
-                    </div>
                 </div>
                 <aside
-                    aria-label='ColorInvo app summary'
-                    className='appPreview'
+                    aria-label={`${SITE.localName} App 畫面示意`}
+                    className='demoPreview'
                 >
                     <Image
-                        alt='ColorInvo app icon'
-                        className='appPreview__icon'
-                        height={112}
+                        alt={`${SITE.localName} App 顯示手機條碼與桌面小工具預覽`}
+                        className='demoPreview__image'
+                        height={2778}
                         priority
-                        src='/colorinvo-icon.png'
-                        width={112}
+                        src='/colorinvo-demo.png'
+                        width={1284}
                     />
-                    <div className='appPreview__text'>
-                        <p className='appPreview__title'>
-                            Home Screen carrier widget
-                        </p>
-                        <p>
-                            Save the carrier once, choose a palette, and show
-                            the barcode in an iOS widget.
-                        </p>
-                    </div>
                 </aside>
             </section>
-            <section aria-label='Site sections' className='homeSection'>
-                <div className='panelGrid'>
-                    {panels.map((panel) => {
-                        const Icon = panel.icon;
-
-                        return (
-                            <Link
-                                className='panel'
-                                href={panel.href}
-                                key={panel.title}
-                            >
-                                <span className='panel__icon'>
-                                    <Icon aria-hidden='true' size={24} />
-                                </span>
-                                <p className='panel__title'>{panel.title}</p>
-                                <p className='panel__body'>{panel.body}</p>
-                                <span className='panel__footer'>
-                                    Open
-                                    <ChevronRight
-                                        aria-hidden='true'
-                                        size={20}
-                                    />
-                                </span>
-                            </Link>
-                        );
-                    })}
-                </div>
-            </section>
-            <section className='homeSection'>
-                <div className='callout'>
-                    <p className='callout__title'>
-                        Built for the Taiwan mobile invoice carrier flow.
-                    </p>
-                    <p>
-                        ColorInvo supports Code 39 carrier barcodes, validates
-                        the saved value, and shares the same settings with the
-                        widget through the iOS app group.
-                    </p>
-                    <Smartphone aria-hidden='true' size={24} />
-                </div>
+            <section aria-label='功能概要' className='homeSection homeDetails'>
+                <ul className='homeDetails__list'>
+                    {details.map((detail) => (
+                        <li className='homeDetails__item' key={detail.title}>
+                            <h2 className='homeDetails__title'>
+                                {detail.title}
+                            </h2>
+                            <p>{detail.body}</p>
+                        </li>
+                    ))}
+                </ul>
             </section>
         </SiteShell>
     );
