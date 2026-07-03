@@ -200,7 +200,7 @@ struct ContentView: View {
                 contrastStatus
             }
 
-            HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 12) {
                 wallpaperColorSection
                 customColorSection
             }
@@ -210,7 +210,7 @@ struct ContentView: View {
     private var wallpaperColorSection: some View {
         let pickerTitle = wallpaperPalettes.isEmpty ? "選擇圖片" : "重新選擇"
 
-        return colorChoicePanel(title: "桌布") {
+        return colorChoicePanel(title: "先從桌布", minHeight: 160) {
             VStack(alignment: .leading, spacing: 12) {
                 PhotosPicker(
                     selection: $wallpaperPickerItem,
@@ -271,8 +271,8 @@ struct ContentView: View {
     }
 
     private var customColorSection: some View {
-        colorChoicePanel(title: "自訂") {
-            VStack(alignment: .leading, spacing: 8) {
+        colorChoicePanel(title: "需要時微調") {
+            HStack(spacing: 8) {
                 compactColorPicker(
                     title: "條碼",
                     color: Binding(
@@ -302,6 +302,7 @@ struct ContentView: View {
 
     private func colorChoicePanel<Content: View>(
         title: String,
+        minHeight: CGFloat = 0,
         @ViewBuilder content: () -> Content
     ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -311,7 +312,7 @@ struct ContentView: View {
             content()
         }
         .padding(12)
-        .frame(maxWidth: .infinity, minHeight: 160, alignment: .topLeading)
+        .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .topLeading)
         .background(ColorInvoColor.surface)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay {
