@@ -176,26 +176,68 @@ struct ContentView: View {
     }
 
     private var customColorSection: some View {
-        HStack(spacing: 8) {
-            compactColorPicker(
-                title: "背景",
-                color: Binding(
-                    get: { model.draftPalette.backgroundColor.color },
-                    set: { color in
-                        model.updateBackgroundColor(color)
-                    }
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                compactColorPicker(
+                    title: "背景",
+                    color: Binding(
+                        get: { model.draftPalette.backgroundColor.color },
+                        set: { color in
+                            model.updateBackgroundColor(color)
+                        }
+                    )
                 )
-            )
 
-            compactColorPicker(
-                title: "條碼",
-                color: Binding(
-                    get: { model.draftPalette.barColor.color },
-                    set: { color in
-                        model.updateBarColor(color)
-                    }
+                compactColorPicker(
+                    title: "條碼",
+                    color: Binding(
+                        get: { model.draftPalette.barColor.color },
+                        set: { color in
+                            model.updateBarColor(color)
+                        }
+                    )
                 )
-            )
+            }
+
+            wallpaperWaveColorChoices
+        }
+    }
+
+    @ViewBuilder
+    private var wallpaperWaveColorChoices: some View {
+        let colors = Array(model.wallpaperDominantColors.prefix(3))
+
+        if !model.isAnalyzingWallpaper, !colors.isEmpty {
+            HStack(spacing: 12) {
+                Text("波浪")
+                    .colorInvoText(.secondary)
+
+                Spacer()
+
+                HStack(spacing: 8) {
+                    ForEach(colors.indices, id: \.self) { index in
+                        let color = colors[index]
+                        let isSelected = color == model.selectedWaveColor
+
+                        Button {
+                            model.updateWaveColor(color)
+                        } label: {
+                            WaveColorDot(color: color, isSelected: isSelected)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("波浪色彩 \(index + 1)")
+                        .accessibilityAddTraits(isSelected ? .isSelected : [])
+                    }
+                }
+            }
+            .padding(.horizontal, 12)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background(ColorInvoColor.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+            }
         }
     }
 
@@ -282,6 +324,7 @@ struct ContentView: View {
                         carrierCode: model.normalizedCode,
                         palette: model.draftPalette,
                         dominantColors: model.wallpaperDominantColors,
+                        waveColor: model.selectedWaveColor,
                         showsWave: model.showsWave,
                         showsBarcodeValue: model.showsBarcodeValue
                     )
@@ -307,6 +350,36 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
+    }
+}
+
+private struct WaveColorDot: View {
+    let color: RGBAColor
+    let isSelected: Bool
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(isSelected ? ColorInvoColor.primarySoft : ColorInvoColor.surface)
+                .frame(width: 40, height: 40)
+
+            Circle()
+                .fill(color.color)
+                .frame(width: 28, height: 28)
+                .overlay {
+                    Circle()
+                        .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+                }
+                .overlay {
+                    Circle()
+                        .strokeBorder(
+                            isSelected ? ColorInvoColor.primary : .clear,
+                            lineWidth: 4
+                        )
+                }
+        }
+        .frame(width: 40, height: 40)
+        .contentShape(Circle())
     }
 }
 

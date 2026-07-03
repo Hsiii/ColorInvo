@@ -15,6 +15,7 @@ final class CarrierEditorModel: ObservableObject {
     @Published private(set) var wallpaperPreviewImage: WallpaperPreviewImage?
     @Published private(set) var wallpaperPalettes: [BarcodePalette] = []
     @Published private(set) var wallpaperDominantColors: [RGBAColor] = []
+    @Published private(set) var waveColor: RGBAColor?
     @Published private(set) var wallpaperStatusText: String?
     @Published private(set) var isAnalyzingWallpaper = false
     @Published private(set) var showsWave = true
@@ -59,6 +60,7 @@ final class CarrierEditorModel: ObservableObject {
             carrierCode: carrierCode.value,
             palette: draftPalette,
             wallpaperDominantColors: wallpaperDominantColors,
+            waveColor: waveColor,
             showsWave: showsWave,
             showsBarcodeValue: showsBarcodeValue
         )
@@ -66,6 +68,10 @@ final class CarrierEditorModel: ObservableObject {
 
     var widgetIsReady: Bool {
         draftSettings == savedSettings
+    }
+
+    var selectedWaveColor: RGBAColor? {
+        waveColor ?? wallpaperDominantColors.first
     }
 
     var widgetStatusText: String {
@@ -154,6 +160,15 @@ final class CarrierEditorModel: ObservableObject {
         updatePalette(draftPalette.replacing(barColor: RGBAColor(color: color)))
     }
 
+    func updateWaveColor(_ color: RGBAColor) {
+        guard waveColor != color else {
+            return
+        }
+
+        waveColor = color
+        scheduleSettingsSave()
+    }
+
     func setShowsWave(_ showsWave: Bool) {
         guard self.showsWave != showsWave else {
             return
@@ -228,6 +243,7 @@ final class CarrierEditorModel: ObservableObject {
         draftPalette = snapshot.settings.palette
         paletteRevision = 0
         wallpaperDominantColors = snapshot.settings.wallpaperDominantColors
+        waveColor = snapshot.settings.waveColor
         showsWave = snapshot.settings.showsWave
         showsBarcodeValue = snapshot.settings.showsBarcodeValue
         wallpaperPreviewImage = snapshot.previewImage
@@ -302,6 +318,7 @@ final class CarrierEditorModel: ObservableObject {
         wallpaperPreviewImage = result.previewImage
         wallpaperDominantColors = result.sourceColors
         wallpaperPalettes = result.palettes
+        waveColor = result.sourceColors.first
         wallpaperStatusText = nil
         isAnalyzingWallpaper = false
 

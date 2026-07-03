@@ -42,6 +42,7 @@ struct CarrierWidgetView: View {
             carrierCode: carrierCode,
             palette: entry.settings.palette,
             dominantColors: entry.settings.wallpaperDominantColors,
+            waveColor: entry.settings.waveColor,
             showsWave: entry.settings.showsWave,
             showsBarcodeValue: entry.settings.showsBarcodeValue
         )

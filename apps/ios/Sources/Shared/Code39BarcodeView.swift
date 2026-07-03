@@ -51,6 +51,7 @@ struct CarrierBarcodePanel: View {
     var verticalPadding: CGFloat = 16
     var fillsAvailableSpace = false
     var dominantColors: [RGBAColor] = []
+    var waveColor: RGBAColor?
 
     var body: some View {
         Group {
@@ -99,7 +100,7 @@ struct CarrierBarcodePanel: View {
 
             if showsWave {
                 CarrierBarcodeWaveShape()
-                    .fill(waveColor)
+                    .fill(waveFillColor)
                     .frame(height: waveHeight)
                     .frame(maxHeight: .infinity, alignment: .bottom)
             }
@@ -124,8 +125,10 @@ struct CarrierBarcodePanel: View {
         barcodeHeight >= 120 ? 76 : 60
     }
 
-    private var waveColor: Color {
-        dominantColors.first?.color ?? Color(red: 0 / 255, green: 102 / 255, blue: 255 / 255)
+    private var waveFillColor: Color {
+        waveColor?.color
+            ?? dominantColors.first?.color
+            ?? RGBAColor(hex: 0x0066FF).color
     }
 }
 
@@ -133,6 +136,7 @@ struct CarrierWidgetContentView: View {
     let carrierCode: String
     let palette: BarcodePalette
     let dominantColors: [RGBAColor]
+    var waveColor: RGBAColor?
     var showsWave = true
     var showsBarcodeValue = true
 
@@ -150,7 +154,8 @@ struct CarrierWidgetContentView: View {
                     horizontalPadding: 0,
                     verticalPadding: 8,
                     fillsAvailableSpace: true,
-                    dominantColors: dominantColors
+                    dominantColors: dominantColors,
+                    waveColor: waveColor
                 )
             } else {
                 VStack(spacing: 8) {
