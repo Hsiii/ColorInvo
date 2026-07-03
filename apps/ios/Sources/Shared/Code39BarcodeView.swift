@@ -130,32 +130,22 @@ private struct CarrierBarcodeValueOverlay: View {
     let horizontalPadding: CGFloat
 
     var body: some View {
-        GeometryReader { proxy in
-            let barcodeWidth = max(1, proxy.size.width - horizontalPadding * 2)
-            let leadingInset = horizontalPadding
-                + Code39Encoder.visibleBarcodeInset(for: value, width: barcodeWidth)
-
-            Text(value)
-                .font(.system(.subheadline, design: .monospaced, weight: .bold))
-                .fontWidth(.condensed)
-                .foregroundStyle(palette.backgroundColor.color)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-                .padding(.horizontal, 12)
-                .frame(height: 28)
-                .background {
-                    Capsule(style: .continuous)
-                        .fill(palette.barColor.color)
-                }
-            .padding(.leading, leadingInset)
+        Text(value)
+            .font(.system(.subheadline, design: .monospaced, weight: .bold))
+            .fontWidth(.condensed)
+            .foregroundStyle(palette.backgroundColor.color)
+            .lineLimit(1)
+            .minimumScaleFactor(0.72)
+            .padding(.horizontal, 12)
+            .frame(height: 28)
+            .background {
+                Capsule(style: .continuous)
+                    .fill(palette.barColor.color)
+            }
+            .padding(.leading, horizontalPadding + 12)
             .padding(.trailing, max(12, horizontalPadding + 12))
             .padding(.bottom, 8)
-            .frame(
-                width: proxy.size.width,
-                height: proxy.size.height,
-                alignment: .bottomLeading
-            )
-        }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
     }
 }
 
