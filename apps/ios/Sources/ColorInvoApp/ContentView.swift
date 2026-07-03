@@ -7,7 +7,6 @@ struct ContentView: View {
     @State private var draftCode: String
     @State private var draftPalette: BarcodePalette
     @State private var savedSettings: CarrierSettings
-    @State private var showingWidgetHelp = false
     @State private var wallpaperPickerItem: PhotosPickerItem?
     @State private var wallpaperPalettes: [BarcodePalette] = []
     @State private var wallpaperStatusText: String?
@@ -95,7 +94,6 @@ struct ContentView: View {
         _draftCode = State(initialValue: settings.carrierCode)
         _draftPalette = State(initialValue: settings.palette)
         _savedSettings = State(initialValue: settings)
-        _showingWidgetHelp = State(initialValue: ColorInvoRuntime.screenshotTarget == "widget")
         _wallpaperPalettes = State(initialValue: usesShowcaseData ? BarcodePalette.showcaseOptions : [])
     }
 
@@ -112,9 +110,6 @@ struct ContentView: View {
         .background(ColorInvoColor.background.ignoresSafeArea())
         .preferredColorScheme(.light)
         .tint(ColorInvoColor.primary)
-        .sheet(isPresented: $showingWidgetHelp) {
-            WidgetHelpSheet()
-        }
         .onChange(of: normalizedCode) { _, _ in
             persistCarrierIfReady()
         }
@@ -366,29 +361,11 @@ struct ContentView: View {
             .frame(height: 136)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-            HStack(spacing: 8) {
-                Label(
-                    widgetStatusText,
-                    systemImage: widgetIsReady ? "info.circle.fill" : "info.circle"
-                )
+            Text(widgetStatusText)
                 .colorInvoText(.secondary)
                 .foregroundStyle(widgetIsReady ? ColorInvoColor.success : ColorInvoColor.muted)
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
-
-                Spacer(minLength: 8)
-
-                Button {
-                    showingWidgetHelp = true
-                } label: {
-                    Image(systemName: "questionmark.circle")
-                        .font(.title3)
-                        .frame(width: 44, height: 44)
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(ColorInvoColor.primary)
-                .accessibilityLabel("加入小工具說明")
-            }
         }
     }
 
@@ -511,73 +488,6 @@ private struct ColorChoiceSeparator: View {
     }
 }
 
-private struct WidgetHelpSheet: View {
-    @Environment(\.dismiss) private var dismiss
-
-    private let steps = [
-        "長按主畫面空白處",
-        "點左上角 +",
-        "選擇條色盤",
-        "加入小工具",
-    ]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 22) {
-            Image(systemName: "rectangle.grid.1x2")
-                .font(.largeTitle)
-                .foregroundStyle(ColorInvoColor.primary)
-
-            Text("加入小工具")
-                .colorInvoText(.heading)
-
-            VStack(alignment: .leading, spacing: 14) {
-                ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
-                    helpRow(number: index + 1, text: step)
-                }
-            }
-
-            Spacer()
-
-            Button {
-                dismiss()
-            } label: {
-                Text("了解")
-                    .colorInvoText(.control)
-                    .frame(maxWidth: .infinity, minHeight: 52)
-            }
-            .buttonStyle(ColorInvoPrimaryButtonStyle())
-        }
-        .padding(24)
-        .tint(ColorInvoColor.primary)
-        .presentationDetents([.medium])
-    }
-
-    private func helpRow(number: Int, text: String) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Text("\(number).")
-                .colorInvoText(.control)
-                .foregroundStyle(ColorInvoColor.primary)
-                .monospacedDigit()
-                .frame(width: 24, alignment: .leading)
-
-            Text(text)
-                .colorInvoText(.control)
-        }
-    }
-}
-
-private struct ColorInvoPrimaryButtonStyle: ButtonStyle {
-    @Environment(\.isEnabled) private var isEnabled
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .foregroundStyle(.white)
-            .background(isEnabled ? ColorInvoColor.primary : ColorInvoColor.hairline)
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            .opacity(configuration.isPressed ? 0.82 : 1)
-    }
-}
-
 private enum ColorInvoTextStyle {
     case heading
     case control
@@ -635,18 +545,6 @@ private enum ColorInvoRuntime {
     static var showcaseDataEnabled: Bool {
         ProcessInfo.processInfo.environment["COLORINVO_SHOWCASE_DATA"] == "1"
             || ProcessInfo.processInfo.arguments.contains("--showcase-data")
-    }
-
-    static var screenshotTarget: String? {
-        if let target = ProcessInfo.processInfo.environment["COLORINVO_SCREENSHOT_TARGET"] {
-            return target
-        }
-
-        if ProcessInfo.processInfo.arguments.contains("--screenshot-widget") {
-            return "widget"
-        }
-
-        return nil
     }
 }
 
