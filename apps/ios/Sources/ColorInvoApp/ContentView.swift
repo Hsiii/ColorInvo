@@ -388,15 +388,21 @@ struct ContentView: View {
         do {
             guard
                 let data = try await item.loadTransferable(type: Data.self),
-                let image = UIImage(data: data),
-                let dominantColor = WallpaperPaletteGenerator.dominantColor(from: image)
+                let image = UIImage(data: data)
             else {
                 wallpaperPalettes = []
                 wallpaperStatusText = "無法讀取圖片"
                 return
             }
 
-            let generatedPalettes = WallpaperPaletteGenerator.palettes(from: dominantColor)
+            let sourceColors = WallpaperPaletteGenerator.representativeColors(from: image)
+            let generatedPalettes = WallpaperPaletteGenerator.palettes(from: sourceColors)
+            guard !generatedPalettes.isEmpty else {
+                wallpaperPalettes = []
+                wallpaperStatusText = "無法讀取圖片"
+                return
+            }
+
             wallpaperPalettes = generatedPalettes
 
             if let firstPalette = generatedPalettes.first {

@@ -195,6 +195,10 @@ struct RGBAColor: Codable, Equatable {
 
 enum WallpaperPaletteGenerator {
     static func dominantColor(from image: UIImage) -> RGBAColor? {
+        representativeColors(from: image).first
+    }
+
+    static func representativeColors(from image: UIImage) -> [RGBAColor] {
         let sampleWidth = 40
         let sampleHeight = 40
         let sampleSize = CGSize(width: sampleWidth, height: sampleHeight)
@@ -209,7 +213,7 @@ enum WallpaperPaletteGenerator {
         }
 
         guard let thumbnailImage = thumbnail.cgImage else {
-            return nil
+            return []
         }
 
         var pixels = [UInt8](repeating: 0, count: sampleWidth * sampleHeight * 4)
@@ -222,7 +226,7 @@ enum WallpaperPaletteGenerator {
             space: CGColorSpaceCreateDeviceRGB(),
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
         ) else {
-            return nil
+            return []
         }
 
         context.interpolationQuality = .low
@@ -251,27 +255,59 @@ enum WallpaperPaletteGenerator {
             buckets[key] = bucket
         }
 
-        guard let dominantBucket = buckets.values.max(by: { $0.weight < $1.weight }) else {
-            return nil
+        let candidates = buckets.values
+            .compactMap { bucket -> PaletteSource? in
+                guard bucket.weight > 0 else {
+                    return nil
+                }
+
+                let color = RGBAColor(
+                    red: bucket.red / bucket.weight,
+                    green: bucket.green / bucket.weight,
+                    blue: bucket.blue / bucket.weight
+                )
+                let hsb = color.hueSaturationBrightness
+                let score = bucket.weight * (0.72 + hsb.saturation * 0.56)
+
+                return PaletteSource(color: color, score: score)
+            }
+            .sorted { $0.score > $1.score }
+
+        var selected: [RGBAColor] = []
+
+        for minimumDistance in [0.28, 0.18, 0.10] {
+            for candidate in candidates where selected.count < 3 {
+                guard selected.allSatisfy({
+                    candidate.color.perceptualDistance(to: $0) >= minimumDistance
+                }) else {
+                    continue
+                }
+
+                selected.append(candidate.color)
+            }
         }
 
-        return RGBAColor(
-            red: dominantBucket.red / dominantBucket.weight,
-            green: dominantBucket.green / dominantBucket.weight,
-            blue: dominantBucket.blue / dominantBucket.weight
-        )
+        return selected
     }
 
-    static func palettes(from dominantColor: RGBAColor) -> [BarcodePalette] {
-        let hsb = dominantColor.hueSaturationBrightness
-        let names = ["桌布對比", "桌布柔光", "桌布清亮"]
+    static func palettes(from sourceColors: [RGBAColor]) -> [BarcodePalette] {
+        guard let firstSourceColor = sourceColors.first else {
+            return []
+        }
+
+        let names = ["桌布主色", "桌布副色", "桌布點綴"]
         let hueOffsets = [0.50, 0.34, 0.66]
-        let backgroundMixAmounts = [0.76, 0.84, 0.92]
+        let fallbackSourceHueOffsets = [0.00, 0.08, 0.92]
+        let backgroundMixAmounts = [0.76, 0.84, 0.90]
         let barBrightness = [0.15, 0.18, 0.13]
 
         return names.indices.map { index in
+            let sourceColor = sourceColors.indices.contains(index)
+                ? sourceColors[index]
+                : fallbackColor(from: firstSourceColor, hueOffset: fallbackSourceHueOffsets[index])
+            let hsb = sourceColor.hueSaturationBrightness
             let backgroundColor = scannerSafeBackground(
-                from: dominantColor,
+                from: sourceColor,
                 whiteMixAmount: backgroundMixAmounts[index]
             )
             let hue = scannerSafeHue(hsb.hue + hueOffsets[index])
@@ -336,6 +372,19 @@ enum WallpaperPaletteGenerator {
         return safeColor
     }
 
+    private static func fallbackColor(
+        from color: RGBAColor,
+        hueOffset: Double
+    ) -> RGBAColor {
+        let hsb = color.hueSaturationBrightness
+
+        return RGBAColor(
+            hue: hsb.hue + hueOffset,
+            saturation: max(0.32, min(0.76, hsb.saturation + 0.12)),
+            brightness: max(0.44, hsb.brightness)
+        )
+    }
+
     private static func scannerSafeHue(_ hue: Double) -> Double {
         let normalizedHue = hue - floor(hue)
         let degrees = normalizedHue * 360
@@ -372,6 +421,11 @@ private struct ColorBucket {
     var red = 0.0
     var green = 0.0
     var blue = 0.0
+}
+
+private struct PaletteSource {
+    let color: RGBAColor
+    let score: Double
 }
 
 private extension RGBAColor {
@@ -440,5 +494,27 @@ private extension RGBAColor {
             blue: blue * retainedAmount + color.blue * clampedAmount,
             alpha: alpha * retainedAmount + color.alpha * clampedAmount
         )
+    }
+
+    func perceptualDistance(to color: RGBAColor) -> Double {
+        let redDelta = (red - color.red) * 0.30
+        let greenDelta = (green - color.green) * 0.59
+        let blueDelta = (blue - color.blue) * 0.11
+        let hueDelta = hueDistance(to: color) * 0.40
+
+        return sqrt(
+            redDelta * redDelta
+                + greenDelta * greenDelta
+                + blueDelta * blueDelta
+                + hueDelta * hueDelta
+        )
+    }
+
+    private func hueDistance(to color: RGBAColor) -> Double {
+        let hue = hueSaturationBrightness.hue
+        let otherHue = color.hueSaturationBrightness.hue
+        let difference = abs(hue - otherHue)
+
+        return min(difference, 1 - difference)
     }
 }
