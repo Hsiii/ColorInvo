@@ -61,17 +61,32 @@ struct CarrierBarcodePanel: View {
             .frame(height: barcodeHeight)
 
             if showsValue {
-                HStack(spacing: 8) {
-                    Text(value)
-                        .font(.system(.subheadline, design: .monospaced, weight: .semibold))
-                        .foregroundStyle(palette.barColor.color)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
+                GeometryReader { proxy in
+                    HStack(spacing: 8) {
+                        Text(value)
+                            .font(.system(.subheadline, design: .monospaced, weight: .semibold))
+                            .foregroundStyle(palette.barColor.color)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
 
-                    Spacer(minLength: 8)
+                        Spacer(minLength: 8)
 
-                    WallpaperDominantColorDots(colors: dominantColors)
+                        WallpaperDominantColorDots(colors: dominantColors)
+                    }
+                    .padding(
+                        .horizontal,
+                        Code39Encoder.visibleBarcodeInset(
+                            for: value,
+                            width: proxy.size.width
+                        )
+                    )
+                    .frame(
+                        width: proxy.size.width,
+                        height: proxy.size.height,
+                        alignment: .leading
+                    )
                 }
+                .frame(height: 20)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
@@ -100,10 +115,6 @@ private struct WallpaperDominantColorDots: View {
                 Circle()
                     .fill(color.color)
                     .frame(width: 12, height: 12)
-                    .overlay {
-                        Circle()
-                            .stroke(.black.opacity(0.16), lineWidth: 1)
-                    }
             }
         }
         .accessibilityHidden(displayColors.isEmpty)
@@ -198,5 +209,14 @@ enum Code39Encoder {
         elements.append(Element(isBar: false, units: quietZone))
 
         return elements
+    }
+
+    static func visibleBarcodeInset(for value: String, width: CGFloat) -> CGFloat {
+        let totalUnits = elements(for: value).reduce(0) { $0 + $1.units }
+        guard totalUnits > 0 else {
+            return 0
+        }
+
+        return width * CGFloat(quietZone) / CGFloat(totalUnits)
     }
 }
