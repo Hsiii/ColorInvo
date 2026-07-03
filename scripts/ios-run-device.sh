@@ -5,6 +5,7 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/ios-common.sh"
 
 CONFIGURATION="${IOS_CONFIGURATION:-Debug}"
 DERIVED_DATA_PATH="${IOS_DERIVED_DATA_PATH:-$IOS_ROOT_DIR/build/DeviceDerivedData}"
+PRESERVE_APP_DATA="${IOS_PRESERVE_APP_DATA:-0}"
 
 ios_require_development_team "building on a physical iOS device"
 
@@ -55,6 +56,11 @@ if [[ ! -d "$APP_PATH" ]]; then
 fi
 
 echo "Installing $APP_PATH..."
+if [[ "$PRESERVE_APP_DATA" != "1" ]]; then
+    echo "Removing existing $IOS_BUNDLE_ID_VALUE to clear cached app state..."
+    ios_devicectl device uninstall app --device "$DEVICE_ID" "$IOS_BUNDLE_ID_VALUE" >/dev/null 2>&1 || true
+fi
+
 ios_devicectl device install app --device "$DEVICE_ID" "$APP_PATH"
 
 if [[ "${IOS_SKIP_LAUNCH:-0}" == "1" ]]; then
