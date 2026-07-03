@@ -65,7 +65,7 @@ final class CarrierEditorModel: ObservableObject {
     }
 
     var canSaveSettings: Bool {
-        draftSettings != nil && !widgetIsReady && !isSavingSettings
+        draftSettings != nil && !isSavingSettings
     }
 
     var saveButtonText: String {
@@ -74,14 +74,14 @@ final class CarrierEditorModel: ObservableObject {
         }
 
         if widgetIsReady {
-            return "已儲存"
+            return "重新儲存"
         }
 
         return "儲存載具"
     }
 
     var saveButtonSystemImage: String {
-        widgetIsReady ? "checkmark.circle.fill" : "square.and.arrow.down"
+        widgetIsReady ? "arrow.clockwise" : "square.and.arrow.down"
     }
 
     var widgetStatusText: String {
@@ -90,7 +90,7 @@ final class CarrierEditorModel: ObservableObject {
         }
 
         if widgetIsReady {
-            return "小工具已準備好，可在主畫面加入"
+            return "小工具已準備好，可重新儲存以更新"
         }
 
         if !isValid {
@@ -185,7 +185,7 @@ final class CarrierEditorModel: ObservableObject {
     }
 
     func saveSettings() {
-        guard let settings = draftSettings, settings != savedSettings else {
+        guard let settings = draftSettings else {
             return
         }
 
