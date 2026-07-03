@@ -48,7 +48,7 @@ struct CarrierWidgetView: View {
 }
 
 struct ColorInvoWidget: Widget {
-    let kind = "ColorInvoWidget"
+    let kind = CarrierWidgetKind.colorInvo
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: CarrierProvider()) { entry in

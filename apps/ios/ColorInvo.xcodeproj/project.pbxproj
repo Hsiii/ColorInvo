@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		19E0FE47E92A4AB2852A8DEF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3E156DE3C3A6C9028CD52432 /* Localizable.strings */; };
+		2100D44CFC1E548F4F541DF9 /* CarrierWidgetKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D32EAE07191D482043DFF71 /* CarrierWidgetKind.swift */; };
 		2F6D6D68F6213B211A1CBECD /* ColorInvoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BA0A795276F4F92700B1549 /* ColorInvoApp.swift */; };
 		3E5A6A7B8D6B9D927588305C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2BBDA9BEC927485A857E737C /* InfoPlist.strings */; };
 		3EB7BF13588F47C0BED1C90C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = EC82EA48A35034DDF09959AA /* PrivacyInfo.xcprivacy */; };
@@ -22,8 +23,10 @@
 		807BD22734D6A8201B194199 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FF28C2EB6F943C7612EF7F0C /* Localizable.strings */; };
 		87144DB2203B8129385E424D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E60FD679A095710988F6C9E /* ContentView.swift */; };
 		93EC4DB9295378B794DD9CF4 /* CarrierCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A11DF4AD04EC6FA7BB2BD6 /* CarrierCode.swift */; };
+		99423A25509D4D89A6BB4ED3 /* WallpaperProcessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229D1D169BB8B49D4B39EE9F /* WallpaperProcessing.swift */; };
 		9AB9EC9138B41414015A4C66 /* ColorInvoWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4A5A4E48BE5EB27BDA9FBD1D /* ColorInvoWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9F305F1286745FFACF52F445 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F05933D6EBA34CFA44823B /* AppGroup.swift */; };
+		C6B3176503BB5487986DEF9C /* CarrierWidgetKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D32EAE07191D482043DFF71 /* CarrierWidgetKind.swift */; };
 		CA90A39D51DDC1BB7CD9827F /* BarcodePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2F02F307BBF02B927FF459 /* BarcodePalette.swift */; };
 		E14954B2C1BCDF758CD46336 /* CarrierSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BDCB590CA17AAFCAA3289A5 /* CarrierSettings.swift */; };
 		E34174EE6F1F473078394658 /* BarcodePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2F02F307BBF02B927FF459 /* BarcodePalette.swift */; };
@@ -60,6 +63,8 @@
 		095E3AD8411360B054ACB0AB /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		0BA0A795276F4F92700B1549 /* ColorInvoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorInvoApp.swift; sourceTree = "<group>"; };
 		1B2B20F5DD5AE3A8E5B68020 /* Code39BarcodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Code39BarcodeView.swift; sourceTree = "<group>"; };
+		1D32EAE07191D482043DFF71 /* CarrierWidgetKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarrierWidgetKind.swift; sourceTree = "<group>"; };
+		229D1D169BB8B49D4B39EE9F /* WallpaperProcessing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WallpaperProcessing.swift; sourceTree = "<group>"; };
 		4A5A4E48BE5EB27BDA9FBD1D /* ColorInvoWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ColorInvoWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E60FD679A095710988F6C9E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4EF79ECC71E150A7F226266A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -91,6 +96,7 @@
 				4E60FD679A095710988F6C9E /* ContentView.swift */,
 				5C656D39AB9EB12EEFA74BB5 /* Info.plist */,
 				7208AE85AD7B21303DCE5955 /* PrivacyInfo.xcprivacy */,
+				229D1D169BB8B49D4B39EE9F /* WallpaperProcessing.swift */,
 				2BBDA9BEC927485A857E737C /* InfoPlist.strings */,
 				FF28C2EB6F943C7612EF7F0C /* Localizable.strings */,
 			);
@@ -116,6 +122,7 @@
 				CD2F02F307BBF02B927FF459 /* BarcodePalette.swift */,
 				B9A11DF4AD04EC6FA7BB2BD6 /* CarrierCode.swift */,
 				9BDCB590CA17AAFCAA3289A5 /* CarrierSettings.swift */,
+				1D32EAE07191D482043DFF71 /* CarrierWidgetKind.swift */,
 				1B2B20F5DD5AE3A8E5B68020 /* Code39BarcodeView.swift */,
 			);
 			name = Shared;
@@ -278,6 +285,7 @@
 				CA90A39D51DDC1BB7CD9827F /* BarcodePalette.swift in Sources */,
 				93EC4DB9295378B794DD9CF4 /* CarrierCode.swift in Sources */,
 				E14954B2C1BCDF758CD46336 /* CarrierSettings.swift in Sources */,
+				C6B3176503BB5487986DEF9C /* CarrierWidgetKind.swift in Sources */,
 				4A5F52AA87314EC8D4F4E17A /* Code39BarcodeView.swift in Sources */,
 				F8EC1ADA203EABA403979A00 /* ColorInvoWidget.swift in Sources */,
 			);
@@ -291,9 +299,11 @@
 				E34174EE6F1F473078394658 /* BarcodePalette.swift in Sources */,
 				59CB288722FF02E609E98F16 /* CarrierCode.swift in Sources */,
 				586A4116D912718B6ED5A1F8 /* CarrierSettings.swift in Sources */,
+				2100D44CFC1E548F4F541DF9 /* CarrierWidgetKind.swift in Sources */,
 				7FAD7B647CC4791735FDBF52 /* Code39BarcodeView.swift in Sources */,
 				2F6D6D68F6213B211A1CBECD /* ColorInvoApp.swift in Sources */,
 				87144DB2203B8129385E424D /* ContentView.swift in Sources */,
+				99423A25509D4D89A6BB4ED3 /* WallpaperProcessing.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
