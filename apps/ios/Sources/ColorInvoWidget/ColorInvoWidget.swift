@@ -44,9 +44,9 @@ struct CarrierWidgetView: View {
                     value: carrierCode,
                     palette: entry.settings.palette,
                     showsValue: true,
-                    barcodeHeight: 104,
+                    barcodeHeight: 132,
                     horizontalPadding: 0,
-                    verticalPadding: 6,
+                    verticalPadding: 8,
                     fillsAvailableSpace: true,
                     dominantColors: entry.settings.wallpaperDominantColors
                 )

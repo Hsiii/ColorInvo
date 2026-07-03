@@ -52,44 +52,23 @@ struct CarrierBarcodePanel: View {
     var dominantColors: [RGBAColor] = []
 
     var body: some View {
-        VStack(spacing: showsValue ? 6 : 0) {
-            Code39BarcodeView(
-                value: value,
-                barColor: palette.barColor.color,
-                backgroundColor: palette.backgroundColor.color
-            )
-            .frame(height: barcodeHeight)
-
+        Group {
             if showsValue {
-                GeometryReader { proxy in
-                    HStack(spacing: 8) {
-                        Text(value)
-                            .font(.system(.subheadline, design: .monospaced, weight: .semibold))
-                            .foregroundStyle(palette.barColor.color)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.72)
-
-                        Spacer(minLength: 8)
-
-                        WallpaperDominantColorDots(colors: dominantColors)
-                    }
-                    .padding(
-                        .horizontal,
-                        Code39Encoder.visibleBarcodeInset(
-                            for: value,
-                            width: proxy.size.width
-                        )
-                    )
-                    .frame(
-                        width: proxy.size.width,
-                        height: proxy.size.height,
-                        alignment: .leading
-                    )
-                }
-                .frame(height: 20)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                decoratedPanel
+            } else {
+                plainPanel
             }
         }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var plainPanel: some View {
+        Code39BarcodeView(
+            value: value,
+            barColor: palette.barColor.color,
+            backgroundColor: palette.backgroundColor.color
+        )
+        .frame(height: barcodeHeight)
         .padding(.horizontal, horizontalPadding)
         .padding(.vertical, verticalPadding)
         .frame(
@@ -98,11 +77,105 @@ struct CarrierBarcodePanel: View {
         )
         .background(palette.backgroundColor.color)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .accessibilityElement(children: .combine)
+    }
+
+    private var decoratedPanel: some View {
+        ZStack(alignment: .bottom) {
+            palette.backgroundColor.color
+
+            Code39BarcodeView(
+                value: value,
+                barColor: palette.barColor.color,
+                backgroundColor: palette.backgroundColor.color
+            )
+            .frame(height: barcodeHeight)
+            .padding(.horizontal, horizontalPadding)
+            .padding(.top, verticalPadding)
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: fillsAvailableSpace ? .infinity : nil,
+                alignment: .top
+            )
+
+            CarrierBarcodeWaveStack(colors: waveColors)
+                .frame(height: waveHeight)
+                .frame(maxHeight: .infinity, alignment: .bottom)
+
+            CarrierBarcodeValueOverlay(
+                value: value,
+                palette: palette,
+                horizontalPadding: horizontalPadding,
+                dominantColors: dominantColors
+            )
+        }
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: fillsAvailableSpace ? .infinity : nil
+        )
+        .background(palette.backgroundColor.color)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private var waveHeight: CGFloat {
+        barcodeHeight >= 120 ? 76 : 60
+    }
+
+    private var waveColors: [Color] {
+        let sourceColors = Array(dominantColors.prefix(3))
+        let fallbackColors = [
+            RGBAColor(hex: 0x0066FF),
+            palette.barColor,
+            palette.backgroundColor,
+        ]
+        let colors = sourceColors.isEmpty ? fallbackColors : sourceColors
+
+        return colors.map(\.color)
     }
 }
 
-private struct WallpaperDominantColorDots: View {
+private struct CarrierBarcodeValueOverlay: View {
+    let value: String
+    let palette: BarcodePalette
+    let horizontalPadding: CGFloat
+    let dominantColors: [RGBAColor]
+
+    var body: some View {
+        GeometryReader { proxy in
+            let barcodeWidth = max(1, proxy.size.width - horizontalPadding * 2)
+            let leadingInset = horizontalPadding
+                + Code39Encoder.visibleBarcodeInset(for: value, width: barcodeWidth)
+
+            HStack(alignment: .bottom, spacing: 12) {
+                Text(value)
+                    .font(.system(.subheadline, design: .monospaced, weight: .bold))
+                    .fontWidth(.condensed)
+                    .foregroundStyle(palette.backgroundColor.color)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                    .padding(.horizontal, 12)
+                    .frame(height: 28)
+                    .background {
+                        Capsule(style: .continuous)
+                            .fill(palette.barColor.color)
+                    }
+
+                Spacer(minLength: 8)
+
+                WallpaperDropletCluster(colors: dominantColors)
+            }
+            .padding(.leading, leadingInset)
+            .padding(.trailing, max(12, horizontalPadding + 12))
+            .padding(.bottom, 8)
+            .frame(
+                width: proxy.size.width,
+                height: proxy.size.height,
+                alignment: .bottomLeading
+            )
+        }
+    }
+}
+
+private struct WallpaperDropletCluster: View {
     let colors: [RGBAColor]
 
     private var displayColors: [RGBAColor] {
@@ -110,14 +183,196 @@ private struct WallpaperDominantColorDots: View {
     }
 
     var body: some View {
-        HStack(spacing: 4) {
-            ForEach(Array(displayColors.enumerated()), id: \.offset) { _, color in
+        ZStack {
+            ForEach(Array(displayColors.enumerated()), id: \.offset) { index, color in
                 Circle()
                     .fill(color.color)
-                    .frame(width: 12, height: 12)
+                    .overlay {
+                        Circle()
+                            .strokeBorder(.white.opacity(0.64), lineWidth: 1)
+                    }
+                    .frame(width: dropletSize(for: index), height: dropletSize(for: index))
+                    .offset(offset(for: index))
             }
         }
-        .accessibilityHidden(displayColors.isEmpty)
+        .frame(width: 52, height: 40)
+        .accessibilityHidden(true)
+        .opacity(displayColors.isEmpty ? 0 : 1)
+    }
+
+    private func dropletSize(for index: Int) -> CGFloat {
+        [20, 16, 12][index]
+    }
+
+    private func offset(for index: Int) -> CGSize {
+        [
+            CGSize(width: -12, height: 4),
+            CGSize(width: 8, height: -8),
+            CGSize(width: 20, height: 8),
+        ][index]
+    }
+}
+
+private struct CarrierBarcodeWaveStack: View {
+    let colors: [Color]
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            CarrierBarcodeWaveShape(variant: .secondary)
+                .fill(color(at: 1).opacity(0.64))
+                .offset(y: -8)
+
+            CarrierBarcodeWaveShape(variant: .primary)
+                .fill(color(at: 0))
+
+            CarrierBarcodeWaveShape(variant: .secondary)
+                .fill(color(at: 2).opacity(0.32))
+                .offset(y: 16)
+        }
+    }
+
+    private func color(at index: Int) -> Color {
+        guard colors.indices.contains(index) else {
+            return Color(red: 0 / 255, green: 102 / 255, blue: 255 / 255)
+        }
+
+        return colors[index]
+    }
+}
+
+private struct CarrierBarcodeWaveShape: Shape {
+    enum Variant {
+        case primary
+        case secondary
+    }
+
+    let variant: Variant
+
+    func path(in rect: CGRect) -> Path {
+        switch variant {
+        case .primary:
+            primaryPath(in: rect)
+        case .secondary:
+            secondaryPath(in: rect)
+        }
+    }
+
+    private func primaryPath(in rect: CGRect) -> Path {
+        // Path coordinates are normalized from the downloaded Haikei wave SVG reference.
+        let baseY: CGFloat = 326
+        let spanY: CGFloat = 275
+
+        func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
+            CGPoint(
+                x: rect.minX + rect.width * x / 900,
+                y: rect.minY + rect.height * (y - baseY) / spanY
+            )
+        }
+
+        var path = Path()
+        path.move(to: point(0, 408))
+        path.addLine(to: point(21.5, 390.3))
+        path.addCurve(
+            to: point(128.8, 352.2),
+            control1: point(43, 372.7),
+            control2: point(86, 337.3)
+        )
+        path.addCurve(
+            to: point(257.2, 450.5),
+            control1: point(171.7, 367),
+            control2: point(214.3, 432)
+        )
+        path.addCurve(
+            to: point(385.8, 416.5),
+            control1: point(300, 469),
+            control2: point(343, 441)
+        )
+        path.addCurve(
+            to: point(514.2, 391),
+            control1: point(428.7, 392),
+            control2: point(471.3, 371)
+        )
+        path.addCurve(
+            to: point(642.8, 473.5),
+            control1: point(557, 411),
+            control2: point(600, 472)
+        )
+        path.addCurve(
+            to: point(771.2, 382.5),
+            control1: point(685.7, 475),
+            control2: point(728.3, 417)
+        )
+        path.addCurve(
+            to: point(878.5, 331.5),
+            control1: point(814, 348),
+            control2: point(857, 337)
+        )
+        path.addLine(to: point(900, 326))
+        path.addLine(to: point(900, 601))
+        path.addLine(to: point(0, 601))
+        path.closeSubpath()
+        return path
+    }
+
+    private func secondaryPath(in rect: CGRect) -> Path {
+        let baseY: CGFloat = 355
+        let spanY: CGFloat = 246
+
+        func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
+            CGPoint(
+                x: rect.minX + rect.width * x / 900,
+                y: rect.minY + rect.height * (y - baseY) / spanY
+            )
+        }
+
+        var path = Path()
+        path.move(to: point(0, 376))
+        path.addLine(to: point(18.8, 378.3))
+        path.addCurve(
+            to: point(112.8, 402.5),
+            control1: point(37.7, 380.7),
+            control2: point(75.3, 385.3)
+        )
+        path.addCurve(
+            to: point(225.2, 475.2),
+            control1: point(150.3, 419.7),
+            control2: point(187.7, 449.3)
+        )
+        path.addCurve(
+            to: point(337.8, 515.2),
+            control1: point(262.7, 501),
+            control2: point(300.3, 523)
+        )
+        path.addCurve(
+            to: point(450.2, 434.7),
+            control1: point(375.3, 507.3),
+            control2: point(412.7, 469.7)
+        )
+        path.addCurve(
+            to: point(562.8, 355.5),
+            control1: point(487.7, 399.7),
+            control2: point(525.3, 367.3)
+        )
+        path.addCurve(
+            to: point(675.2, 387.2),
+            control1: point(600.3, 343.7),
+            control2: point(637.7, 352.3)
+        )
+        path.addCurve(
+            to: point(787.8, 495.3),
+            control1: point(712.7, 422),
+            control2: point(750.3, 483)
+        )
+        path.addCurve(
+            to: point(881.3, 453.2),
+            control1: point(825.3, 507.7),
+            control2: point(862.7, 471.3)
+        )
+        path.addLine(to: point(900, 435))
+        path.addLine(to: point(900, 601))
+        path.addLine(to: point(0, 601))
+        path.closeSubpath()
+        return path
     }
 }
 

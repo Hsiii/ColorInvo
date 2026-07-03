@@ -312,9 +312,9 @@ struct ContentView: View {
                                 value: normalizedCode,
                                 palette: draftPalette,
                                 showsValue: true,
-                                barcodeHeight: 80,
+                                barcodeHeight: 108,
                                 horizontalPadding: 12,
-                                verticalPadding: 10,
+                                verticalPadding: 8,
                                 fillsAvailableSpace: false,
                                 dominantColors: wallpaperDominantColors
                             )
