@@ -3,8 +3,6 @@ import SwiftUI
 import UIKit
 
 struct ContentView: View {
-    @Environment(\.scenePhase) private var scenePhase
-
     @StateObject private var model: CarrierEditorModel
     @FocusState private var carrierFieldFocused: Bool
 
@@ -41,13 +39,6 @@ struct ContentView: View {
         .tint(ColorInvoColor.primary)
         .task {
             await model.start()
-        }
-        .onChange(of: scenePhase) { _, phase in
-            guard phase != .active else {
-                return
-            }
-
-            model.reloadWidgetIfNeeded()
         }
     }
 
@@ -93,7 +84,31 @@ struct ContentView: View {
                             )
                     }
             }
+
+            saveCarrierButton
         }
+    }
+
+    private var saveCarrierButton: some View {
+        Button {
+            model.saveSettings()
+            carrierFieldFocused = false
+        } label: {
+            Label {
+                Text(model.saveButtonText)
+                    .colorInvoText(.control)
+                    .lineLimit(1)
+            } icon: {
+                Image(systemName: model.saveButtonSystemImage)
+                    .font(.headline)
+            }
+            .foregroundStyle(model.canSaveSettings ? .white : ColorInvoColor.muted)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background(model.canSaveSettings ? ColorInvoColor.primary : ColorInvoColor.primarySoft)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .disabled(!model.canSaveSettings)
     }
 
     private var validationBadge: some View {
