@@ -188,24 +188,18 @@ struct ContentView: View {
                 contrastStatus
             }
 
-            wallpaperColorSection
-
-            ColorChoiceSeparator()
-
-            customColorSection
+            HStack(alignment: .top, spacing: 12) {
+                wallpaperColorSection
+                customColorSection
+            }
         }
     }
 
     private var wallpaperColorSection: some View {
         let pickerTitle = wallpaperPalettes.isEmpty ? "選擇圖片" : "重新選擇"
 
-        return VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                Text("從桌布")
-                    .colorInvoText(.secondary)
-
-                Spacer()
-
+        return colorChoicePanel(title: "桌布") {
+            VStack(alignment: .leading, spacing: 12) {
                 PhotosPicker(
                     selection: $wallpaperPickerItem,
                     matching: .images,
@@ -217,25 +211,27 @@ struct ContentView: View {
                     )
                     .colorInvoText(.control)
                     .foregroundStyle(ColorInvoColor.primary)
-                    .padding(.horizontal, 12)
-                    .frame(minHeight: 40)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .padding(.horizontal, 8)
+                    .frame(maxWidth: .infinity, minHeight: 40)
                     .background(ColorInvoColor.primarySoft)
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
                 .buttonStyle(.plain)
                 .disabled(isAnalyzingWallpaper)
-            }
 
-            if isAnalyzingWallpaper {
-                Label("分析中", systemImage: "sparkles")
-                    .colorInvoText(.secondary)
-                    .frame(minHeight: 40, alignment: .leading)
-            } else if !wallpaperPalettes.isEmpty {
-                paletteButtonGrid(wallpaperPalettes)
-            } else if let wallpaperStatusText {
-                Text(wallpaperStatusText)
-                    .colorInvoText(.secondary)
-                    .frame(minHeight: 40, alignment: .leading)
+                if isAnalyzingWallpaper {
+                    Label("分析中", systemImage: "sparkles")
+                        .colorInvoText(.secondary)
+                        .frame(minHeight: 40, alignment: .leading)
+                } else if !wallpaperPalettes.isEmpty {
+                    paletteButtonGrid(wallpaperPalettes)
+                } else if let wallpaperStatusText {
+                    Text(wallpaperStatusText)
+                        .colorInvoText(.secondary)
+                        .frame(minHeight: 40, alignment: .leading)
+                }
             }
         }
         .onChange(of: wallpaperPickerItem) { _, item in
@@ -263,40 +259,60 @@ struct ContentView: View {
     }
 
     private var customColorSection: some View {
-        HStack(spacing: 8) {
-            Text("自訂")
+        colorChoicePanel(title: "自訂") {
+            VStack(alignment: .leading, spacing: 8) {
+                compactColorPicker(
+                    title: "條碼",
+                    color: Binding(
+                        get: { draftPalette.barColor.color },
+                        set: { color in
+                            draftPalette = draftPalette.replacing(
+                                barColor: RGBAColor(color: color)
+                            )
+                        }
+                    )
+                )
+
+                compactColorPicker(
+                    title: "背景",
+                    color: Binding(
+                        get: { draftPalette.backgroundColor.color },
+                        set: { color in
+                            draftPalette = draftPalette.replacing(
+                                backgroundColor: RGBAColor(color: color)
+                            )
+                        }
+                    )
+                )
+            }
+        }
+    }
+
+    private func colorChoicePanel<Content: View>(
+        title: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
                 .colorInvoText(.secondary)
-                .frame(width: 40, alignment: .leading)
 
-            compactColorPicker(
-                title: "條碼",
-                color: Binding(
-                    get: { draftPalette.barColor.color },
-                    set: { color in
-                        draftPalette = draftPalette.replacing(
-                            barColor: RGBAColor(color: color)
-                        )
-                    }
-                )
-            )
-
-            compactColorPicker(
-                title: "背景",
-                color: Binding(
-                    get: { draftPalette.backgroundColor.color },
-                    set: { color in
-                        draftPalette = draftPalette.replacing(
-                            backgroundColor: RGBAColor(color: color)
-                        )
-                    }
-                )
-            )
+            content()
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, minHeight: 160, alignment: .topLeading)
+        .background(ColorInvoColor.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
         }
     }
 
     private func compactColorPicker(title: String, color: Binding<Color>) -> some View {
         ColorPicker(title, selection: color, supportsOpacity: false)
             .colorInvoText(.control)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
             .padding(.horizontal, 12)
             .frame(maxWidth: .infinity, minHeight: 44)
             .background(ColorInvoColor.surface)
@@ -437,10 +453,11 @@ private struct PaletteOptionButtonContent: View {
                     barColor: palette.barColor.color,
                     backgroundColor: palette.backgroundColor.color
                 )
-                .padding(.horizontal, 8)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 8)
             }
-            .frame(width: 64, height: 64)
+            .frame(maxWidth: .infinity)
+            .aspectRatio(1, contentMode: .fit)
             .overlay {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
@@ -454,7 +471,7 @@ private struct PaletteOptionButtonContent: View {
                 .frame(maxWidth: .infinity)
         }
         .padding(4)
-        .frame(maxWidth: .infinity, minHeight: 96, alignment: .top)
+        .frame(maxWidth: .infinity, minHeight: 88, alignment: .top)
         .background {
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(isSelected ? ColorInvoColor.primarySoft : .clear)
@@ -467,24 +484,6 @@ private struct PaletteOptionButtonContent: View {
                 )
         }
         .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-    }
-}
-
-private struct ColorChoiceSeparator: View {
-    var body: some View {
-        HStack(spacing: 8) {
-            Rectangle()
-                .fill(ColorInvoColor.hairline)
-                .frame(height: 1)
-
-            Text("或")
-                .colorInvoText(.secondary)
-
-            Rectangle()
-                .fill(ColorInvoColor.hairline)
-                .frame(height: 1)
-        }
-        .padding(.vertical, 6)
     }
 }
 
