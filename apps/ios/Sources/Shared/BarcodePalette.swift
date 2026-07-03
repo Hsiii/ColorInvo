@@ -240,6 +240,13 @@ enum WallpaperPaletteGenerator {
             return []
         }
 
+        return representativeColors(from: thumbnailImage)
+    }
+
+    static func representativeColors(from image: CGImage) -> [RGBAColor] {
+        let sampleWidth = 40
+        let sampleHeight = 40
+        let sampleSize = CGSize(width: sampleWidth, height: sampleHeight)
         var pixels = [UInt8](repeating: 0, count: sampleWidth * sampleHeight * 4)
         guard let context = CGContext(
             data: &pixels,
@@ -254,7 +261,7 @@ enum WallpaperPaletteGenerator {
         }
 
         context.interpolationQuality = .low
-        context.draw(thumbnailImage, in: CGRect(origin: .zero, size: sampleSize))
+        context.draw(image, in: CGRect(origin: .zero, size: sampleSize))
 
         var buckets: [Int: ColorBucket] = [:]
 

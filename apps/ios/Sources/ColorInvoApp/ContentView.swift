@@ -1,6 +1,8 @@
+import ImageIO
 import PhotosUI
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
 import WidgetKit
 
 struct ContentView: View {
@@ -411,27 +413,28 @@ struct ContentView: View {
 
         do {
             guard
-                let data = try await item.loadTransferable(type: Data.self),
-                let image = UIImage(data: data)
+                let data = try await item.loadTransferable(type: Data.self)
             else {
                 wallpaperPalettes = []
                 wallpaperStatusText = "無法讀取圖片"
                 return
             }
 
-            let sourceColors = WallpaperPaletteGenerator.representativeColors(from: image)
-            let generatedPalettes = WallpaperPaletteGenerator.palettes(from: sourceColors)
-            guard !generatedPalettes.isEmpty else {
+            let analysis = await Task.detached(priority: .userInitiated) {
+                WallpaperImageAnalyzer.analyze(data)
+            }.value
+
+            guard let analysis else {
                 wallpaperPalettes = []
                 wallpaperStatusText = "無法讀取圖片"
                 return
             }
 
-            wallpaperPreviewImage = WallpaperPreviewStore.save(image)
-            wallpaperDominantColors = sourceColors
-            wallpaperPalettes = generatedPalettes
+            wallpaperPreviewImage = WallpaperPreviewStore.savePreviewData(analysis.previewData)
+            wallpaperDominantColors = analysis.sourceColors
+            wallpaperPalettes = analysis.palettes
 
-            if let firstPalette = generatedPalettes.first {
+            if let firstPalette = analysis.palettes.first {
                 draftPalette = firstPalette
             }
         } catch {
@@ -538,6 +541,18 @@ private enum WallpaperPreviewStore {
         return previewImage
     }
 
+    static func savePreviewData(_ data: Data) -> UIImage? {
+        guard let previewImage = UIImage(data: data) else {
+            return nil
+        }
+
+        if let fileURL {
+            try? data.write(to: fileURL, options: .atomic)
+        }
+
+        return previewImage
+    }
+
     static func showcaseImage() -> UIImage {
         let size = CGSize(width: 900, height: 1600)
         let format = UIGraphicsImageRendererFormat()
@@ -621,6 +636,70 @@ private enum WallpaperPreviewStore {
         path.close()
 
         return path
+    }
+}
+
+private struct WallpaperImageAnalysis: Sendable {
+    let previewData: Data
+    let sourceColors: [RGBAColor]
+    let palettes: [BarcodePalette]
+}
+
+private enum WallpaperImageAnalyzer {
+    static func analyze(_ data: Data) -> WallpaperImageAnalysis? {
+        guard
+            let imageSource = CGImageSourceCreateWithData(data as CFData, nil),
+            let previewImage = downsampledImage(from: imageSource),
+            let previewData = jpegData(from: previewImage)
+        else {
+            return nil
+        }
+
+        let sourceColors = WallpaperPaletteGenerator.representativeColors(from: previewImage)
+        let palettes = WallpaperPaletteGenerator.palettes(from: sourceColors)
+        guard !palettes.isEmpty else {
+            return nil
+        }
+
+        return WallpaperImageAnalysis(
+            previewData: previewData,
+            sourceColors: sourceColors,
+            palettes: palettes
+        )
+    }
+
+    private static func downsampledImage(from imageSource: CGImageSource) -> CGImage? {
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: 900,
+        ]
+
+        return CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options as CFDictionary)
+    }
+
+    private static func jpegData(from image: CGImage) -> Data? {
+        let data = NSMutableData()
+        guard
+            let destination = CGImageDestinationCreateWithData(
+                data,
+                UTType.jpeg.identifier as CFString,
+                1,
+                nil
+            )
+        else {
+            return nil
+        }
+
+        let options: [CFString: Any] = [
+            kCGImageDestinationLossyCompressionQuality: 0.76,
+        ]
+        CGImageDestinationAddImage(destination, image, options as CFDictionary)
+        guard CGImageDestinationFinalize(destination) else {
+            return nil
+        }
+
+        return data as Data
     }
 }
 
