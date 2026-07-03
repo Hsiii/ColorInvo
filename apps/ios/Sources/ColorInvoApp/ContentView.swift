@@ -123,14 +123,8 @@ struct ContentView: View {
         .background(ColorInvoColor.background.ignoresSafeArea())
         .preferredColorScheme(.light)
         .tint(ColorInvoColor.primary)
-        .onChange(of: normalizedCode) { _, _ in
-            persistCarrierIfReady()
-        }
-        .onChange(of: draftPalette) { _, _ in
-            persistCarrierIfReady()
-        }
-        .onChange(of: wallpaperDominantColors) { _, _ in
-            persistCarrierIfReady()
+        .task(id: draftSettings) {
+            await persistCarrierIfReady()
         }
     }
 
@@ -357,14 +351,28 @@ struct ContentView: View {
         }
     }
 
-    private func persistCarrierIfReady() {
+    @MainActor
+    private func persistCarrierIfReady() async {
         guard let settings = draftSettings, settings != savedSettings else {
             return
         }
 
-        CarrierStore.save(settings)
+        do {
+            try await Task.sleep(nanoseconds: 300_000_000)
+        } catch {
+            return
+        }
+
+        await Task.detached(priority: .utility) {
+            CarrierStore.save(settings)
+            WidgetCenter.shared.reloadAllTimelines()
+        }.value
+
+        guard !Task.isCancelled, draftSettings == settings else {
+            return
+        }
+
         savedSettings = settings
-        WidgetCenter.shared.reloadAllTimelines()
     }
 
     @MainActor

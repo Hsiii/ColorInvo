@@ -1,6 +1,6 @@
 import Foundation
 
-struct CarrierSettings: Codable, Equatable {
+struct CarrierSettings: Codable, Equatable, Sendable {
     var carrierCode: String
     var palette: BarcodePalette
     var wallpaperDominantColors: [RGBAColor]

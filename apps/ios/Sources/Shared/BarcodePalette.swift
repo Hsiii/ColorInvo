@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 import UIKit
 
-struct BarcodePalette: Codable, Equatable, Identifiable {
+struct BarcodePalette: Codable, Equatable, Identifiable, Sendable {
     var name: String
     var barColor: RGBAColor
     var backgroundColor: RGBAColor
@@ -110,7 +110,7 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
     ]
 }
 
-struct RGBAColor: Codable, Equatable {
+struct RGBAColor: Codable, Equatable, Sendable {
     var red: Double
     var green: Double
     var blue: Double
