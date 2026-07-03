@@ -205,6 +205,8 @@ struct RGBAColor: Codable, Equatable {
 }
 
 enum WallpaperPaletteGenerator {
+    private static let symbolContrastCushion = 0.02
+
     static func dominantColor(from image: UIImage) -> RGBAColor? {
         representativeColors(from: image).first
     }
@@ -331,7 +333,7 @@ enum WallpaperPaletteGenerator {
                 backgroundColor: backgroundColor
             )
 
-            return BarcodePalette(
+            return scannerValidatedPalette(
                 name: names[index],
                 barColor: barColor,
                 backgroundColor: backgroundColor
@@ -370,8 +372,20 @@ enum WallpaperPaletteGenerator {
             safeColor = RGBAColor(hue: 210 / 360, saturation: 0.68, brightness: 0.16)
         }
 
-        let maximumRed = max(0.02, min(backgroundColor.red * 0.42, 0.32))
+        let maximumRed = max(
+            0,
+            min(
+                backgroundColor.red / 2,
+                backgroundColor.red
+                    - BarcodePalette.symbolContrastStandard
+                    - symbolContrastCushion
+            )
+        )
         if safeColor.red > maximumRed {
+            guard maximumRed > 0 else {
+                return RGBAColor(hex: 0x000000)
+            }
+
             let scale = maximumRed / safeColor.red
             safeColor = RGBAColor(
                 red: safeColor.red * scale,
@@ -381,6 +395,32 @@ enum WallpaperPaletteGenerator {
         }
 
         return safeColor
+    }
+
+    private static func scannerValidatedPalette(
+        name: String,
+        barColor: RGBAColor,
+        backgroundColor: RGBAColor
+    ) -> BarcodePalette {
+        let palette = BarcodePalette(
+            name: name,
+            barColor: barColor,
+            backgroundColor: backgroundColor
+        )
+        guard !palette.meetsCommercialGuidance else {
+            return palette
+        }
+
+        let fallbackBackground = backgroundColor.scannerReflectance
+            >= BarcodePalette.minimumBackgroundReflectance
+            ? backgroundColor
+            : RGBAColor(hex: 0xFFFFFF)
+
+        return BarcodePalette(
+            name: name,
+            barColor: RGBAColor(hex: 0x000000),
+            backgroundColor: fallbackBackground
+        )
     }
 
     private static func fallbackColor(
