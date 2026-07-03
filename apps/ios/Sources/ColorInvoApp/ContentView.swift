@@ -20,22 +20,39 @@ struct ContentView: View {
         _model = StateObject(wrappedValue: model)
     }
 
+#if DEBUG
+    private var opensWidgetScreenshot: Bool {
+        ProcessInfo.processInfo.environment["COLORINVO_SCREENSHOT_TARGET"] == "widget"
+            || ProcessInfo.processInfo.arguments.contains("--screenshot-widget")
+    }
+#endif
+
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                carrierSection
-                colorSection
-                displayOptionsSection
-                widgetSection
+        ScrollViewReader { scrollProxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    scrollContentSections
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 28)
+                .padding(.bottom, 24)
+                .frame(maxWidth: .infinity, alignment: .top)
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 28)
-            .padding(.bottom, 24)
-            .frame(maxWidth: .infinity, alignment: .top)
+            .scrollDismissesKeyboard(.interactively)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .background(ColorInvoColor.background.ignoresSafeArea())
+#if DEBUG
+            .onAppear {
+                guard opensWidgetScreenshot else {
+                    return
+                }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    scrollProxy.scrollTo(Self.widgetScreenshotSectionID, anchor: .top)
+                }
+            }
+#endif
         }
-        .scrollDismissesKeyboard(.interactively)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(ColorInvoColor.background.ignoresSafeArea())
         .preferredColorScheme(.light)
         .tint(ColorInvoColor.primary)
         .sheet(item: $activeColorPicker) { picker in
@@ -44,6 +61,34 @@ struct ContentView: View {
         .task {
             await model.start()
         }
+    }
+
+    private static let widgetScreenshotSectionID = "colorinvo-widget-screenshot-section"
+
+    @ViewBuilder
+    private var scrollContentSections: some View {
+#if DEBUG
+        if opensWidgetScreenshot {
+            widgetSection
+                .id(Self.widgetScreenshotSectionID)
+
+            Color.clear
+                .frame(height: 520)
+        } else {
+            editorSections
+        }
+#else
+        editorSections
+#endif
+    }
+
+    @ViewBuilder
+    private var editorSections: some View {
+        carrierSection
+        colorSection
+        displayOptionsSection
+        widgetSection
+            .id(Self.widgetScreenshotSectionID)
     }
 
     private var carrierSection: some View {
