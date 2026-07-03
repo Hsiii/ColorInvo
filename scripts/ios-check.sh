@@ -4,8 +4,8 @@ set -euo pipefail
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/ios-common.sh"
 
 PROJECT_FILE="$IOS_PROJECT_PATH/project.pbxproj"
-APP_ENTITLEMENTS="$IOS_ROOT_DIR/Sources/ColorInvoApp/ColorInvo.entitlements"
-WIDGET_ENTITLEMENTS="$IOS_ROOT_DIR/Sources/ColorInvoWidget/ColorInvoWidget.entitlements"
+APP_ENTITLEMENTS="$IOS_APP_DIR/Sources/ColorInvoApp/ColorInvo.entitlements"
+WIDGET_ENTITLEMENTS="$IOS_APP_DIR/Sources/ColorInvoWidget/ColorInvoWidget.entitlements"
 
 ios_generate_project
 
@@ -23,7 +23,7 @@ grep -q "$IOS_WIDGET_BUNDLE_ID_VALUE" "$PROJECT_FILE" \
 
 while IFS= read -r strings_file; do
     plutil -lint "$strings_file" >/dev/null
-done < <(find "$IOS_ROOT_DIR/Sources" -name "*.strings" -type f | sort)
+done < <(find "$IOS_APP_DIR/Sources" -name "*.strings" -type f | sort)
 
 "$IOS_ROOT_DIR/scripts/ios-build.sh" >/dev/null
 

@@ -1,7 +1,6 @@
 name: ColorInvo
 options:
   minimumXcodeGenVersion: 2.42.0
-  postGenCommand: scripts/ios-patch-project-capabilities.sh
   deploymentTarget:
     iOS: "17.0"
 settings:

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PROJECT_FILE="$ROOT_DIR/ColorInvo.xcodeproj/project.pbxproj"
+PROJECT_FILE="${IOS_PROJECT:-$ROOT_DIR/apps/ios/ColorInvo.xcodeproj}/project.pbxproj"
 
 if [[ ! -f "$PROJECT_FILE" ]]; then
     exit 0

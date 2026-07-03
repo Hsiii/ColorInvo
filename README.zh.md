@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="Resources/ColorInvo/Assets.xcassets/AppIcon.appiconset/AppIcon-10241024-1x.png" alt="條色盤 app icon" width="96" />
+  <img src="apps/ios/Resources/ColorInvo/Assets.xcassets/AppIcon.appiconset/AppIcon-10241024-1x.png" alt="條色盤 app icon" width="96" />
   <h1>條色盤</h1>
   <p>讓你的載具條碼和桌布顏色完美搭配。</p>
   <a href="./README.md">English</a>

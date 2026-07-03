@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="Resources/ColorInvo/Assets.xcassets/AppIcon.appiconset/AppIcon-10241024-1x.png" alt="ColorInvo app icon" width="96" />
+  <img src="apps/ios/Resources/ColorInvo/Assets.xcassets/AppIcon.appiconset/AppIcon-10241024-1x.png" alt="ColorInvo app icon" width="96" />
 <h1>ColorInvo</h1>
   <p>Make your Taiwan mobile invoice carrier barcode match your wallpaper.</p>
   <a href="./README.zh.md">繁體中文</a>

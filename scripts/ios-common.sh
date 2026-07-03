@@ -4,6 +4,7 @@ APP_STORE_AUTH_ARGS=()
 IOS_PROVISIONING_ARGS=()
 
 IOS_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+IOS_APP_DIR="${IOS_APP_DIR:-$IOS_ROOT_DIR/apps/ios}"
 
 ios_load_env_file() {
     local env_path="$1"
@@ -84,7 +85,8 @@ ios_apply_env_aliases() {
 
 ios_load_env
 
-IOS_PROJECT_PATH="${IOS_PROJECT:-$IOS_ROOT_DIR/ColorInvo.xcodeproj}"
+IOS_PROJECT_PATH="${IOS_PROJECT:-$IOS_APP_DIR/ColorInvo.xcodeproj}"
+IOS_PROJECT_SPEC_PATH="${IOS_PROJECT_SPEC:-$IOS_APP_DIR/project.yml}"
 IOS_SCHEME_NAME="${IOS_SCHEME:-ColorInvo}"
 IOS_BUNDLE_ID_VALUE="${IOS_BUNDLE_ID:-dev.hsichen.colorinvo}"
 IOS_WIDGET_BUNDLE_ID_VALUE="${IOS_WIDGET_BUNDLE_ID:-dev.hsichen.colorinvo.widget}"
@@ -97,7 +99,8 @@ ios_die() {
 
 ios_generate_project() {
     command -v xcodegen >/dev/null || ios_die "xcodegen is required. Install it before running iOS scripts."
-    xcodegen generate --spec "$IOS_ROOT_DIR/project.yml"
+    xcodegen generate --spec "$IOS_PROJECT_SPEC_PATH" --project "$IOS_APP_DIR" --project-root "$IOS_APP_DIR"
+    "$IOS_ROOT_DIR/scripts/ios-patch-project-capabilities.sh"
 }
 
 ios_project_build_setting() {
