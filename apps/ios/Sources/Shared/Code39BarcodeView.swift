@@ -151,9 +151,9 @@ private struct CarrierBarcodeValueOverlay: View {
 
 private struct CarrierBarcodeWaveShape: Shape {
     func path(in rect: CGRect) -> Path {
-        // Path coordinates are normalized from the downloaded Haikei wave SVG reference.
-        let baseY: CGFloat = 326
-        let spanY: CGFloat = 275
+        // Path coordinates are normalized from the downloaded Wave.svg reference.
+        let baseY: CGFloat = 259.571
+        let spanY: CGFloat = 341.429
 
         func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
             CGPoint(
@@ -163,44 +163,38 @@ private struct CarrierBarcodeWaveShape: Shape {
         }
 
         var path = Path()
-        path.move(to: point(0, 408))
-        path.addLine(to: point(21.5, 390.3))
+        path.move(to: point(0, 601))
+        path.addLine(to: point(0, 435.3))
         path.addCurve(
-            to: point(128.8, 352.2),
-            control1: point(43, 372.7),
-            control2: point(86, 337.3)
+            to: point(107.8, 313.2),
+            control1: point(8.5, 397.7),
+            control2: point(42, 313.274)
         )
         path.addCurve(
-            to: point(257.2, 450.5),
-            control1: point(171.7, 367),
-            control2: point(214.3, 432)
+            to: point(275.2, 519.5),
+            control1: point(193.926, 313.103),
+            control2: point(189.338, 516.203)
         )
         path.addCurve(
-            to: point(385.8, 416.5),
-            control1: point(300, 469),
-            control2: point(343, 441)
+            to: point(450, 380),
+            control1: point(365.968, 522.985),
+            control2: point(378.1, 381)
         )
         path.addCurve(
-            to: point(514.2, 391),
-            control1: point(428.7, 392),
-            control2: point(471.3, 371)
+            to: point(629.8, 457.5),
+            control1: point(523.814, 378.973),
+            control2: point(569.117, 460.46)
         )
         path.addCurve(
-            to: point(642.8, 473.5),
-            control1: point(557, 411),
-            control2: point(600, 472)
+            to: point(807.394, 259.571),
+            control1: point(702.511, 453.953),
+            control2: point(704.125, 259.815)
         )
         path.addCurve(
-            to: point(771.2, 382.5),
-            control1: point(685.7, 475),
-            control2: point(728.3, 417)
+            to: point(900, 381),
+            control1: point(887.814, 259.381),
+            control2: point(900, 381)
         )
-        path.addCurve(
-            to: point(878.5, 331.5),
-            control1: point(814, 348),
-            control2: point(857, 337)
-        )
-        path.addLine(to: point(900, 326))
         path.addLine(to: point(900, 601))
         path.addLine(to: point(0, 601))
         path.closeSubpath()
