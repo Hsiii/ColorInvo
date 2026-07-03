@@ -49,7 +49,7 @@ struct ContentView: View {
         }
 
         if !isValid {
-            return "完成載具格式後會自動更新小工具"
+            return "填入載具以產生小工具"
         }
 
         if !draftPalette.meetsCommercialGuidance {
@@ -203,7 +203,7 @@ struct ContentView: View {
             matching: .images,
             photoLibrary: .shared()
         ) {
-            Label("選擇桌布", systemImage: "photo.on.rectangle")
+            Label("選擇桌布以產生配色", systemImage: "photo.on.rectangle")
                 .colorInvoText(.control)
                 .foregroundStyle(ColorInvoColor.primary)
                 .lineLimit(1)
