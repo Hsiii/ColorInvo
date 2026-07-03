@@ -10,9 +10,11 @@
 		19E0FE47E92A4AB2852A8DEF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3E156DE3C3A6C9028CD52432 /* Localizable.strings */; };
 		2F6D6D68F6213B211A1CBECD /* ColorInvoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BA0A795276F4F92700B1549 /* ColorInvoApp.swift */; };
 		3E5A6A7B8D6B9D927588305C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2BBDA9BEC927485A857E737C /* InfoPlist.strings */; };
+		3EB7BF13588F47C0BED1C90C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = EC82EA48A35034DDF09959AA /* PrivacyInfo.xcprivacy */; };
 		4A5F52AA87314EC8D4F4E17A /* Code39BarcodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B2B20F5DD5AE3A8E5B68020 /* Code39BarcodeView.swift */; };
 		586A4116D912718B6ED5A1F8 /* CarrierSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BDCB590CA17AAFCAA3289A5 /* CarrierSettings.swift */; };
 		59CB288722FF02E609E98F16 /* CarrierCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9A11DF4AD04EC6FA7BB2BD6 /* CarrierCode.swift */; };
+		6B6C6729F5CBCE4D032B9486 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 7208AE85AD7B21303DCE5955 /* PrivacyInfo.xcprivacy */; };
 		715C98477B26FD4FBB90FDF0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 913A130A5A4C24D9EEC4D4FD /* Assets.xcassets */; };
 		77D0A0F6AA417D25D083BD28 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F05933D6EBA34CFA44823B /* AppGroup.swift */; };
 		7D1DCA62D6C11DD5D5C5F847 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D6D1E7C856EF7AD232FE89DF /* InfoPlist.strings */; };
@@ -63,6 +65,7 @@
 		4EF79ECC71E150A7F226266A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		536E0BD6F9389D36DDE17F2C /* ColorInvo.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ColorInvo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C656D39AB9EB12EEFA74BB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		7208AE85AD7B21303DCE5955 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		81A46D55AA2AF0EE56B7D10F /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		86C46C6B4737C9DD08E9ED3E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		913A130A5A4C24D9EEC4D4FD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -75,6 +78,7 @@
 		E0CB209F84455580DC4D770B /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		E694B10230223879CC7FC315 /* ColorInvoWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorInvoWidget.swift; sourceTree = "<group>"; };
 		EA50C0ED47F81804F40188AB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		EC82EA48A35034DDF09959AA /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		F05E3CC563318EDDFBE31B22 /* ColorInvo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ColorInvo.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -86,6 +90,7 @@
 				0BA0A795276F4F92700B1549 /* ColorInvoApp.swift */,
 				4E60FD679A095710988F6C9E /* ContentView.swift */,
 				5C656D39AB9EB12EEFA74BB5 /* Info.plist */,
+				7208AE85AD7B21303DCE5955 /* PrivacyInfo.xcprivacy */,
 				2BBDA9BEC927485A857E737C /* InfoPlist.strings */,
 				FF28C2EB6F943C7612EF7F0C /* Localizable.strings */,
 			);
@@ -132,6 +137,7 @@
 				D7F0064CF706CA1FB9D0127E /* ColorInvoWidget.entitlements */,
 				E694B10230223879CC7FC315 /* ColorInvoWidget.swift */,
 				06D02F28A6B3B574AF4F3F8E /* Info.plist */,
+				EC82EA48A35034DDF09959AA /* PrivacyInfo.xcprivacy */,
 				D6D1E7C856EF7AD232FE89DF /* InfoPlist.strings */,
 				3E156DE3C3A6C9028CD52432 /* Localizable.strings */,
 			);
@@ -246,6 +252,7 @@
 			files = (
 				7D1DCA62D6C11DD5D5C5F847 /* InfoPlist.strings in Resources */,
 				19E0FE47E92A4AB2852A8DEF /* Localizable.strings in Resources */,
+				3EB7BF13588F47C0BED1C90C /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,6 +263,7 @@
 				715C98477B26FD4FBB90FDF0 /* Assets.xcassets in Resources */,
 				3E5A6A7B8D6B9D927588305C /* InfoPlist.strings in Resources */,
 				807BD22734D6A8201B194199 /* Localizable.strings in Resources */,
+				6B6C6729F5CBCE4D032B9486 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
