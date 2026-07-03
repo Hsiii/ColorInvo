@@ -199,7 +199,6 @@ struct ContentView: View {
             wallpaperPaletteChoices
             customColorSection
         }
-        .disabled(!hasCarrierInput)
         .opacity(hasCarrierInput ? 1 : 0.48)
     }
 
@@ -220,7 +219,7 @@ struct ContentView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
         .buttonStyle(.plain)
-        .disabled(isAnalyzingWallpaper)
+        .disabled(!hasCarrierInput || isAnalyzingWallpaper)
         .onChange(of: wallpaperPickerItem) { _, item in
             Task {
                 await loadWallpaperPalettes(from: item)
@@ -255,6 +254,7 @@ struct ContentView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .disabled(!hasCarrierInput)
                 .accessibilityLabel(palette.name)
             }
         }
@@ -301,6 +301,7 @@ struct ContentView: View {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
             }
+            .disabled(!hasCarrierInput)
     }
 
     private var widgetSection: some View {
