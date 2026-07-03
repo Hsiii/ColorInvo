@@ -7,7 +7,6 @@ struct ContentView: View {
     @State private var draftCode: String
     @State private var draftPalette: BarcodePalette
     @State private var savedSettings: CarrierSettings
-    @State private var didSave = false
     @State private var showingWidgetHelp = false
     @State private var wallpaperPickerItem: PhotosPickerItem?
     @State private var wallpaperPalettes: [BarcodePalette] = []
@@ -23,12 +22,12 @@ struct ContentView: View {
         CarrierCode.isValid(normalizedCode)
     }
 
-    private var canSave: Bool {
+    private var canAutoSave: Bool {
         isValid && draftPalette.meetsCommercialGuidance
     }
 
     private var draftSettings: CarrierSettings? {
-        guard canSave, let carrierCode = CarrierCode(normalizedCode) else {
+        guard canAutoSave, let carrierCode = CarrierCode(normalizedCode) else {
             return nil
         }
 
@@ -47,7 +46,15 @@ struct ContentView: View {
             return "小工具已準備好，可在主畫面加入"
         }
 
-        return canSave ? "儲存後可在主畫面加入小工具" : "完成載具與配色後可加入小工具"
+        if !isValid {
+            return "完成載具格式後會自動更新小工具"
+        }
+
+        if !draftPalette.meetsCommercialGuidance {
+            return "配色可掃描後會自動更新小工具"
+        }
+
+        return "小工具設定會自動更新"
     }
 
     private var paletteGridColumns: [GridItem] {
@@ -70,7 +77,6 @@ struct ContentView: View {
                 let suffix = CarrierCode.normalize(newValue)
                     .replacingOccurrences(of: "/", with: "")
                 draftCode = suffix.isEmpty ? "" : "/\(suffix)"
-                didSave = false
             }
         )
     }
@@ -109,6 +115,12 @@ struct ContentView: View {
         .sheet(isPresented: $showingWidgetHelp) {
             WidgetHelpSheet()
         }
+        .onChange(of: normalizedCode) { _, _ in
+            persistCarrierIfReady()
+        }
+        .onChange(of: draftPalette) { _, _ in
+            persistCarrierIfReady()
+        }
     }
 
     private var carrierSection: some View {
@@ -139,9 +151,7 @@ struct ContentView: View {
                     .padding(.trailing, 16)
                     .padding(.vertical, 10)
                     .onSubmit {
-                        if canSave {
-                            saveCarrier()
-                        }
+                        carrierFieldFocused = false
                     }
             }
             .background {
@@ -155,17 +165,6 @@ struct ContentView: View {
                             )
                     }
             }
-
-            Button {
-                saveCarrier()
-                carrierFieldFocused = false
-            } label: {
-                Label(didSave ? "已儲存" : "儲存載具", systemImage: didSave ? "checkmark" : "tray.and.arrow.down")
-                    .colorInvoText(.heading)
-                    .frame(maxWidth: .infinity, minHeight: 48)
-            }
-            .buttonStyle(ColorInvoPrimaryButtonStyle())
-            .disabled(!canSave)
         }
     }
 
@@ -256,7 +255,6 @@ struct ContentView: View {
             ForEach(palettes) { palette in
                 Button {
                     draftPalette = palette
-                    didSave = false
                 } label: {
                     PaletteOptionButtonContent(
                         palette: palette,
@@ -283,7 +281,6 @@ struct ContentView: View {
                         draftPalette = draftPalette.replacing(
                             barColor: RGBAColor(color: color)
                         )
-                        didSave = false
                     }
                 )
             )
@@ -296,7 +293,6 @@ struct ContentView: View {
                         draftPalette = draftPalette.replacing(
                             backgroundColor: RGBAColor(color: color)
                         )
-                        didSave = false
                     }
                 )
             )
@@ -396,18 +392,13 @@ struct ContentView: View {
         }
     }
 
-    private func saveCarrier() {
-        guard canSave, let carrierCode = CarrierCode(normalizedCode) else {
+    private func persistCarrierIfReady() {
+        guard let settings = draftSettings, settings != savedSettings else {
             return
         }
 
-        let settings = CarrierSettings(
-            carrierCode: carrierCode.value,
-            palette: draftPalette
-        )
         CarrierStore.save(settings)
         savedSettings = settings
-        didSave = true
         WidgetCenter.shared.reloadAllTimelines()
     }
 
@@ -446,7 +437,6 @@ struct ContentView: View {
 
             if let firstPalette = generatedPalettes.first {
                 draftPalette = firstPalette
-                didSave = false
             }
         } catch {
             wallpaperPalettes = []
