@@ -15,7 +15,7 @@ simulator:
 	bun run ios:simulator
 
 device:
-	bun run ios:device
+	bun run ios
 
 mock:
 	bun run ios:mock
