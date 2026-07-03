@@ -24,15 +24,19 @@ struct ContentView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            carrierSection
-            colorSection
-            displayOptionsSection
-            widgetSection
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                carrierSection
+                colorSection
+                displayOptionsSection
+                widgetSection
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 28)
+            .padding(.bottom, 24)
+            .frame(maxWidth: .infinity, alignment: .top)
         }
-        .padding(.horizontal, 24)
-        .padding(.top, 28)
-        .padding(.bottom, 24)
+        .scrollDismissesKeyboard(.interactively)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(ColorInvoColor.background.ignoresSafeArea())
         .preferredColorScheme(.light)
