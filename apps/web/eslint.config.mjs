@@ -35,6 +35,7 @@ export default [
         files: ['src/app/**/*.ts', 'src/app/**/*.tsx'],
         rules: {
             'complete/require-ascii': 'off',
+            'n/file-extension-in-import': 'off',
         },
     },
 

@@ -4,13 +4,32 @@ export const SITE = {
     url: 'https://colorinvo.hsichen.dev',
     domain: 'colorinvo.hsichen.dev',
     supportEmail: 'its.hsichen@gmail.com',
-    lastUpdated: '2026 年 7 月 3 日',
-    description:
-        '台灣手機條碼 iPhone 桌面小工具，配色跟著桌布走，設定只留在裝置上。',
 } as const;
 
 export const ROUTES = {
-    home: '/',
-    privacy: '/privacy',
-    support: '/support',
+    en: {
+        home: '/en',
+        privacy: '/en/privacy',
+        support: '/en/support',
+    },
+    zh: {
+        home: '/',
+        privacy: '/privacy',
+        support: '/support',
+    },
 } as const;
+
+export type Locale = keyof typeof ROUTES;
+export type SitePage = keyof (typeof ROUTES)['zh'];
+
+export const DEFAULT_LOCALE: Locale = 'zh';
+
+export const LOCALES = ['zh', 'en'] as const satisfies readonly Locale[];
+
+export function routeFor(locale: Locale, page: SitePage): string {
+    return ROUTES[locale][page];
+}
+
+export function absoluteRoute(locale: Locale, page: SitePage): string {
+    return `${SITE.url}${routeFor(locale, page)}`;
+}

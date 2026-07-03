@@ -33,7 +33,7 @@ From the repository root:
 bun run web:check
 ```
 
-The app statically exports `/`, `/support`, `/privacy`, `/robots.txt`, and
-`/sitemap.xml`.
+The app statically exports `/`, `/support`, `/privacy`, `/en`, `/en/support`,
+`/en/privacy`, `/robots.txt`, and `/sitemap.xml`.
 
 This project includes `bunfig.toml` with `minimumReleaseAge = 604800`.
