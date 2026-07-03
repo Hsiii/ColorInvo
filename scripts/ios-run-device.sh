@@ -66,7 +66,7 @@ echo "Launching $IOS_BUNDLE_ID_VALUE..."
 xcrun devicectl device process launch \
     --device "$DEVICE_ID" \
     --terminate-existing \
-    "${LAUNCH_ENV_ARGS[@]}" \
+    ${LAUNCH_ENV_ARGS[@]+"${LAUNCH_ENV_ARGS[@]}"} \
     "$IOS_BUNDLE_ID_VALUE"
 
 echo "Updated and launched $IOS_BUNDLE_ID_VALUE on $DEVICE_ID."
