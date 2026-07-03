@@ -10,6 +10,7 @@ struct ContentView: View {
     @State private var wallpaperPickerItem: PhotosPickerItem?
     @State private var wallpaperPreviewImage: UIImage?
     @State private var wallpaperPalettes: [BarcodePalette] = []
+    @State private var wallpaperDominantColors: [RGBAColor]
     @State private var wallpaperStatusText: String?
     @State private var isAnalyzingWallpaper = false
     @FocusState private var carrierFieldFocused: Bool
@@ -33,7 +34,8 @@ struct ContentView: View {
 
         return CarrierSettings(
             carrierCode: carrierCode.value,
-            palette: draftPalette
+            palette: draftPalette,
+            wallpaperDominantColors: wallpaperDominantColors
         )
     }
 
@@ -95,6 +97,7 @@ struct ContentView: View {
         _draftCode = State(initialValue: settings.carrierCode)
         _draftPalette = State(initialValue: settings.palette)
         _savedSettings = State(initialValue: settings)
+        _wallpaperDominantColors = State(initialValue: settings.wallpaperDominantColors)
         _wallpaperPreviewImage = State(
             initialValue: usesShowcaseData
                 ? WallpaperPreviewStore.showcaseImage()
@@ -120,6 +123,9 @@ struct ContentView: View {
             persistCarrierIfReady()
         }
         .onChange(of: draftPalette) { _, _ in
+            persistCarrierIfReady()
+        }
+        .onChange(of: wallpaperDominantColors) { _, _ in
             persistCarrierIfReady()
         }
     }
@@ -372,7 +378,8 @@ struct ContentView: View {
                                 barcodeHeight: 80,
                                 horizontalPadding: 12,
                                 verticalPadding: 10,
-                                fillsAvailableSpace: false
+                                fillsAvailableSpace: false,
+                                dominantColors: wallpaperDominantColors
                             )
                         } else {
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -451,6 +458,7 @@ struct ContentView: View {
             }
 
             wallpaperPreviewImage = WallpaperPreviewStore.save(image)
+            wallpaperDominantColors = sourceColors
             wallpaperPalettes = generatedPalettes
 
             if let firstPalette = generatedPalettes.first {
@@ -491,8 +499,8 @@ private struct PaletteOptionButtonContent: View {
             Text(palette.name)
                 .colorInvoText(.secondary)
                 .multilineTextAlignment(.center)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .lineLimit(2)
+                .minimumScaleFactor(0.72)
                 .frame(maxWidth: .infinity)
         }
         .padding(4)

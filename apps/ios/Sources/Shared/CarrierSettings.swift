@@ -3,6 +3,7 @@ import Foundation
 struct CarrierSettings: Codable, Equatable {
     var carrierCode: String
     var palette: BarcodePalette
+    var wallpaperDominantColors: [RGBAColor]
 
     static let empty = CarrierSettings(
         carrierCode: "",
@@ -11,12 +12,18 @@ struct CarrierSettings: Codable, Equatable {
 
     static let showcase = CarrierSettings(
         carrierCode: "/AB12345",
-        palette: .showcase
+        palette: .showcase,
+        wallpaperDominantColors: BarcodePalette.showcaseSourceColors
     )
 
-    init(carrierCode: String, palette: BarcodePalette = .classic) {
+    init(
+        carrierCode: String,
+        palette: BarcodePalette = .classic,
+        wallpaperDominantColors: [RGBAColor] = []
+    ) {
         self.carrierCode = carrierCode
         self.palette = palette
+        self.wallpaperDominantColors = Array(wallpaperDominantColors.prefix(3))
     }
 
     init(from decoder: Decoder) throws {
@@ -25,6 +32,9 @@ struct CarrierSettings: Codable, Equatable {
         carrierCode = try container.decode(String.self, forKey: .carrierCode)
         palette = try container.decodeIfPresent(BarcodePalette.self, forKey: .palette)
             ?? .classic
+        wallpaperDominantColors = try container
+            .decodeIfPresent([RGBAColor].self, forKey: .wallpaperDominantColors)
+            ?? []
     }
 }
 

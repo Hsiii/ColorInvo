@@ -49,6 +49,7 @@ struct CarrierBarcodePanel: View {
     var horizontalPadding: CGFloat = 18
     var verticalPadding: CGFloat = 16
     var fillsAvailableSpace = false
+    var dominantColors: [RGBAColor] = []
 
     var body: some View {
         VStack(spacing: showsValue ? 6 : 0) {
@@ -60,11 +61,18 @@ struct CarrierBarcodePanel: View {
             .frame(height: barcodeHeight)
 
             if showsValue {
-                Text(value)
-                    .font(.system(.subheadline, design: .monospaced, weight: .semibold))
-                    .foregroundStyle(palette.barColor.color)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
+                HStack(spacing: 8) {
+                    Text(value)
+                        .font(.system(.subheadline, design: .monospaced, weight: .semibold))
+                        .foregroundStyle(palette.barColor.color)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
+
+                    Spacer(minLength: 8)
+
+                    WallpaperDominantColorDots(colors: dominantColors)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding(.horizontal, horizontalPadding)
@@ -76,6 +84,29 @@ struct CarrierBarcodePanel: View {
         .background(palette.backgroundColor.color)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .accessibilityElement(children: .combine)
+    }
+}
+
+private struct WallpaperDominantColorDots: View {
+    let colors: [RGBAColor]
+
+    private var displayColors: [RGBAColor] {
+        Array(colors.prefix(3))
+    }
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(Array(displayColors.enumerated()), id: \.offset) { _, color in
+                Circle()
+                    .fill(color.color)
+                    .frame(width: 12, height: 12)
+                    .overlay {
+                        Circle()
+                            .stroke(.black.opacity(0.16), lineWidth: 1)
+                    }
+            }
+        }
+        .accessibilityHidden(displayColors.isEmpty)
     }
 }
 

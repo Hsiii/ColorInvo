@@ -47,7 +47,8 @@ struct CarrierWidgetView: View {
                     barcodeHeight: 104,
                     horizontalPadding: 0,
                     verticalPadding: 6,
-                    fillsAvailableSpace: true
+                    fillsAvailableSpace: true,
+                    dominantColors: entry.settings.wallpaperDominantColors
                 )
             } else {
                 VStack(spacing: 8) {

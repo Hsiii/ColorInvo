@@ -102,6 +102,12 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
         ),
         showcase
     ]
+
+    static let showcaseSourceColors = [
+        RGBAColor(hex: 0x59BAC9),
+        RGBAColor(hex: 0xFFB876),
+        RGBAColor(hex: 0x396791),
+    ]
 }
 
 struct RGBAColor: Codable, Equatable {
