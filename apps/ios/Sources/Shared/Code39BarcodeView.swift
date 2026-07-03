@@ -170,6 +170,10 @@ private struct CarrierBarcodeValueOverlay: View {
     let palette: BarcodePalette
     let horizontalPadding: CGFloat
 
+    private var edgeInset: CGFloat {
+        max(8, horizontalPadding + 8)
+    }
+
     var body: some View {
         Text(value)
             .font(.system(.caption, design: .monospaced, weight: .bold))
@@ -183,8 +187,8 @@ private struct CarrierBarcodeValueOverlay: View {
                 Capsule(style: .continuous)
                     .fill(palette.barColor.color)
             }
-            .padding(.trailing, max(8, horizontalPadding + 8))
-            .padding(.bottom, 4)
+            .padding(.trailing, edgeInset)
+            .padding(.bottom, edgeInset)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
     }
 }
