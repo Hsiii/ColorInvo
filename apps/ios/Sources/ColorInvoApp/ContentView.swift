@@ -4,7 +4,6 @@ import UIKit
 
 struct ContentView: View {
     @StateObject private var model: CarrierEditorModel
-    @State private var activeColorPicker: ActiveColorPicker?
     @FocusState private var carrierFieldFocused: Bool
 
     private var carrierSuffixBinding: Binding<String> {
@@ -55,9 +54,6 @@ struct ContentView: View {
         }
         .preferredColorScheme(.light)
         .tint(ColorInvoColor.primary)
-        .sheet(item: $activeColorPicker) { picker in
-            colorPickerSheet(for: picker)
-        }
         .task {
             await model.start()
         }
@@ -152,6 +148,15 @@ struct ContentView: View {
 
     private var colorSection: some View {
         VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Text("條碼顏色")
+                    .colorInvoText(.heading)
+
+                Spacer()
+
+                contrastStatus
+            }
+
             wallpaperColorSection
             wallpaperPaletteChoices
             customColorSection
@@ -229,17 +234,23 @@ struct ContentView: View {
             HStack(spacing: 8) {
                 compactColorPicker(
                     title: "背景",
-                    color: model.draftPalette.backgroundColor.color
-                ) {
-                    activeColorPicker = .background
-                }
+                    color: Binding(
+                        get: { model.draftPalette.backgroundColor.color },
+                        set: { color in
+                            model.updateBackgroundColor(color)
+                        }
+                    )
+                )
 
                 compactColorPicker(
                     title: "條碼",
-                    color: model.draftPalette.barColor.color
-                ) {
-                    activeColorPicker = .bar
-                }
+                    color: Binding(
+                        get: { model.draftPalette.barColor.color },
+                        set: { color in
+                            model.updateBarColor(color)
+                        }
+                    )
+                )
             }
 
             wallpaperWaveColorChoices
@@ -297,24 +308,15 @@ struct ContentView: View {
 
     private func compactColorPicker(
         title: String,
-        color: Color,
-        action: @escaping () -> Void
+        color: Binding<Color>
     ) -> some View {
         let identifier = title == "背景" ? "backgroundColorPicker" : "barColorPicker"
 
-        return Button(action: action) {
-            HStack(spacing: 8) {
-                Text(title)
-                    .colorInvoText(.control)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                Spacer(minLength: 8)
-
-                ColorPickerSwatch(color: color)
-            }
-            .padding(.leading, 12)
-            .padding(.trailing, 4)
+        return ColorPicker(title, selection: color, supportsOpacity: false)
+            .colorInvoText(.control)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .padding(.horizontal, 12)
             .frame(maxWidth: .infinity)
             .frame(height: 44)
             .background(ColorInvoColor.surface)
@@ -324,37 +326,7 @@ struct ContentView: View {
                     .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
                     .allowsHitTesting(false)
             }
-        }
-        .buttonStyle(.plain)
         .accessibilityIdentifier(identifier)
-    }
-
-    private func colorBinding(for picker: ActiveColorPicker) -> Binding<Color> {
-        Binding(
-            get: {
-                switch picker {
-                case .background:
-                    return model.draftPalette.backgroundColor.color
-                case .bar:
-                    return model.draftPalette.barColor.color
-                }
-            },
-            set: { color in
-                switch picker {
-                case .background:
-                    model.updateBackgroundColor(color)
-                case .bar:
-                    model.updateBarColor(color)
-                }
-            }
-        )
-    }
-
-    private func colorPickerSheet(for picker: ActiveColorPicker) -> some View {
-        ColorPickerSheet(
-            title: picker.title,
-            color: colorBinding(for: picker)
-        )
     }
 
     private var displayOptionsSection: some View {
@@ -413,6 +385,31 @@ struct ContentView: View {
         .accessibilityAddTraits(isChecked ? .isSelected : [])
     }
 
+    private var contrastStatus: some View {
+        let statusColor = model.draftPalette.meetsCommercialGuidance
+            ? ColorInvoColor.success
+            : ColorInvoColor.warning
+
+        return HStack(spacing: 6) {
+            Image(
+                systemName: model.draftPalette.meetsCommercialGuidance
+                    ? "checkmark.circle.fill"
+                    : "exclamationmark.triangle.fill"
+            )
+            .font(.callout)
+            .foregroundStyle(statusColor)
+
+            Text(model.draftPalette.contrastSummary)
+                .colorInvoText(.secondary)
+                .foregroundStyle(statusColor)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(model.draftPalette.standardMessage)
+    }
+
     private var widgetSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("主畫面預覽")
@@ -452,86 +449,6 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-    }
-}
-
-private enum ActiveColorPicker: String, Identifiable {
-    case background
-    case bar
-
-    var id: String {
-        rawValue
-    }
-
-    var title: String {
-        switch self {
-        case .background:
-            return "背景顏色"
-        case .bar:
-            return "條碼顏色"
-        }
-    }
-}
-
-private struct ColorPickerSheet: View {
-    let title: String
-    @Binding var color: Color
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 12) {
-                Text(title)
-                    .colorInvoText(.heading)
-
-                Spacer()
-
-                Button("完成") {
-                    dismiss()
-                }
-                .colorInvoText(.control)
-            }
-
-            ColorPicker(title, selection: $color, supportsOpacity: false)
-                .colorInvoText(.control)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .padding(.horizontal, 12)
-                .frame(maxWidth: .infinity)
-                .frame(height: 44)
-                .background(ColorInvoColor.surface)
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
-                        .allowsHitTesting(false)
-                }
-
-            Spacer(minLength: 0)
-        }
-        .padding(24)
-        .frame(maxWidth: .infinity, alignment: .topLeading)
-        .background(ColorInvoColor.background)
-        .presentationDetents([.height(180), .medium])
-        .presentationDragIndicator(.visible)
-        .preferredColorScheme(.light)
-        .tint(ColorInvoColor.primary)
-    }
-}
-
-private struct ColorPickerSwatch: View {
-    let color: Color
-
-    var body: some View {
-        Circle()
-            .fill(color)
-            .frame(width: 28, height: 28)
-            .overlay {
-                Circle()
-                    .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
-                    .allowsHitTesting(false)
-            }
-            .frame(width: 44, height: 44)
     }
 }
 
@@ -675,6 +592,7 @@ private enum ColorInvoColor {
     static let frozenLake = Color(red: 112 / 255, green: 214 / 255, blue: 255 / 255)
     static let roseKiss = Color(red: 255 / 255, green: 112 / 255, blue: 166 / 255)
     static let primary = Color(red: 0 / 255, green: 126 / 255, blue: 168 / 255)
+    static let attention = Color(red: 180 / 255, green: 98 / 255, blue: 20 / 255)
     static let background = Color.white
     static let surface = Color.white
     static let primarySoft = Color(red: 234 / 255, green: 248 / 255, blue: 255 / 255)
@@ -682,6 +600,7 @@ private enum ColorInvoColor {
     static let text = Color(red: 17 / 255, green: 24 / 255, blue: 39 / 255)
     static let muted = Color(red: 82 / 255, green: 96 / 255, blue: 106 / 255)
     static let success = primary
+    static let warning = attention
 }
 
 #Preview {
