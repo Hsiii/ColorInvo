@@ -29,6 +29,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 24) {
             carrierSection
             colorSection
+            displayOptionsSection
             widgetSection
         }
         .padding(.horizontal, 24)
@@ -211,6 +212,61 @@ struct ContentView: View {
             }
     }
 
+    private var displayOptionsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("顯示項目")
+                .colorInvoText(.heading)
+
+            HStack(spacing: 8) {
+                checkboxButton(
+                    title: "波浪",
+                    isChecked: model.showsWave
+                ) {
+                    model.setShowsWave(!model.showsWave)
+                }
+
+                checkboxButton(
+                    title: "載具文字",
+                    isChecked: model.showsBarcodeValue
+                ) {
+                    model.setShowsBarcodeValue(!model.showsBarcodeValue)
+                }
+            }
+        }
+    }
+
+    private func checkboxButton(
+        title: String,
+        isChecked: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Label {
+                Text(title)
+                    .colorInvoText(.control)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            } icon: {
+                Image(systemName: isChecked ? "checkmark.square.fill" : "square")
+                    .font(.title3)
+                    .foregroundStyle(isChecked ? ColorInvoColor.primary : ColorInvoColor.muted)
+            }
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .padding(.horizontal, 12)
+            .background(ColorInvoColor.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(
+                        isChecked ? ColorInvoColor.primary : ColorInvoColor.hairline,
+                        lineWidth: 1
+                    )
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isChecked ? .isSelected : [])
+    }
+
     private var widgetSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("主畫面預覽")
@@ -223,7 +279,9 @@ struct ContentView: View {
                     CarrierWidgetContentView(
                         carrierCode: model.normalizedCode,
                         palette: model.draftPalette,
-                        dominantColors: model.wallpaperDominantColors
+                        dominantColors: model.wallpaperDominantColors,
+                        showsWave: model.showsWave,
+                        showsBarcodeValue: model.showsBarcodeValue
                     )
                     .aspectRatio(329 / 155, contentMode: .fit)
                     .frame(maxWidth: .infinity)

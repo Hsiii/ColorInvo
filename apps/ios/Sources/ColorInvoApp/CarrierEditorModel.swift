@@ -15,6 +15,8 @@ final class CarrierEditorModel: ObservableObject {
     @Published private(set) var wallpaperDominantColors: [RGBAColor] = []
     @Published private(set) var wallpaperStatusText: String?
     @Published private(set) var isAnalyzingWallpaper = false
+    @Published private(set) var showsWave = true
+    @Published private(set) var showsBarcodeValue = true
 
     private static let autosaveDelayNanoseconds: UInt64 = 300_000_000
 
@@ -56,7 +58,9 @@ final class CarrierEditorModel: ObservableObject {
         return CarrierSettings(
             carrierCode: carrierCode.value,
             palette: draftPalette,
-            wallpaperDominantColors: wallpaperDominantColors
+            wallpaperDominantColors: wallpaperDominantColors,
+            showsWave: showsWave,
+            showsBarcodeValue: showsBarcodeValue
         )
     }
 
@@ -146,6 +150,24 @@ final class CarrierEditorModel: ObservableObject {
         updatePalette(draftPalette.replacing(barColor: RGBAColor(color: color)))
     }
 
+    func setShowsWave(_ showsWave: Bool) {
+        guard self.showsWave != showsWave else {
+            return
+        }
+
+        self.showsWave = showsWave
+        scheduleAutosave()
+    }
+
+    func setShowsBarcodeValue(_ showsBarcodeValue: Bool) {
+        guard self.showsBarcodeValue != showsBarcodeValue else {
+            return
+        }
+
+        self.showsBarcodeValue = showsBarcodeValue
+        scheduleAutosave()
+    }
+
     func loadWallpaperPalettes(from item: PhotosPickerItem?) {
         wallpaperTask?.cancel()
         wallpaperRequestID = UUID()
@@ -213,6 +235,8 @@ final class CarrierEditorModel: ObservableObject {
         draftPalette = snapshot.settings.palette
         paletteRevision = 0
         wallpaperDominantColors = snapshot.settings.wallpaperDominantColors
+        showsWave = snapshot.settings.showsWave
+        showsBarcodeValue = snapshot.settings.showsBarcodeValue
         wallpaperPreviewImage = snapshot.previewImage
         wallpaperPalettes = snapshot.wallpaperPalettes
         wallpaperStatusText = nil

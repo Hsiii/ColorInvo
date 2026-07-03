@@ -44,6 +44,7 @@ struct Code39BarcodeView: View {
 struct CarrierBarcodePanel: View {
     let value: String
     let palette: BarcodePalette
+    var showsWave = false
     var showsValue = false
     var barcodeHeight: CGFloat = 96
     var horizontalPadding: CGFloat = 18
@@ -53,7 +54,7 @@ struct CarrierBarcodePanel: View {
 
     var body: some View {
         Group {
-            if showsValue {
+            if showsWave || showsValue {
                 decoratedPanel
             } else {
                 plainPanel
@@ -96,16 +97,20 @@ struct CarrierBarcodePanel: View {
                 alignment: .top
             )
 
-            CarrierBarcodeWaveShape()
-                .fill(waveColor)
-                .frame(height: waveHeight)
-                .frame(maxHeight: .infinity, alignment: .bottom)
+            if showsWave {
+                CarrierBarcodeWaveShape()
+                    .fill(waveColor)
+                    .frame(height: waveHeight)
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+            }
 
-            CarrierBarcodeValueOverlay(
-                value: value,
-                palette: palette,
-                horizontalPadding: horizontalPadding
-            )
+            if showsValue {
+                CarrierBarcodeValueOverlay(
+                    value: value,
+                    palette: palette,
+                    horizontalPadding: horizontalPadding
+                )
+            }
         }
         .frame(
             maxWidth: .infinity,
@@ -128,6 +133,8 @@ struct CarrierWidgetContentView: View {
     let carrierCode: String
     let palette: BarcodePalette
     let dominantColors: [RGBAColor]
+    var showsWave = true
+    var showsBarcodeValue = true
 
     var body: some View {
         ZStack {
@@ -137,7 +144,8 @@ struct CarrierWidgetContentView: View {
                 CarrierBarcodePanel(
                     value: carrierCode,
                     palette: palette,
-                    showsValue: true,
+                    showsWave: showsWave,
+                    showsValue: showsBarcodeValue,
                     barcodeHeight: 132,
                     horizontalPadding: 0,
                     verticalPadding: 8,
