@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0F6878D8321B36425B233EFA /* CarrierEditorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67251E362FF2569A95AE0E78 /* CarrierEditorModel.swift */; };
 		19E0FE47E92A4AB2852A8DEF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3E156DE3C3A6C9028CD52432 /* Localizable.strings */; };
+		1AC688412E9EFDC588A5E090 /* ColorInvoControlInteractionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ED4D4DA673E33A33CBCB87A /* ColorInvoControlInteractionUITests.swift */; };
 		2100D44CFC1E548F4F541DF9 /* CarrierWidgetKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D32EAE07191D482043DFF71 /* CarrierWidgetKind.swift */; };
 		2F6D6D68F6213B211A1CBECD /* ColorInvoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BA0A795276F4F92700B1549 /* ColorInvoApp.swift */; };
 		3E5A6A7B8D6B9D927588305C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2BBDA9BEC927485A857E737C /* InfoPlist.strings */; };
@@ -35,6 +36,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		3C5C79D471A9D7C8CDE3D821 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3F24B9CC2DF6611062BCC64F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA746E034829D9347F840F56;
+			remoteInfo = ColorInvo;
+		};
 		8F99926A7192FDB9EAF1FC80 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3F24B9CC2DF6611062BCC64F /* Project object */;
@@ -66,6 +74,7 @@
 		1B2B20F5DD5AE3A8E5B68020 /* Code39BarcodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Code39BarcodeView.swift; sourceTree = "<group>"; };
 		1D32EAE07191D482043DFF71 /* CarrierWidgetKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarrierWidgetKind.swift; sourceTree = "<group>"; };
 		229D1D169BB8B49D4B39EE9F /* WallpaperProcessing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WallpaperProcessing.swift; sourceTree = "<group>"; };
+		2E80E999DA259EAA901A608F /* ColorInvoUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ColorInvoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A5A4E48BE5EB27BDA9FBD1D /* ColorInvoWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = ColorInvoWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E60FD679A095710988F6C9E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4EF79ECC71E150A7F226266A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -78,6 +87,7 @@
 		913A130A5A4C24D9EEC4D4FD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		94F05933D6EBA34CFA44823B /* AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
 		9BDCB590CA17AAFCAA3289A5 /* CarrierSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarrierSettings.swift; sourceTree = "<group>"; };
+		9ED4D4DA673E33A33CBCB87A /* ColorInvoControlInteractionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorInvoControlInteractionUITests.swift; sourceTree = "<group>"; };
 		A69AAC56B8350E1A75124EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		B9A11DF4AD04EC6FA7BB2BD6 /* CarrierCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarrierCode.swift; sourceTree = "<group>"; };
 		CD2F02F307BBF02B927FF459 /* BarcodePalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarcodePalette.swift; sourceTree = "<group>"; };
@@ -112,6 +122,7 @@
 			children = (
 				FEE2FE4876DC4104EE37A5F9 /* ColorInvo */,
 				080F7FDBEFC296C916EBFDD2 /* ColorInvoApp */,
+				ED806F9CD0E9819ECC338CD0 /* ColorInvoUITests */,
 				77B4285981213B31D950AAC4 /* ColorInvoWidget */,
 				24F261E3F9C2BF619F9E6F82 /* Shared */,
 				751BDCDBEE26C0636081F5F2 /* Products */,
@@ -136,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				536E0BD6F9389D36DDE17F2C /* ColorInvo.app */,
+				2E80E999DA259EAA901A608F /* ColorInvoUITests.xctest */,
 				4A5A4E48BE5EB27BDA9FBD1D /* ColorInvoWidget.appex */,
 			);
 			name = Products;
@@ -155,6 +167,15 @@
 			path = Sources/ColorInvoWidget;
 			sourceTree = "<group>";
 		};
+		ED806F9CD0E9819ECC338CD0 /* ColorInvoUITests */ = {
+			isa = PBXGroup;
+			children = (
+				9ED4D4DA673E33A33CBCB87A /* ColorInvoControlInteractionUITests.swift */,
+			);
+			name = ColorInvoUITests;
+			path = Sources/ColorInvoUITests;
+			sourceTree = "<group>";
+		};
 		FEE2FE4876DC4104EE37A5F9 /* ColorInvo */ = {
 			isa = PBXGroup;
 			children = (
@@ -167,6 +188,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1684B27B1B944348043B162C /* ColorInvoUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E2005D21E2A8AF099D8BAD71 /* Build configuration list for PBXNativeTarget "ColorInvoUITests" */;
+			buildPhases = (
+				33DD3F7437432E2F771AE6A1 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				34983AA7DA6D6CF6B74AED3A /* PBXTargetDependency */,
+			);
+			name = ColorInvoUITests;
+			packageProductDependencies = (
+			);
+			productName = ColorInvoUITests;
+			productReference = 2E80E999DA259EAA901A608F /* ColorInvoUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		969412918951C9D460787E70 /* ColorInvoWidget */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 09DABC3A5175FD8F55CF3B4A /* Build configuration list for PBXNativeTarget "ColorInvoWidget" */;
@@ -214,6 +253,11 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					1684B27B1B944348043B162C = {
+						DevelopmentTeam = D925G8G7CS;
+						ProvisioningStyle = Automatic;
+						TestTargetID = EA746E034829D9347F840F56;
+					};
 					969412918951C9D460787E70 = {
 						DevelopmentTeam = D925G8G7CS;
 						ProvisioningStyle = Automatic;
@@ -250,6 +294,7 @@
 			projectRoot = "";
 			targets = (
 				EA746E034829D9347F840F56 /* ColorInvo */,
+				1684B27B1B944348043B162C /* ColorInvoUITests */,
 				969412918951C9D460787E70 /* ColorInvoWidget */,
 			);
 		};
@@ -280,6 +325,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		33DD3F7437432E2F771AE6A1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1AC688412E9EFDC588A5E090 /* ColorInvoControlInteractionUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4C71F04C16E286C5D6A1DFAC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -314,6 +367,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		34983AA7DA6D6CF6B74AED3A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA746E034829D9347F840F56 /* ColorInvo */;
+			targetProxy = 3C5C79D471A9D7C8CDE3D821 /* PBXContainerItemProxy */;
+		};
 		585F8E00D9BCCCCD8C223487 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 969412918951C9D460787E70 /* ColorInvoWidget */;
@@ -378,6 +436,24 @@
 				PRODUCT_NAME = ColorInvo;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		20AA78696F62E9E2D8F78082 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hsichen.colorinvo.uitests;
+				PRODUCT_NAME = ColorInvoUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ColorInvo;
 			};
 			name = Release;
 		};
@@ -499,6 +575,24 @@
 			};
 			name = Debug;
 		};
+		FC409AA44FB3E486116D0E84 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.hsichen.colorinvo.uitests;
+				PRODUCT_NAME = ColorInvoUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ColorInvo;
+			};
+			name = Debug;
+		};
 		FE1C918026C6581CE2003588 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -590,6 +684,15 @@
 			buildConfigurations = (
 				FE1C918026C6581CE2003588 /* Debug */,
 				245A52C82ECA7CD376AD62E8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E2005D21E2A8AF099D8BAD71 /* Build configuration list for PBXNativeTarget "ColorInvoUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC409AA44FB3E486116D0E84 /* Debug */,
+				20AA78696F62E9E2D8F78082 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

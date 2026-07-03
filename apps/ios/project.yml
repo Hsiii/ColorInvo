@@ -77,3 +77,31 @@ targets:
       properties:
         com.apple.security.application-groups:
           - group.dev.hsichen.colorinvo
+  ColorInvoUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: Sources/ColorInvoUITests
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: dev.hsichen.colorinvo.uitests
+        PRODUCT_NAME: ColorInvoUITests
+        TEST_TARGET_NAME: ColorInvo
+    dependencies:
+      - target: ColorInvo
+schemes:
+  ColorInvo:
+    build:
+      targets:
+        ColorInvo: all
+        ColorInvoWidget: all
+        ColorInvoUITests:
+          - test
+    test:
+      targets:
+        - name: ColorInvoUITests
+  ColorInvoWidget:
+    build:
+      targets:
+        ColorInvoWidget: all

@@ -4,6 +4,7 @@ import UIKit
 
 struct ContentView: View {
     @StateObject private var model: CarrierEditorModel
+    @State private var activeColorPicker: ActiveColorPicker?
     @FocusState private var carrierFieldFocused: Bool
 
     private var carrierSuffixBinding: Binding<String> {
@@ -37,6 +38,9 @@ struct ContentView: View {
         .background(ColorInvoColor.background.ignoresSafeArea())
         .preferredColorScheme(.light)
         .tint(ColorInvoColor.primary)
+        .sheet(item: $activeColorPicker) { picker in
+            colorPickerSheet(for: picker)
+        }
         .task {
             await model.start()
         }
@@ -168,6 +172,8 @@ struct ContentView: View {
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
                 .accessibilityLabel("桌布配色 \(index + 1)")
+                .accessibilityValue(palette == model.draftPalette ? "selected" : "not selected")
+                .accessibilityIdentifier("wallpaperPaletteOption.\(index)")
             }
         }
         .frame(height: 88)
@@ -178,23 +184,17 @@ struct ContentView: View {
             HStack(spacing: 8) {
                 compactColorPicker(
                     title: "背景",
-                    color: Binding(
-                        get: { model.draftPalette.backgroundColor.color },
-                        set: { color in
-                            model.updateBackgroundColor(color)
-                        }
-                    )
-                )
+                    color: model.draftPalette.backgroundColor.color
+                ) {
+                    activeColorPicker = .background
+                }
 
                 compactColorPicker(
                     title: "條碼",
-                    color: Binding(
-                        get: { model.draftPalette.barColor.color },
-                        set: { color in
-                            model.updateBarColor(color)
-                        }
-                    )
-                )
+                    color: model.draftPalette.barColor.color
+                ) {
+                    activeColorPicker = .bar
+                }
             }
 
             wallpaperWaveColorChoices
@@ -206,9 +206,13 @@ struct ContentView: View {
         let colors = Array(model.wallpaperDominantColors.prefix(3))
 
         if !model.isAnalyzingWallpaper, !colors.isEmpty {
+            let selectedIndex = colors.firstIndex { $0 == model.selectedWaveColor } ?? -1
+
             HStack(spacing: 12) {
                 Text("波浪")
                     .colorInvoText(.secondary)
+                    .accessibilityIdentifier("selectedWaveColorIndex")
+                    .accessibilityValue("\(selectedIndex)")
 
                 Spacer()
 
@@ -222,13 +226,18 @@ struct ContentView: View {
                         } label: {
                             WaveColorDot(color: color, isSelected: isSelected)
                         }
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                         .buttonStyle(.plain)
                         .accessibilityLabel("波浪色彩 \(index + 1)")
+                        .accessibilityValue(isSelected ? "selected" : "not selected")
                         .accessibilityAddTraits(isSelected ? .isSelected : [])
+                        .accessibilityIdentifier("waveColorDot.\(index)")
                     }
                 }
             }
-            .padding(.horizontal, 12)
+            .padding(.leading, 12)
+            .padding(.trailing, 8)
             .frame(maxWidth: .infinity)
             .frame(height: 44)
             .background(ColorInvoColor.surface)
@@ -236,16 +245,31 @@ struct ContentView: View {
             .overlay {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+                    .allowsHitTesting(false)
             }
         }
     }
 
-    private func compactColorPicker(title: String, color: Binding<Color>) -> some View {
-        ColorPicker(title, selection: color, supportsOpacity: false)
-            .colorInvoText(.control)
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
-            .padding(.horizontal, 12)
+    private func compactColorPicker(
+        title: String,
+        color: Color,
+        action: @escaping () -> Void
+    ) -> some View {
+        let identifier = title == "背景" ? "backgroundColorPicker" : "barColorPicker"
+
+        return Button(action: action) {
+            HStack(spacing: 8) {
+                Text(title)
+                    .colorInvoText(.control)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                Spacer(minLength: 8)
+
+                ColorPickerSwatch(color: color)
+            }
+            .padding(.leading, 12)
+            .padding(.trailing, 4)
             .frame(maxWidth: .infinity)
             .frame(height: 44)
             .background(ColorInvoColor.surface)
@@ -253,7 +277,39 @@ struct ContentView: View {
             .overlay {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+                    .allowsHitTesting(false)
             }
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(identifier)
+    }
+
+    private func colorBinding(for picker: ActiveColorPicker) -> Binding<Color> {
+        Binding(
+            get: {
+                switch picker {
+                case .background:
+                    return model.draftPalette.backgroundColor.color
+                case .bar:
+                    return model.draftPalette.barColor.color
+                }
+            },
+            set: { color in
+                switch picker {
+                case .background:
+                    model.updateBackgroundColor(color)
+                case .bar:
+                    model.updateBarColor(color)
+                }
+            }
+        )
+    }
+
+    private func colorPickerSheet(for picker: ActiveColorPicker) -> some View {
+        ColorPickerSheet(
+            title: picker.title,
+            color: colorBinding(for: picker)
+        )
     }
 
     private var displayOptionsSection: some View {
@@ -305,6 +361,7 @@ struct ContentView: View {
                         isChecked ? ColorInvoColor.primary : ColorInvoColor.hairline,
                         lineWidth: 1
                     )
+                    .allowsHitTesting(false)
             }
         }
         .buttonStyle(.plain)
@@ -353,6 +410,86 @@ struct ContentView: View {
     }
 }
 
+private enum ActiveColorPicker: String, Identifiable {
+    case background
+    case bar
+
+    var id: String {
+        rawValue
+    }
+
+    var title: String {
+        switch self {
+        case .background:
+            return "背景顏色"
+        case .bar:
+            return "條碼顏色"
+        }
+    }
+}
+
+private struct ColorPickerSheet: View {
+    let title: String
+    @Binding var color: Color
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 12) {
+                Text(title)
+                    .colorInvoText(.heading)
+
+                Spacer()
+
+                Button("完成") {
+                    dismiss()
+                }
+                .colorInvoText(.control)
+            }
+
+            ColorPicker(title, selection: $color, supportsOpacity: false)
+                .colorInvoText(.control)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .padding(.horizontal, 12)
+                .frame(maxWidth: .infinity)
+                .frame(height: 44)
+                .background(ColorInvoColor.surface)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+                        .allowsHitTesting(false)
+                }
+
+            Spacer(minLength: 0)
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .background(ColorInvoColor.background)
+        .presentationDetents([.height(180), .medium])
+        .presentationDragIndicator(.visible)
+        .preferredColorScheme(.light)
+        .tint(ColorInvoColor.primary)
+    }
+}
+
+private struct ColorPickerSwatch: View {
+    let color: Color
+
+    var body: some View {
+        Circle()
+            .fill(color)
+            .frame(width: 28, height: 28)
+            .overlay {
+                Circle()
+                    .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+                    .allowsHitTesting(false)
+            }
+            .frame(width: 44, height: 44)
+    }
+}
+
 private struct WaveColorDot: View {
     let color: RGBAColor
     let isSelected: Bool
@@ -369,6 +506,7 @@ private struct WaveColorDot: View {
                 .overlay {
                     Circle()
                         .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+                        .allowsHitTesting(false)
                 }
                 .overlay {
                     Circle()
@@ -376,10 +514,11 @@ private struct WaveColorDot: View {
                             isSelected ? ColorInvoColor.primary : .clear,
                             lineWidth: 4
                         )
+                        .allowsHitTesting(false)
                 }
         }
-        .frame(width: 40, height: 40)
-        .contentShape(Circle())
+        .frame(width: 44, height: 44)
+        .contentShape(Rectangle())
     }
 }
 
@@ -406,6 +545,7 @@ private struct PaletteOptionButtonContent: View {
             .overlay {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+                    .allowsHitTesting(false)
             }
 
         }
@@ -421,6 +561,7 @@ private struct PaletteOptionButtonContent: View {
                     isSelected ? ColorInvoColor.primary : .clear,
                     lineWidth: 2
                 )
+                .allowsHitTesting(false)
         }
         .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
@@ -441,6 +582,9 @@ private struct WallpaperPreviewBackground: View {
                 ColorInvoColor.primarySoft
             }
         }
+        .clipped()
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 }
 
