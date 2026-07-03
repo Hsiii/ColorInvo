@@ -313,7 +313,7 @@ struct ContentView: View {
                                 barcodeHeight: 108,
                                 horizontalPadding: 12,
                                 verticalPadding: 8,
-                                fillsAvailableSpace: false,
+                                fillsAvailableSpace: true,
                                 dominantColors: wallpaperDominantColors
                             )
                         } else {

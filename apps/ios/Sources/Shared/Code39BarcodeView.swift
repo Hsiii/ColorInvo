@@ -68,9 +68,9 @@ struct CarrierBarcodePanel: View {
             barColor: palette.barColor.color,
             backgroundColor: palette.backgroundColor.color
         )
-        .frame(height: barcodeHeight)
+        .frame(height: fillsAvailableSpace ? nil : barcodeHeight)
         .padding(.horizontal, horizontalPadding)
-        .padding(.vertical, verticalPadding)
+        .padding(.vertical, fillsAvailableSpace ? 0 : verticalPadding)
         .frame(
             maxWidth: .infinity,
             maxHeight: fillsAvailableSpace ? .infinity : nil
@@ -88,7 +88,7 @@ struct CarrierBarcodePanel: View {
                 barColor: palette.barColor.color,
                 backgroundColor: palette.backgroundColor.color
             )
-            .frame(height: barcodeHeight)
+            .frame(height: fillsAvailableSpace ? nil : barcodeHeight)
             .padding(.horizontal, horizontalPadding)
             .frame(
                 maxWidth: .infinity,
