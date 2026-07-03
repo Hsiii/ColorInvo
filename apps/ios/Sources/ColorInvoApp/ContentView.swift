@@ -143,7 +143,12 @@ struct ContentView: View {
                 .colorInvoText(.secondary)
                 .frame(minHeight: 40, alignment: .leading)
         } else if !model.wallpaperPalettes.isEmpty {
-            paletteButtonGrid(model.wallpaperPalettes)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("桌布配色")
+                    .colorInvoText(.secondary)
+
+                paletteButtonGrid(model.wallpaperPalettes)
+            }
         } else if let wallpaperStatusText = model.wallpaperStatusText {
             Text(wallpaperStatusText)
                 .colorInvoText(.secondary)
@@ -153,7 +158,9 @@ struct ContentView: View {
 
     private func paletteButtonGrid(_ palettes: [BarcodePalette]) -> some View {
         LazyVGrid(columns: paletteGridColumns, spacing: 8) {
-            ForEach(palettes) { palette in
+            ForEach(palettes.indices, id: \.self) { index in
+                let palette = palettes[index]
+
                 Button {
                     model.selectPalette(palette)
                 } label: {
@@ -163,7 +170,7 @@ struct ContentView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(palette.name)
+                .accessibilityLabel("桌布配色 \(index + 1)")
             }
         }
     }
@@ -328,12 +335,6 @@ private struct PaletteOptionButtonContent: View {
                     .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
             }
 
-            Text(palette.name)
-                .colorInvoText(.secondary)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .minimumScaleFactor(0.72)
-                .frame(maxWidth: .infinity)
         }
         .padding(4)
         .frame(maxWidth: .infinity, minHeight: 88, alignment: .top)
