@@ -6,10 +6,6 @@ struct ContentView: View {
     @StateObject private var model: CarrierEditorModel
     @FocusState private var carrierFieldFocused: Bool
 
-    private var paletteGridColumns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 8), count: 3)
-    }
-
     private var carrierSuffixBinding: Binding<String> {
         Binding(
             get: { model.carrierSuffix },
@@ -157,8 +153,8 @@ struct ContentView: View {
     }
 
     private func paletteButtonGrid(_ palettes: [BarcodePalette]) -> some View {
-        LazyVGrid(columns: paletteGridColumns, spacing: 8) {
-            ForEach(palettes.indices, id: \.self) { index in
+        HStack(spacing: 8) {
+            ForEach(Array(palettes.prefix(3).indices), id: \.self) { index in
                 let palette = palettes[index]
 
                 Button {
@@ -170,9 +166,11 @@ struct ContentView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .frame(maxWidth: .infinity)
                 .accessibilityLabel("桌布配色 \(index + 1)")
             }
         }
+        .frame(height: 88)
     }
 
     private var customColorSection: some View {
@@ -231,7 +229,8 @@ struct ContentView: View {
                 }
             }
             .padding(.horizontal, 12)
-            .frame(maxWidth: .infinity, minHeight: 44)
+            .frame(maxWidth: .infinity)
+            .frame(height: 44)
             .background(ColorInvoColor.surface)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .overlay {
@@ -247,7 +246,8 @@ struct ContentView: View {
             .lineLimit(1)
             .minimumScaleFactor(0.8)
             .padding(.horizontal, 12)
-            .frame(maxWidth: .infinity, minHeight: 44)
+            .frame(maxWidth: .infinity)
+            .frame(height: 44)
             .background(ColorInvoColor.surface)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .overlay {
