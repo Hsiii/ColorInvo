@@ -1,0 +1,18 @@
+:root {
+    accent-color: var(--clr-accent);
+
+    --clr-bg: #f8fcff;
+    --clr-bg-accent: #e8f8fc;
+    --clr-surface: #ffffff;
+    --clr-surface-elevated: #f1fbfe;
+    --clr-text: #10202b;
+    --clr-text-muted: #536775;
+    --clr-border: #d5e7ee;
+    --clr-accent: #007ea8;
+    --clr-accent-strong: #005f80;
+    --clr-accent-soft: #d7f3fb;
+    --clr-contrast: #e84f80;
+    --clr-contrast-soft: #ffe5ed;
+    --clr-success: #27795f;
+    --shadow-surface: 0 24px 48px rgba(16, 32, 43, 0.08);
+}

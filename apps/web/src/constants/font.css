@@ -1,0 +1,50 @@
+:root {
+    --ff-body: 'IBM Plex Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+    --ff-display: 'Iowan Old Style', 'Palatino Linotype', serif;
+
+    --fs-label: 0.75rem;
+    --fs-small: 0.875rem;
+    --fs-body: 1rem;
+    --fs-body-lg: 1.125rem;
+    --fs-heading: 1.5rem;
+    --fs-title: 3rem;
+
+    --fw-medium: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+
+    --font-label: var(--fw-semibold) var(--fs-label) / 1.2 var(--ff-body);
+    --font-body-md: var(--fw-medium) var(--fs-body) / 1.6 var(--ff-body);
+    --font-body-lg: var(--fw-medium) var(--fs-body-lg) / 1.6 var(--ff-body);
+    --font-heading: var(--fw-bold) var(--fs-heading) / 1.2 var(--ff-body);
+    --font-display: var(--fw-bold) var(--fs-title) / 1 var(--ff-display);
+
+    --space-4: 4px;
+    --space-8: 8px;
+    --space-12: 12px;
+    --space-16: 16px;
+    --space-20: 20px;
+    --space-24: 24px;
+    --space-32: 32px;
+    --space-40: 40px;
+    --space-48: 48px;
+    --space-64: 64px;
+    --space-80: 80px;
+
+    --size-border-1: 1px;
+    --size-outline: 2px;
+    --size-content-max: 1120px;
+    --size-legal-max: 760px;
+    --size-icon-lg: 112px;
+    --measure-copy: 64ch;
+
+    --radius-8: 8px;
+    --radius-12: 12px;
+}
+
+@media (max-width: 720px) {
+    :root {
+        --fs-title: 2.375rem;
+        --fs-heading: 1.25rem;
+    }
+}

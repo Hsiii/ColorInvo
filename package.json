@@ -26,6 +26,9 @@
     "release": "scripts/ios-release.sh",
     "screenshots": "scripts/ios-capture-app-store-screenshots.sh",
     "simulator": "scripts/ios-build.sh",
-    "upload": "scripts/ios-upload.sh"
+    "upload": "scripts/ios-upload.sh",
+    "web:build": "bun run --cwd apps/web build",
+    "web:check": "bun run --cwd apps/web check",
+    "web:dev": "bun run --cwd apps/web dev"
   }
 }

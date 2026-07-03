@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Local and platform files
+.DS_Store
+
+# Repository automation
+.github/
+docs/
+packages/create-hsi-app/
+scripts/
+
+# Registry auth config
+.npmrc
