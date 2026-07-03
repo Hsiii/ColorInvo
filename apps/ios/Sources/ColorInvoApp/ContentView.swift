@@ -312,53 +312,35 @@ struct ContentView: View {
             Text("主畫面預覽")
                 .colorInvoText(.heading)
 
-            ZStack {
-                WallpaperPreviewBackground(image: wallpaperPreviewImage)
+            VStack(alignment: .leading, spacing: 8) {
+                ZStack {
+                    WallpaperPreviewBackground(image: wallpaperPreviewImage)
 
-                VStack(alignment: .leading, spacing: 12) {
-                    Group {
-                        if isValid {
-                            CarrierBarcodePanel(
-                                value: normalizedCode,
-                                palette: draftPalette,
-                                showsValue: true,
-                                barcodeHeight: 108,
-                                horizontalPadding: 12,
-                                verticalPadding: 8,
-                                fillsAvailableSpace: true,
-                                dominantColors: wallpaperDominantColors
-                            )
-                        } else {
-                            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .fill(ColorInvoColor.primarySoft)
-                                .overlay {
-                                    Image(systemName: "barcode.viewfinder")
-                                        .font(.largeTitle)
-                                        .foregroundStyle(ColorInvoColor.primary.opacity(0.48))
-                                }
-                        }
-                    }
-                    .frame(height: 132)
-                    .shadow(color: .black.opacity(0.10), radius: 8, x: 0, y: 4)
-
-                    Text(widgetStatusText)
-                        .colorInvoText(.secondary)
-                        .foregroundStyle(widgetIsReady ? ColorInvoColor.success : ColorInvoColor.muted)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.horizontal, 12)
-                        .frame(minHeight: 40, alignment: .leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(.regularMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    CarrierWidgetContentView(
+                        carrierCode: normalizedCode,
+                        palette: draftPalette,
+                        dominantColors: wallpaperDominantColors
+                    )
+                    .aspectRatio(329 / 155, contentMode: .fit)
+                    .frame(maxWidth: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .shadow(color: .black.opacity(0.16), radius: 12, x: 0, y: 8)
+                    .padding(16)
                 }
-                .padding(16)
-            }
-            .frame(height: 220)
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .strokeBorder(.black.opacity(0.10), lineWidth: 1)
+                .frame(height: 220)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .strokeBorder(.black.opacity(0.10), lineWidth: 1)
+                }
+
+                Text(widgetStatusText)
+                    .colorInvoText(.secondary)
+                    .foregroundStyle(widgetIsReady ? ColorInvoColor.success : ColorInvoColor.muted)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(minHeight: 40, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }

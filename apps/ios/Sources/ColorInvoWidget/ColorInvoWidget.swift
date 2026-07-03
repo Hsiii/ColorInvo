@@ -38,28 +38,11 @@ struct CarrierWidgetView: View {
     }
 
     var body: some View {
-        ZStack {
-            if CarrierCode.isValid(carrierCode) {
-                CarrierBarcodePanel(
-                    value: carrierCode,
-                    palette: entry.settings.palette,
-                    showsValue: true,
-                    barcodeHeight: 132,
-                    horizontalPadding: 0,
-                    verticalPadding: 8,
-                    fillsAvailableSpace: true,
-                    dominantColors: entry.settings.wallpaperDominantColors
-                )
-            } else {
-                VStack(spacing: 8) {
-                    Image(systemName: "barcode.viewfinder")
-                        .font(.title2)
-                    Text("開啟 App 儲存載具")
-                        .font(.headline)
-                }
-                .foregroundStyle(.secondary)
-            }
-        }
+        CarrierWidgetContentView(
+            carrierCode: carrierCode,
+            palette: entry.settings.palette,
+            dominantColors: entry.settings.wallpaperDominantColors
+        )
         .containerBackground(entry.settings.palette.backgroundColor.color, for: .widget)
     }
 }

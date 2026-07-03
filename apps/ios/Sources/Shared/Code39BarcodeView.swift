@@ -124,6 +124,39 @@ struct CarrierBarcodePanel: View {
     }
 }
 
+struct CarrierWidgetContentView: View {
+    let carrierCode: String
+    let palette: BarcodePalette
+    let dominantColors: [RGBAColor]
+
+    var body: some View {
+        ZStack {
+            palette.backgroundColor.color
+
+            if CarrierCode.isValid(carrierCode) {
+                CarrierBarcodePanel(
+                    value: carrierCode,
+                    palette: palette,
+                    showsValue: true,
+                    barcodeHeight: 132,
+                    horizontalPadding: 0,
+                    verticalPadding: 8,
+                    fillsAvailableSpace: true,
+                    dominantColors: dominantColors
+                )
+            } else {
+                VStack(spacing: 8) {
+                    Image(systemName: "barcode.viewfinder")
+                        .font(.title2)
+                    Text("開啟 App 儲存載具")
+                        .font(.headline)
+                }
+                .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
 private struct CarrierBarcodeValueOverlay: View {
     let value: String
     let palette: BarcodePalette
