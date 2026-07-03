@@ -42,7 +42,8 @@ export default function PrivacyPage(): JSX.Element {
                     <li>
                         Wallpaper-derived palettes are generated on device from
                         the image you select. ColorInvo saves the derived color
-                        choice, not the selected image.
+                        choice and a small local preview copy for the Home
+                        Screen preview.
                     </li>
                     <li>
                         If you email support, the email address and message
@@ -56,6 +57,7 @@ export default function PrivacyPage(): JSX.Element {
                     ColorInvo uses Apple photo picker access only for the image
                     you choose. The app does not browse your full photo library
                     and does not upload selected images to a ColorInvo service.
+                    The preview copy stays on your device.
                 </p>
             </section>
             <section className='legalSection'>

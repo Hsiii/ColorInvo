@@ -92,8 +92,8 @@ export default function SupportPage(): JSX.Element {
                             </p>
                             <p className='supportList__body'>
                                 Choose a still image from Photos. The image is
-                                loaded only for local palette generation and is
-                                not uploaded by ColorInvo.
+                                loaded for local palette generation and a local
+                                preview, and is not uploaded by ColorInvo.
                             </p>
                         </div>
                     </li>

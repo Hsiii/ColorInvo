@@ -8,6 +8,7 @@ struct ContentView: View {
     @State private var draftPalette: BarcodePalette
     @State private var savedSettings: CarrierSettings
     @State private var wallpaperPickerItem: PhotosPickerItem?
+    @State private var wallpaperPreviewImage: UIImage?
     @State private var wallpaperPalettes: [BarcodePalette] = []
     @State private var wallpaperStatusText: String?
     @State private var isAnalyzingWallpaper = false
@@ -94,6 +95,11 @@ struct ContentView: View {
         _draftCode = State(initialValue: settings.carrierCode)
         _draftPalette = State(initialValue: settings.palette)
         _savedSettings = State(initialValue: settings)
+        _wallpaperPreviewImage = State(
+            initialValue: usesShowcaseData
+                ? WallpaperPreviewStore.showcaseImage()
+                : WallpaperPreviewStore.load()
+        )
         _wallpaperPalettes = State(initialValue: usesShowcaseData ? BarcodePalette.showcaseOptions : [])
     }
 
@@ -350,38 +356,56 @@ struct ContentView: View {
 
     private var widgetSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("小工具預覽")
+            Text("主畫面預覽")
                 .colorInvoText(.heading)
 
-            Group {
-                if isValid {
-                    CarrierBarcodePanel(
-                        value: normalizedCode,
-                        palette: draftPalette,
-                        showsValue: true,
-                        barcodeHeight: 88,
-                        horizontalPadding: 0,
-                        verticalPadding: 6,
-                        fillsAvailableSpace: true
-                    )
-                } else {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(ColorInvoColor.primarySoft)
-                        .overlay {
-                            Image(systemName: "barcode.viewfinder")
-                                .font(.largeTitle)
-                                .foregroundStyle(ColorInvoColor.primary.opacity(0.48))
+            ZStack {
+                WallpaperPreviewBackground(image: wallpaperPreviewImage)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Group {
+                        if isValid {
+                            CarrierBarcodePanel(
+                                value: normalizedCode,
+                                palette: draftPalette,
+                                showsValue: true,
+                                barcodeHeight: 80,
+                                horizontalPadding: 12,
+                                verticalPadding: 10,
+                                fillsAvailableSpace: false
+                            )
+                        } else {
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .fill(ColorInvoColor.primarySoft)
+                                .overlay {
+                                    Image(systemName: "barcode.viewfinder")
+                                        .font(.largeTitle)
+                                        .foregroundStyle(ColorInvoColor.primary.opacity(0.48))
+                                }
                         }
                     }
-            }
-            .frame(height: 136)
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .frame(height: 132)
+                    .shadow(color: .black.opacity(0.10), radius: 8, x: 0, y: 4)
 
-            Text(widgetStatusText)
-                .colorInvoText(.secondary)
-                .foregroundStyle(widgetIsReady ? ColorInvoColor.success : ColorInvoColor.muted)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
+                    Text(widgetStatusText)
+                        .colorInvoText(.secondary)
+                        .foregroundStyle(widgetIsReady ? ColorInvoColor.success : ColorInvoColor.muted)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal, 12)
+                        .frame(minHeight: 40, alignment: .leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(.regularMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+                .padding(16)
+            }
+            .frame(height: 220)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(.black.opacity(0.10), lineWidth: 1)
+            }
         }
     }
 
@@ -426,6 +450,7 @@ struct ContentView: View {
                 return
             }
 
+            wallpaperPreviewImage = WallpaperPreviewStore.save(image)
             wallpaperPalettes = generatedPalettes
 
             if let firstPalette = generatedPalettes.first {
@@ -484,6 +509,140 @@ private struct PaletteOptionButtonContent: View {
                 )
         }
         .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+private struct WallpaperPreviewBackground: View {
+    let image: UIImage?
+
+    var body: some View {
+        ZStack {
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+
+                Color.white.opacity(0.52)
+            } else {
+                ColorInvoColor.primarySoft
+            }
+        }
+    }
+}
+
+private enum WallpaperPreviewStore {
+    private static let fileName = "wallpaper-preview.jpg"
+    private static let maximumPixelLength: CGFloat = 900
+
+    static func load() -> UIImage? {
+        guard
+            let fileURL,
+            let data = try? Data(contentsOf: fileURL)
+        else {
+            return nil
+        }
+
+        return UIImage(data: data)
+    }
+
+    static func save(_ image: UIImage) -> UIImage? {
+        guard let previewImage = previewImage(from: image) else {
+            return nil
+        }
+
+        if
+            let fileURL,
+            let data = previewImage.jpegData(compressionQuality: 0.76)
+        {
+            try? data.write(to: fileURL, options: .atomic)
+        }
+
+        return previewImage
+    }
+
+    static func showcaseImage() -> UIImage {
+        let size = CGSize(width: 900, height: 1600)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = true
+
+        return UIGraphicsImageRenderer(size: size, format: format).image { context in
+            UIColor(red: 232 / 255, green: 248 / 255, blue: 252 / 255, alpha: 1).setFill()
+            context.fill(CGRect(origin: .zero, size: size))
+
+            UIColor(red: 89 / 255, green: 186 / 255, blue: 201 / 255, alpha: 1).setFill()
+            diagonalBand(
+                from: CGPoint(x: -120, y: 240),
+                to: CGPoint(x: size.width + 160, y: 40),
+                thickness: 260
+            ).fill()
+
+            UIColor(red: 255 / 255, green: 184 / 255, blue: 118 / 255, alpha: 1).setFill()
+            diagonalBand(
+                from: CGPoint(x: -180, y: 980),
+                to: CGPoint(x: size.width + 180, y: 620),
+                thickness: 320
+            ).fill()
+
+            UIColor(red: 57 / 255, green: 103 / 255, blue: 145 / 255, alpha: 1).setFill()
+            diagonalBand(
+                from: CGPoint(x: -120, y: 1500),
+                to: CGPoint(x: size.width + 120, y: 1160),
+                thickness: 220
+            ).fill()
+        }
+    }
+
+    private static var fileURL: URL? {
+        FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: AppGroup.identifier)?
+            .appendingPathComponent(fileName)
+    }
+
+    private static func previewImage(from image: UIImage) -> UIImage? {
+        let sourceSize = image.size
+        guard sourceSize.width > 0, sourceSize.height > 0 else {
+            return nil
+        }
+
+        let scale = min(
+            1,
+            maximumPixelLength / max(sourceSize.width, sourceSize.height)
+        )
+        let targetSize = CGSize(
+            width: max(1, floor(sourceSize.width * scale)),
+            height: max(1, floor(sourceSize.height * scale))
+        )
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = true
+
+        return UIGraphicsImageRenderer(size: targetSize, format: format).image { context in
+            UIColor.white.setFill()
+            context.fill(CGRect(origin: .zero, size: targetSize))
+            image.draw(in: CGRect(origin: .zero, size: targetSize))
+        }
+    }
+
+    private static func diagonalBand(
+        from startPoint: CGPoint,
+        to endPoint: CGPoint,
+        thickness: CGFloat
+    ) -> UIBezierPath {
+        let deltaX = endPoint.x - startPoint.x
+        let deltaY = endPoint.y - startPoint.y
+        let length = max(1, hypot(deltaX, deltaY))
+        let offsetX = -deltaY / length * thickness / 2
+        let offsetY = deltaX / length * thickness / 2
+        let path = UIBezierPath()
+
+        path.move(to: CGPoint(x: startPoint.x + offsetX, y: startPoint.y + offsetY))
+        path.addLine(to: CGPoint(x: endPoint.x + offsetX, y: endPoint.y + offsetY))
+        path.addLine(to: CGPoint(x: endPoint.x - offsetX, y: endPoint.y - offsetY))
+        path.addLine(to: CGPoint(x: startPoint.x - offsetX, y: startPoint.y - offsetY))
+        path.close()
+
+        return path
     }
 }
 
