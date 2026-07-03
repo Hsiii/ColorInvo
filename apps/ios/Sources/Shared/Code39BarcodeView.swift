@@ -175,10 +175,9 @@ private struct CarrierBarcodeValueOverlay: View {
                 Capsule(style: .continuous)
                     .fill(palette.barColor.color)
             }
-            .padding(.leading, horizontalPadding + 12)
-            .padding(.trailing, max(12, horizontalPadding + 12))
-            .padding(.bottom, 8)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+            .padding(.trailing, max(8, horizontalPadding + 8))
+            .padding(.bottom, 4)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
     }
 }
 
