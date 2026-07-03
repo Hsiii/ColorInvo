@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 const setupItems = [
     'Open ColorInvo and enter the eight-character Taiwan mobile invoice carrier code after the leading slash.',
     'Choose a barcode color preset or pick a wallpaper image to generate palette options on device.',
-    'Save, then add the medium ColorInvo widget from the iOS Home Screen widget picker.',
+    'Save, then add the ColorInvo widget from the iOS Home Screen widget picker.',
 ] as const;
 
 const reportItems = [

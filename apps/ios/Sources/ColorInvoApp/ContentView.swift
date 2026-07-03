@@ -6,6 +6,7 @@ import WidgetKit
 struct ContentView: View {
     @State private var draftCode: String
     @State private var draftPalette: BarcodePalette
+    @State private var savedSettings: CarrierSettings
     @State private var didSave = false
     @State private var showingWidgetHelp = false
     @State private var wallpaperPickerItem: PhotosPickerItem?
@@ -24,6 +25,29 @@ struct ContentView: View {
 
     private var canSave: Bool {
         isValid && draftPalette.meetsCommercialGuidance
+    }
+
+    private var draftSettings: CarrierSettings? {
+        guard canSave, let carrierCode = CarrierCode(normalizedCode) else {
+            return nil
+        }
+
+        return CarrierSettings(
+            carrierCode: carrierCode.value,
+            palette: draftPalette
+        )
+    }
+
+    private var widgetIsReady: Bool {
+        draftSettings == savedSettings
+    }
+
+    private var widgetStatusText: String {
+        if widgetIsReady {
+            return "小工具已準備好，可在主畫面加入"
+        }
+
+        return canSave ? "儲存後可在主畫面加入小工具" : "完成載具與配色後可加入小工具"
     }
 
     private var paletteGridColumns: [GridItem] {
@@ -64,6 +88,7 @@ struct ContentView: View {
         let settings = usesShowcaseData ? .showcase : CarrierStore.load()
         _draftCode = State(initialValue: settings.carrierCode)
         _draftPalette = State(initialValue: settings.palette)
+        _savedSettings = State(initialValue: settings)
         _showingWidgetHelp = State(initialValue: ColorInvoRuntime.screenshotTarget == "widget")
         _wallpaperPalettes = State(initialValue: usesShowcaseData ? BarcodePalette.showcaseOptions : [])
     }
@@ -345,16 +370,29 @@ struct ContentView: View {
             .frame(height: 136)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
-            Button {
-                saveCarrier()
-                showingWidgetHelp = true
-            } label: {
-                Label("加入小工具", systemImage: "plus.rectangle.on.rectangle")
-                    .colorInvoText(.control)
-                    .frame(maxWidth: .infinity, minHeight: 48)
+            HStack(spacing: 8) {
+                Label(
+                    widgetStatusText,
+                    systemImage: widgetIsReady ? "info.circle.fill" : "info.circle"
+                )
+                .colorInvoText(.secondary)
+                .foregroundStyle(widgetIsReady ? ColorInvoColor.success : ColorInvoColor.muted)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 8)
+
+                Button {
+                    showingWidgetHelp = true
+                } label: {
+                    Image(systemName: "questionmark.circle")
+                        .font(.title3)
+                        .frame(width: 44, height: 44)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(ColorInvoColor.primary)
+                .accessibilityLabel("加入小工具說明")
             }
-            .buttonStyle(ColorInvoPrimaryButtonStyle())
-            .disabled(!canSave)
         }
     }
 
@@ -368,6 +406,7 @@ struct ContentView: View {
             palette: draftPalette
         )
         CarrierStore.save(settings)
+        savedSettings = settings
         didSave = true
         WidgetCenter.shared.reloadAllTimelines()
     }
@@ -485,22 +524,27 @@ private struct ColorChoiceSeparator: View {
 private struct WidgetHelpSheet: View {
     @Environment(\.dismiss) private var dismiss
 
+    private let steps = [
+        "長按主畫面空白處",
+        "點左上角 +",
+        "選擇條色盤",
+        "加入小工具",
+    ]
+
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             Image(systemName: "rectangle.grid.1x2")
-                .font(.system(size: 48, weight: .semibold))
+                .font(.largeTitle)
                 .foregroundStyle(ColorInvoColor.primary)
 
             Text("加入小工具")
-                .font(.largeTitle.weight(.bold))
+                .colorInvoText(.heading)
 
             VStack(alignment: .leading, spacing: 14) {
-                helpRow("長按主畫面空白處")
-                helpRow("點左上角 +")
-                helpRow("選擇條色盤")
-                helpRow("加入中尺寸小工具")
+                ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
+                    helpRow(number: index + 1, text: step)
+                }
             }
-            .font(.title3.weight(.medium))
 
             Spacer()
 
@@ -508,7 +552,7 @@ private struct WidgetHelpSheet: View {
                 dismiss()
             } label: {
                 Text("了解")
-                    .font(.headline)
+                    .colorInvoText(.control)
                     .frame(maxWidth: .infinity, minHeight: 52)
             }
             .buttonStyle(ColorInvoPrimaryButtonStyle())
@@ -518,9 +562,17 @@ private struct WidgetHelpSheet: View {
         .presentationDetents([.medium])
     }
 
-    private func helpRow(_ text: String) -> some View {
-        Label(text, systemImage: "checkmark.circle.fill")
-            .foregroundStyle(.primary)
+    private func helpRow(number: Int, text: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Text("\(number).")
+                .colorInvoText(.control)
+                .foregroundStyle(ColorInvoColor.primary)
+                .monospacedDigit()
+                .frame(width: 24, alignment: .leading)
+
+            Text(text)
+                .colorInvoText(.control)
+        }
     }
 }
 

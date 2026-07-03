@@ -20,7 +20,7 @@ const panels: ReadonlyArray<{
     readonly title: string;
 }> = [
     {
-        body: 'Get help adding the medium widget, saving your Taiwan mobile invoice carrier, or reporting a scanning issue.',
+        body: 'Get help adding the widget, saving your Taiwan mobile invoice carrier, or reporting a scanning issue.',
         href: ROUTES.support,
         icon: LifeBuoy,
         title: 'Support',
@@ -79,7 +79,7 @@ export default function HomePage(): JSX.Element {
                         </p>
                         <p>
                             Save the carrier once, choose a palette, and show
-                            the barcode in a medium iOS widget.
+                            the barcode in an iOS widget.
                         </p>
                     </div>
                 </aside>
