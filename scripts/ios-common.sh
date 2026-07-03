@@ -213,6 +213,29 @@ ios_set_provisioning_args() {
     fi
 }
 
+ios_devicectl() {
+    local stderr_path
+    stderr_path="$(mktemp)"
+    local status
+
+    if xcrun devicectl "$@" 2>"$stderr_path"; then
+        status=0
+    else
+        status=$?
+    fi
+
+    if [[ -s "$stderr_path" ]]; then
+        awk '
+            index($0, "Failed to load provisioning paramter list") == 0 && index($0, "`devicectl manage create` may support a reduced set of arguments.") == 0 {
+                    print > "/dev/stderr"
+                }
+        ' "$stderr_path"
+    fi
+
+    rm -f "$stderr_path"
+    return "$status"
+}
+
 ios_require_development_team() {
     local action="$1"
 
@@ -230,7 +253,7 @@ ios_detect_device_id() {
         devicectl_args+=(--timeout "$IOS_DEVICECTL_TIMEOUT_SECONDS")
     fi
 
-    if ! xcrun devicectl "${devicectl_args[@]}" >/dev/null; then
+    if ! ios_devicectl "${devicectl_args[@]}" >/dev/null; then
         rm -f "$devices_json"
         return 1
     fi

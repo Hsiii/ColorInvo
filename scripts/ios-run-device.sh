@@ -55,7 +55,7 @@ if [[ ! -d "$APP_PATH" ]]; then
 fi
 
 echo "Installing $APP_PATH..."
-xcrun devicectl device install app --device "$DEVICE_ID" "$APP_PATH"
+ios_devicectl device install app --device "$DEVICE_ID" "$APP_PATH"
 
 if [[ "${IOS_SKIP_LAUNCH:-0}" == "1" ]]; then
     echo "Installed $IOS_BUNDLE_ID_VALUE on $DEVICE_ID."
@@ -63,7 +63,7 @@ if [[ "${IOS_SKIP_LAUNCH:-0}" == "1" ]]; then
 fi
 
 echo "Launching $IOS_BUNDLE_ID_VALUE..."
-xcrun devicectl device process launch \
+ios_devicectl device process launch \
     --device "$DEVICE_ID" \
     --terminate-existing \
     ${LAUNCH_ENV_ARGS[@]+"${LAUNCH_ENV_ARGS[@]}"} \
