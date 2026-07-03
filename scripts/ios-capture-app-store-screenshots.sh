@@ -9,6 +9,9 @@ OUTPUT_DIR="${IOS_SCREENSHOT_OUTPUT_DIR:-$IOS_ROOT_DIR/assets/app-store/screensh
 DEVICE_NAME="${IOS_SCREENSHOT_DEVICE_NAME:-ColorInvo 14 Plus Screenshots}"
 DEVICE_TYPE="${IOS_SCREENSHOT_DEVICE_TYPE:-com.apple.CoreSimulator.SimDeviceType.iPhone-14-Plus}"
 RUNTIME="${IOS_SCREENSHOT_RUNTIME:-}"
+SCREENSHOT_WALLPAPER_PATH="${IOS_SCREENSHOT_WALLPAPER_PATH:-}"
+SCREENSHOT_WALLPAPER_PRESET="${IOS_SCREENSHOT_WALLPAPER_PRESET:-ios17-blue-light}"
+SCREENSHOT_WALLPAPER_CONTAINER_PATH=""
 APP_PATH="$DERIVED_DATA_PATH/Build/Products/$CONFIGURATION-iphonesimulator/$IOS_SCHEME_NAME.app"
 
 find_screenshot_device() {
@@ -29,6 +32,51 @@ boot_device() {
     xcrun simctl bootstatus "$device_id" -b >/dev/null
 }
 
+find_iphone_preset_wallpaper() {
+    local wallpaper_file
+
+    case "$SCREENSHOT_WALLPAPER_PRESET" in
+        ios17-blue-light)
+            wallpaper_file="Blue Light.HEIC"
+            ;;
+        ios17-background-light)
+            wallpaper_file="Background Light.HEIC"
+            ;;
+        *)
+            ios_die "Unsupported iPhone screenshot wallpaper preset: $SCREENSHOT_WALLPAPER_PRESET"
+            ;;
+    esac
+
+    {
+        find /Library/Developer/CoreSimulator/Volumes "$HOME/Library/Developer/CoreSimulator/Profiles" \
+            -type f \
+            -path "*iOS_17~iphone.wallpaperCollection*428w-926h@3x~iphone*assets/$wallpaper_file" \
+            2>/dev/null || true
+    } | sort | tail -n 1
+}
+
+prepare_screenshot_wallpaper() {
+    local device_id="$1"
+    local data_container
+    local source_path
+    local wallpaper_extension
+
+    source_path="$SCREENSHOT_WALLPAPER_PATH"
+    if [[ -z "$source_path" ]]; then
+        source_path="$(find_iphone_preset_wallpaper)"
+    fi
+
+    [[ -f "$source_path" ]] \
+        || ios_die "Screenshot iPhone wallpaper not found. Set IOS_SCREENSHOT_WALLPAPER_PATH or install a simulator runtime with preset $SCREENSHOT_WALLPAPER_PRESET."
+
+    data_container="$(xcrun simctl get_app_container "$device_id" "$IOS_BUNDLE_ID_VALUE" data)"
+    wallpaper_extension="${source_path##*.}"
+    mkdir -p "$data_container/tmp"
+
+    SCREENSHOT_WALLPAPER_CONTAINER_PATH="$data_container/tmp/colorinvo-showcase-wallpaper.$wallpaper_extension"
+    cp "$source_path" "$SCREENSHOT_WALLPAPER_CONTAINER_PATH"
+}
+
 launch_for_screenshot() {
     local device_id="$1"
     local target="$2"
@@ -38,11 +86,13 @@ launch_for_screenshot() {
     case "$target" in
         main)
             SIMCTL_CHILD_COLORINVO_SHOWCASE_DATA=1 \
+                SIMCTL_CHILD_COLORINVO_SHOWCASE_WALLPAPER_PATH="$SCREENSHOT_WALLPAPER_CONTAINER_PATH" \
                 xcrun simctl launch --terminate-running-process "$device_id" "$IOS_BUNDLE_ID_VALUE" \
                 --showcase-data >/dev/null
             ;;
         widget)
             SIMCTL_CHILD_COLORINVO_SHOWCASE_DATA=1 \
+                SIMCTL_CHILD_COLORINVO_SHOWCASE_WALLPAPER_PATH="$SCREENSHOT_WALLPAPER_CONTAINER_PATH" \
                 SIMCTL_CHILD_COLORINVO_SCREENSHOT_TARGET=widget \
                 xcrun simctl launch --terminate-running-process "$device_id" "$IOS_BUNDLE_ID_VALUE" \
                 --showcase-data --screenshot-widget >/dev/null
@@ -101,6 +151,7 @@ xcodebuild \
 boot_device "$DEVICE_ID"
 xcrun simctl uninstall "$DEVICE_ID" "$IOS_BUNDLE_ID_VALUE" >/dev/null 2>&1 || true
 xcrun simctl install "$DEVICE_ID" "$APP_PATH"
+prepare_screenshot_wallpaper "$DEVICE_ID"
 xcrun simctl status_bar "$DEVICE_ID" override \
     --time 9:41 \
     --dataNetwork wifi \

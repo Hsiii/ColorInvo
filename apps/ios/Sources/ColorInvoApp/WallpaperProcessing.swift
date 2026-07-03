@@ -85,6 +85,7 @@ enum WallpaperImageAnalyzer {
 enum WallpaperPreviewStore {
     private static let fileName = "wallpaper-preview.jpg"
     private static let maximumPixelLength: CGFloat = 900
+    private static let showcaseWallpaperPathKey = "COLORINVO_SHOWCASE_WALLPAPER_PATH"
 
     static func load() -> WallpaperPreviewImage? {
         guard
@@ -110,6 +111,10 @@ enum WallpaperPreviewStore {
     }
 
     static func showcaseImage() -> WallpaperPreviewImage {
+        if let presetImage = showcasePresetImage() {
+            return presetImage
+        }
+
         let size = CGSize(width: 900, height: 1600)
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
@@ -142,6 +147,33 @@ enum WallpaperPreviewStore {
         }
 
         return WallpaperPreviewImage(image: image)
+    }
+
+    private static func showcasePresetImage() -> WallpaperPreviewImage? {
+        guard
+            let filePath = ProcessInfo.processInfo.environment[showcaseWallpaperPathKey],
+            !filePath.isEmpty,
+            let imageSource = CGImageSourceCreateWithURL(URL(fileURLWithPath: filePath) as CFURL, nil),
+            let image = downsampledPreviewImage(from: imageSource)
+        else {
+            return nil
+        }
+
+        return WallpaperPreviewImage(image: image)
+    }
+
+    private static func downsampledPreviewImage(from imageSource: CGImageSource) -> UIImage? {
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: maximumPixelLength,
+        ]
+
+        guard let image = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options as CFDictionary) else {
+            return nil
+        }
+
+        return UIImage(cgImage: image)
     }
 
     private static var fileURL: URL? {
