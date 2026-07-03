@@ -7,7 +7,7 @@ options:
 settings:
   base:
     CODE_SIGN_STYLE: Automatic
-    DEVELOPMENT_TEAM: ""
+    DEVELOPMENT_TEAM: D925G8G7CS
     IPHONEOS_DEPLOYMENT_TARGET: "17.0"
     SWIFT_VERSION: "6.0"
 targets:
