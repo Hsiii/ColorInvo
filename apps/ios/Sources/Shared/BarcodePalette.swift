@@ -48,7 +48,7 @@ struct BarcodePalette: Codable, Equatable, Identifiable {
 
     var standardMessage: String {
         if meetsCommercialGuidance {
-            return "符合掃描標準"
+            return "可掃描配色"
         }
 
         if barColor.isReddish {
