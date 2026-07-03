@@ -164,13 +164,13 @@ private struct CarrierBarcodeValueOverlay: View {
 
     var body: some View {
         Text(value)
-            .font(.system(.subheadline, design: .monospaced, weight: .bold))
+            .font(.system(.caption, design: .monospaced, weight: .bold))
             .fontWidth(.condensed)
             .foregroundStyle(palette.backgroundColor.color)
             .lineLimit(1)
             .minimumScaleFactor(0.72)
-            .padding(.horizontal, 12)
-            .frame(height: 28)
+            .padding(.horizontal, 8)
+            .frame(height: 20)
             .background {
                 Capsule(style: .continuous)
                     .fill(palette.barColor.color)
