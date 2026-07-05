@@ -20,6 +20,11 @@ struct Code39BarcodeView: View {
                 size: size,
                 displayScale: displayScale
             )
+            let spaceRects = Code39BarcodeGeometry.spaceRects(
+                for: elements,
+                size: size,
+                displayScale: displayScale
+            )
 
             context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(backgroundColor))
 
@@ -27,10 +32,12 @@ struct Code39BarcodeView: View {
                 BarcodeCatDamageRenderer.drawBarcode(
                     context: &context,
                     barRects: barRects,
+                    spaceRects: spaceRects,
                     value: value,
                     size: size,
                     displayScale: displayScale,
-                    barColor: barColor
+                    barColor: barColor,
+                    backgroundColor: backgroundColor
                 )
             } else {
                 for rect in barRects {
@@ -126,7 +133,6 @@ struct CarrierBarcodePanel: View {
 
             if showsCat {
                 BarcodeCatOverlay(
-                    value: value,
                     barColor: palette.barColor.color,
                     backgroundColor: palette.backgroundColor.color
                 )
@@ -191,6 +197,33 @@ private struct Code39BarcodeGeometry {
         size: CGSize,
         displayScale: CGFloat
     ) -> [CGRect] {
+        elementRects(
+            for: elements,
+            size: size,
+            displayScale: displayScale,
+            matchingBars: true
+        )
+    }
+
+    static func spaceRects(
+        for elements: [Code39Encoder.Element],
+        size: CGSize,
+        displayScale: CGFloat
+    ) -> [CGRect] {
+        elementRects(
+            for: elements,
+            size: size,
+            displayScale: displayScale,
+            matchingBars: false
+        )
+    }
+
+    private static func elementRects(
+        for elements: [Code39Encoder.Element],
+        size: CGSize,
+        displayScale: CGFloat,
+        matchingBars: Bool
+    ) -> [CGRect] {
         let totalUnits = elements.reduce(0) { $0 + $1.units }
         guard totalUnits > 0 else {
             return []
@@ -206,7 +239,7 @@ private struct Code39BarcodeGeometry {
             unitOffset += element.units
             let endPixel = (CGFloat(unitOffset) * pixelsPerUnit).rounded()
 
-            guard element.isBar else {
+            guard element.isBar == matchingBars else {
                 continue
             }
 
@@ -225,7 +258,6 @@ private struct Code39BarcodeGeometry {
 }
 
 private struct BarcodeCatOverlay: View {
-    let value: String
     let barColor: Color
     let backgroundColor: Color
 
@@ -235,15 +267,6 @@ private struct BarcodeCatOverlay: View {
             let outline = max(1, catFrame.height * 0.012)
 
             ZStack {
-                Canvas { context, size in
-                    BarcodeCatDamageRenderer.drawForegroundScratches(
-                        context: &context,
-                        value: value,
-                        size: size,
-                        backgroundColor: backgroundColor
-                    )
-                }
-
                 Image("CatBarcode")
                     .renderingMode(.template)
                     .resizable()
@@ -293,16 +316,67 @@ private enum BarcodeCatDecorationLayout {
     static func safeBarcodeY(in size: CGSize) -> CGFloat {
         size.height * safeBarcodeHeightRatio
     }
+
+    static func groundY(in size: CGSize) -> CGFloat {
+        catVisibleFrame(in: size).maxY
+    }
+
+    static func collisionY(for x: CGFloat, in size: CGSize) -> CGFloat {
+        let visibleFrame = catVisibleFrame(in: size)
+        let groundY = groundY(in: size)
+        guard x >= visibleFrame.minX, x <= visibleFrame.maxX else {
+            return groundY
+        }
+
+        let u = (x - visibleFrame.minX) / max(1, visibleFrame.width)
+        let base: CGFloat = 0.76
+        let lift = max(
+            tent(u, center: 0.12, radius: 0.12) * 0.24,
+            tent(u, center: 0.28, radius: 0.06) * 0.70,
+            tent(u, center: 0.43, radius: 0.09) * 0.26,
+            tent(u, center: 0.52, radius: 0.32) * 0.24,
+            tent(u, center: 0.67, radius: 0.08) * 0.66,
+            tent(u, center: 0.86, radius: 0.08) * 0.28
+        )
+        let topRatio = max(0.04, min(0.76, base - lift))
+
+        return min(groundY, visibleFrame.minY + visibleFrame.height * topRatio)
+    }
+
+    private static func catVisibleFrame(in size: CGSize) -> CGRect {
+        let frame = catFrame(in: size)
+        let minXRatio = CGFloat(0.122)
+        let minYRatio = CGFloat(0.203)
+        let maxXRatio = CGFloat(0.853)
+        let maxYRatio = CGFloat(0.830)
+
+        return CGRect(
+            x: frame.minX + frame.width * minXRatio,
+            y: frame.minY + frame.height * minYRatio,
+            width: frame.width * (maxXRatio - minXRatio),
+            height: frame.height * (maxYRatio - minYRatio)
+        )
+    }
+
+    private static func tent(
+        _ value: CGFloat,
+        center: CGFloat,
+        radius: CGFloat
+    ) -> CGFloat {
+        max(0, 1 - abs(value - center) / radius)
+    }
 }
 
 private enum BarcodeCatDamageRenderer {
     static func drawBarcode(
         context: inout GraphicsContext,
         barRects: [CGRect],
+        spaceRects: [CGRect],
         value: String,
         size: CGSize,
         displayScale: CGFloat,
-        barColor: Color
+        barColor: Color,
+        backgroundColor: Color
     ) {
         let safeY = BarcodeCatDecorationLayout.safeBarcodeY(in: size)
         let pixel = 1 / displayScale
@@ -331,46 +405,17 @@ private enum BarcodeCatDamageRenderer {
             )
             context.fill(damagedPath, with: .color(barColor))
         }
-    }
 
-    static func drawForegroundScratches(
-        context: inout GraphicsContext,
-        value: String,
-        size: CGSize,
-        backgroundColor: Color
-    ) {
-        let seed = BarcodeCatDamageSeed(value: value)
-        let catFrame = BarcodeCatDecorationLayout.catFrame(in: size)
-        let safeY = BarcodeCatDecorationLayout.safeBarcodeY(in: size)
-        let scratchBand = catFrame.insetBy(dx: -catFrame.width * 0.16, dy: 0)
-        let anchors: [CGFloat] = [0.18, 0.34, 0.58, 0.77]
-
-        for index in anchors.indices {
-            let anchor = anchors[index] + seed.signed(UInt64(400 + index)) * 0.025
-            let startX = scratchBand.minX + scratchBand.width * anchor
-            let topLift = catFrame.height * (0.08 + seed.unit(UInt64(420 + index)) * 0.16)
-            let startY = max(safeY + 2, catFrame.minY + topLift)
-            let endY = min(
-                size.height - 1,
-                catFrame.minY + catFrame.height * (0.72 + seed.unit(UInt64(440 + index)) * 0.20)
+        for (index, rect) in collisionSpaceRects(from: spaceRects, size: size, pixel: pixel) {
+            let pulledPath = pulledSpacePath(
+                rect: rect,
+                index: index,
+                seed: seed,
+                size: size,
+                safeY: safeY,
+                displayScale: displayScale
             )
-            let bend = seed.signed(UInt64(460 + index)) * catFrame.width * 0.10
-            let sway = seed.signed(UInt64(480 + index)) * catFrame.width * 0.05
-
-            var path = Path()
-            path.move(to: CGPoint(x: startX, y: startY))
-            path.addCurve(
-                to: CGPoint(x: startX + bend, y: endY),
-                control1: CGPoint(x: startX + sway, y: startY + catFrame.height * 0.18),
-                control2: CGPoint(x: startX + bend - sway, y: endY - catFrame.height * 0.18)
-            )
-
-            let lineWidth = max(1, size.height * (0.006 + seed.unit(UInt64(500 + index)) * 0.010))
-            context.stroke(
-                path,
-                with: .color(backgroundColor),
-                style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round)
-            )
+            context.fill(pulledPath, with: .color(backgroundColor))
         }
     }
 
@@ -382,7 +427,8 @@ private enum BarcodeCatDamageRenderer {
         safeY: CGFloat,
         displayScale: CGFloat
     ) -> Path {
-        let lowerHeight = max(0, size.height - safeY)
+        let stopY = BarcodeCatDecorationLayout.collisionY(for: rect.midX, in: size)
+        let lowerHeight = max(0, stopY - safeY)
         let steps = 7
         let pixel = 1 / displayScale
         let minimumWidth = max(pixel, rect.width * 0.62)
@@ -423,6 +469,74 @@ private enum BarcodeCatDamageRenderer {
 
         path.closeSubpath()
         return path
+    }
+
+    private static func pulledSpacePath(
+        rect: CGRect,
+        index: Int,
+        seed: BarcodeCatDamageSeed,
+        size: CGSize,
+        safeY: CGFloat,
+        displayScale: CGFloat
+    ) -> Path {
+        let stopY = BarcodeCatDecorationLayout.collisionY(for: rect.midX, in: size)
+        let lowerHeight = max(0, stopY - safeY)
+        let steps = 7
+        let pixel = 1 / displayScale
+        let stripeWidth = max(pixel, rect.width)
+        var leftPoints: [CGPoint] = []
+        var rightPoints: [CGPoint] = []
+
+        for step in 0...steps {
+            let t = CGFloat(step) / CGFloat(steps)
+            let y = safeY + lowerHeight * t
+            let offset = lowerOffset(
+                rect: rect,
+                index: index,
+                t: t,
+                seed: seed,
+                size: size
+            )
+            let centerX = rect.midX + offset
+
+            leftPoints.append(CGPoint(x: centerX - stripeWidth / 2, y: y))
+            rightPoints.append(CGPoint(x: centerX + stripeWidth / 2, y: y))
+        }
+
+        var path = Path()
+        guard let firstPoint = leftPoints.first else {
+            return path
+        }
+
+        path.move(to: firstPoint)
+        for point in leftPoints.dropFirst() {
+            path.addLine(to: point)
+        }
+
+        for point in rightPoints.reversed() {
+            path.addLine(to: point)
+        }
+
+        path.closeSubpath()
+        return path
+    }
+
+    private static func collisionSpaceRects(
+        from rects: [CGRect],
+        size: CGSize,
+        pixel: CGFloat
+    ) -> [(Int, CGRect)] {
+        let catFrame = BarcodeCatDecorationLayout.catFrame(in: size)
+        let interactionMinX = catFrame.minX - catFrame.width * 0.08
+        let interactionMaxX = catFrame.maxX + catFrame.width * 0.08
+        let maximumInternalSpaceWidth = size.width * 0.05
+
+        return rects.enumerated().filter { _, rect in
+            rect.width >= pixel
+                && rect.width <= maximumInternalSpaceWidth
+                && rect.midX >= interactionMinX
+                && rect.midX <= interactionMaxX
+        }
     }
 
     private static func lowerOffset(
