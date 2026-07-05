@@ -20,6 +20,7 @@ final class CarrierEditorModel: ObservableObject {
     @Published private(set) var isAnalyzingWallpaper = false
     @Published private(set) var showsWave = true
     @Published private(set) var showsBarcodeValue = true
+    @Published private(set) var showsCat = false
     @Published private(set) var isSavingSettings = false
 
     private let pipeline: CarrierAppPipeline
@@ -62,7 +63,8 @@ final class CarrierEditorModel: ObservableObject {
             wallpaperDominantColors: wallpaperDominantColors,
             waveColor: waveColor,
             showsWave: showsWave,
-            showsBarcodeValue: showsBarcodeValue
+            showsBarcodeValue: showsBarcodeValue,
+            showsCat: showsCat
         )
     }
 
@@ -175,6 +177,9 @@ final class CarrierEditorModel: ObservableObject {
         }
 
         self.showsWave = showsWave
+        if showsWave {
+            showsCat = false
+        }
         scheduleSettingsSave()
     }
 
@@ -184,6 +189,19 @@ final class CarrierEditorModel: ObservableObject {
         }
 
         self.showsBarcodeValue = showsBarcodeValue
+        scheduleSettingsSave()
+    }
+
+    func setShowsCat(_ showsCat: Bool) {
+        guard self.showsCat != showsCat else {
+            return
+        }
+
+        self.showsCat = showsCat
+        if showsCat {
+            showsWave = false
+            showsBarcodeValue = false
+        }
         scheduleSettingsSave()
     }
 
@@ -246,6 +264,7 @@ final class CarrierEditorModel: ObservableObject {
         waveColor = snapshot.settings.waveColor
         showsWave = snapshot.settings.showsWave
         showsBarcodeValue = snapshot.settings.showsBarcodeValue
+        showsCat = snapshot.settings.showsCat
         wallpaperPreviewImage = snapshot.previewImage
         wallpaperPalettes = snapshot.wallpaperPalettes
         wallpaperStatusText = nil

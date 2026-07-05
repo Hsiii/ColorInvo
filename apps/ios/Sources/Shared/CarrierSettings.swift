@@ -7,6 +7,7 @@ struct CarrierSettings: Codable, Equatable, Sendable {
     var waveColor: RGBAColor?
     var showsWave: Bool
     var showsBarcodeValue: Bool
+    var showsCat: Bool
 
     static let empty = CarrierSettings(
         carrierCode: "",
@@ -16,7 +17,10 @@ struct CarrierSettings: Codable, Equatable, Sendable {
     static let showcase = CarrierSettings(
         carrierCode: "/AB12345",
         palette: .showcase,
-        wallpaperDominantColors: BarcodePalette.showcaseSourceColors
+        wallpaperDominantColors: BarcodePalette.showcaseSourceColors,
+        showsWave: false,
+        showsBarcodeValue: false,
+        showsCat: true
     )
 
     init(
@@ -25,7 +29,8 @@ struct CarrierSettings: Codable, Equatable, Sendable {
         wallpaperDominantColors: [RGBAColor] = [],
         waveColor: RGBAColor? = nil,
         showsWave: Bool = true,
-        showsBarcodeValue: Bool = true
+        showsBarcodeValue: Bool = true,
+        showsCat: Bool = false
     ) {
         self.carrierCode = carrierCode
         self.palette = palette
@@ -33,6 +38,7 @@ struct CarrierSettings: Codable, Equatable, Sendable {
         self.waveColor = waveColor
         self.showsWave = showsWave
         self.showsBarcodeValue = showsBarcodeValue
+        self.showsCat = showsCat
     }
 
     init(from decoder: Decoder) throws {
@@ -49,6 +55,8 @@ struct CarrierSettings: Codable, Equatable, Sendable {
             ?? true
         showsBarcodeValue = try container.decodeIfPresent(Bool.self, forKey: .showsBarcodeValue)
             ?? true
+        showsCat = try container.decodeIfPresent(Bool.self, forKey: .showsCat)
+            ?? false
     }
 }
 

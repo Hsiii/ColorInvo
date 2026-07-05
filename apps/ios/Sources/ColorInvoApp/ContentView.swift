@@ -348,6 +348,13 @@ struct ContentView: View {
                 ) {
                     model.setShowsBarcodeValue(!model.showsBarcodeValue)
                 }
+
+                checkboxButton(
+                    title: "貓咪",
+                    isChecked: model.showsCat
+                ) {
+                    model.setShowsCat(!model.showsCat)
+                }
             }
         }
     }
@@ -425,7 +432,8 @@ struct ContentView: View {
                         dominantColors: model.wallpaperDominantColors,
                         waveColor: model.selectedWaveColor,
                         showsWave: model.showsWave,
-                        showsBarcodeValue: model.showsBarcodeValue
+                        showsBarcodeValue: model.showsBarcodeValue,
+                        showsCat: model.showsCat
                     )
                     .aspectRatio(329 / 155, contentMode: .fit)
                     .frame(maxWidth: .infinity)

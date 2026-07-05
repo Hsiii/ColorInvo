@@ -29,10 +29,12 @@
 		9AB9EC9138B41414015A4C66 /* ColorInvoWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4A5A4E48BE5EB27BDA9FBD1D /* ColorInvoWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9F305F1286745FFACF52F445 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F05933D6EBA34CFA44823B /* AppGroup.swift */; };
 		C6B3176503BB5487986DEF9C /* CarrierWidgetKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D32EAE07191D482043DFF71 /* CarrierWidgetKind.swift */; };
+		C81DAC57FBF9C37BD55E6244 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C29623ACA8030B15F2CD0815 /* Assets.xcassets */; };
 		CA90A39D51DDC1BB7CD9827F /* BarcodePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2F02F307BBF02B927FF459 /* BarcodePalette.swift */; };
 		E14954B2C1BCDF758CD46336 /* CarrierSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BDCB590CA17AAFCAA3289A5 /* CarrierSettings.swift */; };
 		E34174EE6F1F473078394658 /* BarcodePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2F02F307BBF02B927FF459 /* BarcodePalette.swift */; };
 		F8EC1ADA203EABA403979A00 /* ColorInvoWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E694B10230223879CC7FC315 /* ColorInvoWidget.swift */; };
+		FCAF0FFE3628E7AAD92EA66A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C29623ACA8030B15F2CD0815 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -90,6 +92,7 @@
 		9ED4D4DA673E33A33CBCB87A /* ColorInvoControlInteractionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorInvoControlInteractionUITests.swift; sourceTree = "<group>"; };
 		A69AAC56B8350E1A75124EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		B9A11DF4AD04EC6FA7BB2BD6 /* CarrierCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarrierCode.swift; sourceTree = "<group>"; };
+		C29623ACA8030B15F2CD0815 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CD2F02F307BBF02B927FF459 /* BarcodePalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarcodePalette.swift; sourceTree = "<group>"; };
 		D7F0064CF706CA1FB9D0127E /* ColorInvoWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ColorInvoWidget.entitlements; sourceTree = "<group>"; };
 		E0CB209F84455580DC4D770B /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -125,6 +128,7 @@
 				ED806F9CD0E9819ECC338CD0 /* ColorInvoUITests */,
 				77B4285981213B31D950AAC4 /* ColorInvoWidget */,
 				24F261E3F9C2BF619F9E6F82 /* Shared */,
+				E42CCCD0CEF45534E37BF236 /* Shared */,
 				751BDCDBEE26C0636081F5F2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -132,15 +136,10 @@
 		24F261E3F9C2BF619F9E6F82 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				94F05933D6EBA34CFA44823B /* AppGroup.swift */,
-				CD2F02F307BBF02B927FF459 /* BarcodePalette.swift */,
-				B9A11DF4AD04EC6FA7BB2BD6 /* CarrierCode.swift */,
-				9BDCB590CA17AAFCAA3289A5 /* CarrierSettings.swift */,
-				1D32EAE07191D482043DFF71 /* CarrierWidgetKind.swift */,
-				1B2B20F5DD5AE3A8E5B68020 /* Code39BarcodeView.swift */,
+				C29623ACA8030B15F2CD0815 /* Assets.xcassets */,
 			);
 			name = Shared;
-			path = Sources/Shared;
+			path = Resources/Shared;
 			sourceTree = "<group>";
 		};
 		751BDCDBEE26C0636081F5F2 /* Products */ = {
@@ -165,6 +164,20 @@
 			);
 			name = ColorInvoWidget;
 			path = Sources/ColorInvoWidget;
+			sourceTree = "<group>";
+		};
+		E42CCCD0CEF45534E37BF236 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				94F05933D6EBA34CFA44823B /* AppGroup.swift */,
+				CD2F02F307BBF02B927FF459 /* BarcodePalette.swift */,
+				B9A11DF4AD04EC6FA7BB2BD6 /* CarrierCode.swift */,
+				9BDCB590CA17AAFCAA3289A5 /* CarrierSettings.swift */,
+				1D32EAE07191D482043DFF71 /* CarrierWidgetKind.swift */,
+				1B2B20F5DD5AE3A8E5B68020 /* Code39BarcodeView.swift */,
+			);
+			name = Shared;
+			path = Sources/Shared;
 			sourceTree = "<group>";
 		};
 		ED806F9CD0E9819ECC338CD0 /* ColorInvoUITests */ = {
@@ -305,6 +318,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCAF0FFE3628E7AAD92EA66A /* Assets.xcassets in Resources */,
 				7D1DCA62D6C11DD5D5C5F847 /* InfoPlist.strings in Resources */,
 				19E0FE47E92A4AB2852A8DEF /* Localizable.strings in Resources */,
 				3EB7BF13588F47C0BED1C90C /* PrivacyInfo.xcprivacy in Resources */,
@@ -316,6 +330,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				715C98477B26FD4FBB90FDF0 /* Assets.xcassets in Resources */,
+				C81DAC57FBF9C37BD55E6244 /* Assets.xcassets in Resources */,
 				3E5A6A7B8D6B9D927588305C /* InfoPlist.strings in Resources */,
 				807BD22734D6A8201B194199 /* Localizable.strings in Resources */,
 				6B6C6729F5CBCE4D032B9486 /* PrivacyInfo.xcprivacy in Resources */,
