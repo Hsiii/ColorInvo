@@ -343,6 +343,19 @@ private enum BarcodeCatDecorationLayout {
         return min(groundY, visibleFrame.minY + visibleFrame.height * topRatio)
     }
 
+    static func interactionPressure(for x: CGFloat, in size: CGSize) -> CGFloat {
+        let visibleFrame = catVisibleFrame(in: size)
+        let paddedMinX = visibleFrame.minX - visibleFrame.width * 0.18
+        let paddedMaxX = visibleFrame.maxX + visibleFrame.width * 0.18
+        guard x >= paddedMinX, x <= paddedMaxX else {
+            return 0
+        }
+
+        let distanceFromCenter = abs(x - visibleFrame.midX)
+        let radius = visibleFrame.width * 0.68
+        return max(0, 1 - distanceFromCenter / max(1, radius))
+    }
+
     private static func catVisibleFrame(in size: CGSize) -> CGRect {
         let frame = catFrame(in: size)
         let minXRatio = CGFloat(0.122)
@@ -406,6 +419,18 @@ private enum BarcodeCatDamageRenderer {
             context.fill(damagedPath, with: .color(barColor))
         }
 
+        for (index, rect) in barRects.enumerated() {
+            let stripPath = tornStripPath(
+                rect: rect,
+                index: index,
+                seed: seed,
+                size: size,
+                safeY: safeY,
+                displayScale: displayScale
+            )
+            context.fill(stripPath, with: .color(barColor))
+        }
+
         for (index, rect) in collisionSpaceRects(from: spaceRects, size: size, pixel: pixel) {
             let pulledPath = pulledSpacePath(
                 rect: rect,
@@ -427,8 +452,14 @@ private enum BarcodeCatDamageRenderer {
         safeY: CGFloat,
         displayScale: CGFloat
     ) -> Path {
-        let stopY = BarcodeCatDecorationLayout.collisionY(for: rect.midX, in: size)
-        let lowerHeight = max(0, stopY - safeY)
+        let tear = barTearProfile(
+            rect: rect,
+            index: index,
+            seed: seed,
+            size: size,
+            safeY: safeY,
+            displayScale: displayScale
+        )
         let steps = 7
         let pixel = 1 / displayScale
         let minimumWidth = max(pixel, rect.width * 0.62)
@@ -437,7 +468,8 @@ private enum BarcodeCatDamageRenderer {
 
         for step in 0...steps {
             let t = CGFloat(step) / CGFloat(steps)
-            let y = safeY + lowerHeight * t
+            let leftY = safeY + max(0, tear.leftStopY - safeY) * t
+            let rightY = safeY + max(0, tear.rightStopY - safeY) * t
             let offset = lowerOffset(
                 rect: rect,
                 index: index,
@@ -449,8 +481,71 @@ private enum BarcodeCatDamageRenderer {
             let leftX = rect.minX + offset - widthPulse
             let rightX = max(leftX + minimumWidth, rect.maxX + offset + widthPulse)
 
-            leftPoints.append(CGPoint(x: leftX, y: y))
-            rightPoints.append(CGPoint(x: rightX, y: y))
+            leftPoints.append(CGPoint(x: leftX, y: leftY))
+            rightPoints.append(CGPoint(x: rightX, y: rightY))
+        }
+
+        var path = Path()
+        guard let firstPoint = leftPoints.first else {
+            return path
+        }
+
+        path.move(to: firstPoint)
+        for point in leftPoints.dropFirst() {
+            path.addLine(to: point)
+        }
+
+        for point in rightPoints.reversed() {
+            path.addLine(to: point)
+        }
+
+        path.closeSubpath()
+        return path
+    }
+
+    private static func tornStripPath(
+        rect: CGRect,
+        index: Int,
+        seed: BarcodeCatDamageSeed,
+        size: CGSize,
+        safeY: CGFloat,
+        displayScale: CGFloat
+    ) -> Path {
+        let tear = barTearProfile(
+            rect: rect,
+            index: index,
+            seed: seed,
+            size: size,
+            safeY: safeY,
+            displayScale: displayScale
+        )
+        guard tear.drawStrip else {
+            return Path()
+        }
+
+        let steps = 4
+        let pixel = 1 / displayScale
+        let width = max(pixel, rect.width * tear.stripWidthRatio)
+        var leftPoints: [CGPoint] = []
+        var rightPoints: [CGPoint] = []
+
+        for step in 0...steps {
+            let t = CGFloat(step) / CGFloat(steps)
+            let y = tear.stripStartY + max(0, tear.stripEndY - tear.stripStartY) * t
+            let offset = lowerOffset(
+                rect: rect,
+                index: index,
+                t: min(1, 0.72 + t * 0.28),
+                seed: seed,
+                size: size
+            )
+            let centerX = rect.midX
+                + offset
+                + rect.width * tear.stripHorizontalBias
+                + seed.signed(UInt64(1_520 + index + step)) * rect.width * 0.10 * t
+
+            leftPoints.append(CGPoint(x: centerX - width / 2, y: y))
+            rightPoints.append(CGPoint(x: centerX + width / 2, y: y))
         }
 
         var path = Path()
@@ -563,6 +658,67 @@ private enum BarcodeCatDamageRenderer {
             * t
 
         return shove + wave
+    }
+
+    private static func barTearProfile(
+        rect: CGRect,
+        index: Int,
+        seed: BarcodeCatDamageSeed,
+        size: CGSize,
+        safeY: CGFloat,
+        displayScale: CGFloat
+    ) -> BarTearProfile {
+        let pixel = 1 / displayScale
+        let collisionY = BarcodeCatDecorationLayout.collisionY(for: rect.midX, in: size)
+        let pressure = BarcodeCatDecorationLayout.interactionPressure(for: rect.midX, in: size)
+        let tearChance = seed.unit(UInt64(1_000 + index))
+        let shouldBreakEarly = pressure > 0.16 && tearChance > 0.42
+        let maximumLift = size.height * (0.05 + pressure * 0.16)
+        let lift = shouldBreakEarly
+            ? maximumLift * (0.35 + seed.unit(UInt64(1_040 + index)) * 0.65)
+            : 0
+        let baseStopY = max(safeY + size.height * 0.05, collisionY - lift)
+        let raggedness = shouldBreakEarly
+            ? size.height * (0.012 + seed.unit(UInt64(1_080 + index)) * 0.035) * pressure
+            : size.height * 0.004 * pressure
+        let leftStopY = max(
+            safeY + pixel,
+            min(collisionY - pixel, baseStopY + seed.signed(UInt64(1_120 + index)) * raggedness)
+        )
+        let rightStopY = max(
+            safeY + pixel,
+            min(collisionY - pixel, baseStopY + seed.signed(UInt64(1_160 + index)) * raggedness)
+        )
+        let stripGap = size.height * (0.006 + seed.unit(UInt64(1_200 + index)) * 0.014)
+        let stripStartY = max(leftStopY, rightStopY) + stripGap
+        let stripLength = min(
+            collisionY - stripStartY - pixel,
+            size.height * (0.035 + seed.unit(UInt64(1_240 + index)) * 0.090) * pressure
+        )
+        let drawStrip = shouldBreakEarly
+            && rect.width > pixel * 1.5
+            && stripLength > pixel * 3
+            && seed.unit(UInt64(1_280 + index)) > 0.38
+
+        return BarTearProfile(
+            leftStopY: leftStopY,
+            rightStopY: rightStopY,
+            stripStartY: stripStartY,
+            stripEndY: stripStartY + max(0, stripLength),
+            stripWidthRatio: 0.34 + seed.unit(UInt64(1_320 + index)) * 0.34,
+            stripHorizontalBias: seed.signed(UInt64(1_360 + index)) * 0.20,
+            drawStrip: drawStrip
+        )
+    }
+
+    private struct BarTearProfile {
+        let leftStopY: CGFloat
+        let rightStopY: CGFloat
+        let stripStartY: CGFloat
+        let stripEndY: CGFloat
+        let stripWidthRatio: CGFloat
+        let stripHorizontalBias: CGFloat
+        let drawStrip: Bool
     }
 
 }
