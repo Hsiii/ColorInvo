@@ -30,8 +30,7 @@ struct Code39BarcodeView: View {
                     value: value,
                     size: size,
                     displayScale: displayScale,
-                    barColor: barColor,
-                    backgroundColor: backgroundColor
+                    barColor: barColor
                 )
             } else {
                 for rect in barRects {
@@ -233,16 +232,9 @@ private struct BarcodeCatOverlay: View {
     var body: some View {
         GeometryReader { proxy in
             let catFrame = BarcodeCatDecorationLayout.catFrame(in: proxy.size)
+            let outline = max(1, catFrame.height * 0.012)
 
             ZStack {
-                Image("CatBarcode")
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundStyle(barColor)
-                    .frame(width: catFrame.width, height: catFrame.height)
-                    .position(x: catFrame.midX, y: catFrame.midY)
-
                 Canvas { context, size in
                     BarcodeCatDamageRenderer.drawForegroundScratches(
                         context: &context,
@@ -251,6 +243,26 @@ private struct BarcodeCatOverlay: View {
                         backgroundColor: backgroundColor
                     )
                 }
+
+                Image("CatBarcode")
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundStyle(barColor)
+                    .frame(width: catFrame.width, height: catFrame.height)
+                    .shadow(color: backgroundColor, radius: 0, x: -outline, y: 0)
+                    .shadow(color: backgroundColor, radius: 0, x: outline, y: 0)
+                    .shadow(color: backgroundColor, radius: 0, x: 0, y: -outline)
+                    .shadow(color: backgroundColor, radius: 0, x: 0, y: outline)
+                    .position(x: catFrame.midX, y: catFrame.midY)
+
+                Image("CatBarcodeDetails")
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundStyle(backgroundColor)
+                    .frame(width: catFrame.width, height: catFrame.height)
+                    .position(x: catFrame.midX, y: catFrame.midY)
             }
         }
         .allowsHitTesting(false)
@@ -290,8 +302,7 @@ private enum BarcodeCatDamageRenderer {
         value: String,
         size: CGSize,
         displayScale: CGFloat,
-        barColor: Color,
-        backgroundColor: Color
+        barColor: Color
     ) {
         let safeY = BarcodeCatDecorationLayout.safeBarcodeY(in: size)
         let pixel = 1 / displayScale
@@ -320,15 +331,6 @@ private enum BarcodeCatDamageRenderer {
             )
             context.fill(damagedPath, with: .color(barColor))
         }
-
-        drawTornGap(
-            context: &context,
-            seed: seed,
-            size: size,
-            safeY: safeY,
-            displayScale: displayScale,
-            backgroundColor: backgroundColor
-        )
     }
 
     static func drawForegroundScratches(
@@ -341,7 +343,7 @@ private enum BarcodeCatDamageRenderer {
         let catFrame = BarcodeCatDecorationLayout.catFrame(in: size)
         let safeY = BarcodeCatDecorationLayout.safeBarcodeY(in: size)
         let scratchBand = catFrame.insetBy(dx: -catFrame.width * 0.16, dy: 0)
-        let anchors: [CGFloat] = [0.16, 0.27, 0.39, 0.56, 0.68, 0.81]
+        let anchors: [CGFloat] = [0.18, 0.34, 0.58, 0.77]
 
         for index in anchors.indices {
             let anchor = anchors[index] + seed.signed(UInt64(400 + index)) * 0.025
@@ -363,7 +365,7 @@ private enum BarcodeCatDamageRenderer {
                 control2: CGPoint(x: startX + bend - sway, y: endY - catFrame.height * 0.18)
             )
 
-            let lineWidth = max(1.5, size.height * (0.012 + seed.unit(UInt64(500 + index)) * 0.016))
+            let lineWidth = max(1, size.height * (0.006 + seed.unit(UInt64(500 + index)) * 0.010))
             context.stroke(
                 path,
                 with: .color(backgroundColor),
@@ -449,64 +451,6 @@ private enum BarcodeCatDamageRenderer {
         return shove + wave
     }
 
-    private static func drawTornGap(
-        context: inout GraphicsContext,
-        seed: BarcodeCatDamageSeed,
-        size: CGSize,
-        safeY: CGFloat,
-        displayScale: CGFloat,
-        backgroundColor: Color
-    ) {
-        let catFrame = BarcodeCatDecorationLayout.catFrame(in: size)
-        let gapRect = catFrame.insetBy(dx: -catFrame.width * 0.12, dy: 0)
-        let left = max(0, gapRect.minX)
-        let right = min(size.width, gapRect.maxX)
-        guard right > left else {
-            return
-        }
-
-        let pixel = 1 / displayScale
-        let samples = 18
-        var path = Path()
-        path.move(to: CGPoint(x: left, y: size.height))
-
-        for sample in 0...samples {
-            let progress = CGFloat(sample) / CGFloat(samples)
-            let x = left + (right - left) * progress
-            let y = tornEdgeY(
-                progress: progress,
-                sample: sample,
-                seed: seed,
-                catFrame: catFrame,
-                safeY: safeY,
-                pixel: pixel
-            )
-
-            path.addLine(to: CGPoint(x: x, y: y))
-        }
-
-        path.addLine(to: CGPoint(x: right, y: size.height))
-        path.closeSubpath()
-        context.fill(path, with: .color(backgroundColor))
-    }
-
-    private static func tornEdgeY(
-        progress: CGFloat,
-        sample: Int,
-        seed: BarcodeCatDamageSeed,
-        catFrame: CGRect,
-        safeY: CGFloat,
-        pixel: CGFloat
-    ) -> CGFloat {
-        let arch = sin(progress * .pi)
-        let leftClaw = max(0, 1 - abs(progress - 0.28) / 0.12)
-        let rightClaw = max(0, 1 - abs(progress - 0.66) / 0.14)
-        let ragged = seed.signed(UInt64(900 + sample)) * catFrame.height * 0.05
-        let base = catFrame.minY + catFrame.height * 0.36
-        let lift = (arch * 0.48 + leftClaw * 0.22 + rightClaw * 0.26) * catFrame.height
-
-        return max(safeY + pixel, base - lift + ragged)
-    }
 }
 
 private struct BarcodeCatDamageSeed {
