@@ -332,10 +332,10 @@ private enum BarcodeCatDecorationLayout {
         let base: CGFloat = 0.76
         let lift = max(
             tent(u, center: 0.12, radius: 0.12) * 0.24,
-            tent(u, center: 0.28, radius: 0.09) * 0.74,
+            tent(u, center: 0.28, radius: 0.075) * 0.70,
             tent(u, center: 0.43, radius: 0.09) * 0.26,
             tent(u, center: 0.52, radius: 0.32) * 0.24,
-            tent(u, center: 0.67, radius: 0.11) * 0.70,
+            tent(u, center: 0.67, radius: 0.09) * 0.66,
             tent(u, center: 0.86, radius: 0.08) * 0.28
         )
         let topRatio = max(0.04, min(0.76, base - lift))
@@ -364,8 +364,8 @@ private enum BarcodeCatDecorationLayout {
 
         let u = (x - visibleFrame.minX) / max(1, visibleFrame.width)
         return max(
-            tent(u, center: 0.28, radius: 0.11),
-            tent(u, center: 0.67, radius: 0.13)
+            tent(u, center: 0.28, radius: 0.085),
+            tent(u, center: 0.67, radius: 0.10)
         )
     }
 
@@ -380,14 +380,14 @@ private enum BarcodeCatDecorationLayout {
         }
 
         let u = (x - visibleFrame.minX) / max(1, visibleFrame.width)
-        let leftPaw = tent(u, center: 0.28, radius: 0.11)
-        let rightPaw = tent(u, center: 0.67, radius: 0.13)
+        let leftPaw = tent(u, center: 0.28, radius: 0.085)
+        let rightPaw = tent(u, center: 0.67, radius: 0.10)
         let leftDirection: CGFloat = u < 0.28 ? -1 : 1
         let rightDirection: CGFloat = u < 0.67 ? -1 : 1
         let force = leftPaw * leftDirection + rightPaw * rightDirection
 
         if abs(force) < 0.04 {
-            return fallbackDirection * max(leftPaw, rightPaw) * 0.45
+            return fallbackDirection * max(leftPaw, rightPaw) * 0.30
         }
 
         return max(-1, min(1, force))
@@ -699,7 +699,7 @@ private enum BarcodeCatDamageRenderer {
             fallbackDirection: seed.signed(UInt64(760 + index)) < 0 ? -1 : 1
         )
             * size.width
-            * 0.018
+            * 0.010
             * bend
 
         let phase = seed.unit(UInt64(720 + index)) * .pi * 2
@@ -723,7 +723,7 @@ private enum BarcodeCatDamageRenderer {
 
         return max(
             safeY + pixel,
-            collisionY - size.height * (0.016 + pawPressure * 0.110)
+            collisionY - size.height * (0.010 + pawPressure * 0.060)
         )
     }
 
@@ -745,8 +745,8 @@ private enum BarcodeCatDamageRenderer {
             displayScale: displayScale
         )
         let tearChance = seed.unit(UInt64(1_000 + index))
-        let shouldBreakEarly = pressure > 0.16 && (tearChance > 0.42 || pawPressure > 0.35)
-        let maximumLift = size.height * (0.05 + pressure * 0.12 + pawPressure * 0.15)
+        let shouldBreakEarly = pressure > 0.16 && (tearChance > 0.42 || pawPressure > 0.55)
+        let maximumLift = size.height * (0.05 + pressure * 0.13 + pawPressure * 0.075)
         let lift = shouldBreakEarly
             ? maximumLift * (0.35 + seed.unit(UInt64(1_040 + index)) * 0.65)
             : 0
