@@ -332,7 +332,7 @@ private enum BarcodeCatDecorationLayout {
         let base: CGFloat = 0.76
         let lift = max(
             tent(u, center: 0.12, radius: 0.12) * 0.24,
-            tent(u, center: 0.28, radius: 0.075) * 0.70,
+            tent(u, center: 0.28, radius: 0.055) * 0.60,
             tent(u, center: 0.43, radius: 0.09) * 0.26,
             tent(u, center: 0.52, radius: 0.32) * 0.24,
             tent(u, center: 0.67, radius: 0.09) * 0.66,
@@ -364,8 +364,8 @@ private enum BarcodeCatDecorationLayout {
 
         let u = (x - visibleFrame.minX) / max(1, visibleFrame.width)
         return max(
-            tent(u, center: 0.28, radius: 0.085),
-            tent(u, center: 0.67, radius: 0.10)
+            tent(u, center: 0.46, radius: 0.085),
+            tent(u, center: 0.66, radius: 0.095)
         )
     }
 
@@ -380,10 +380,10 @@ private enum BarcodeCatDecorationLayout {
         }
 
         let u = (x - visibleFrame.minX) / max(1, visibleFrame.width)
-        let leftPaw = tent(u, center: 0.28, radius: 0.085)
-        let rightPaw = tent(u, center: 0.67, radius: 0.10)
-        let leftDirection: CGFloat = u < 0.28 ? -1 : 1
-        let rightDirection: CGFloat = u < 0.67 ? -1 : 1
+        let leftPaw = tent(u, center: 0.46, radius: 0.085)
+        let rightPaw = tent(u, center: 0.66, radius: 0.095)
+        let leftDirection: CGFloat = u < 0.46 ? -1 : 1
+        let rightDirection: CGFloat = u < 0.66 ? -1 : 1
         let force = leftPaw * leftDirection + rightPaw * rightDirection
 
         if abs(force) < 0.04 {
@@ -572,14 +572,15 @@ private enum BarcodeCatDamageRenderer {
             let offset = lowerOffset(
                 rect: rect,
                 index: index,
-                t: min(1, 0.72 + t * 0.28),
+                t: 1,
                 seed: seed,
                 size: size
             )
+            let flapDrift = seed.signed(UInt64(1_520 + index + step)) * rect.width * 0.12 * t
             let centerX = rect.midX
                 + offset
-                + rect.width * tear.stripHorizontalBias
-                + seed.signed(UInt64(1_520 + index + step)) * rect.width * 0.10 * t
+                + rect.width * tear.stripHorizontalBias * t
+                + flapDrift
 
             leftPoints.append(CGPoint(x: centerX - width / 2, y: y))
             rightPoints.append(CGPoint(x: centerX + width / 2, y: y))
@@ -762,11 +763,10 @@ private enum BarcodeCatDamageRenderer {
             safeY + pixel,
             min(contactY - pixel, baseStopY + seed.signed(UInt64(1_160 + index)) * raggedness)
         )
-        let stripGap = size.height * (0.006 + seed.unit(UInt64(1_200 + index)) * 0.014)
-        let stripStartY = max(leftStopY, rightStopY) + stripGap
+        let stripStartY = min(leftStopY, rightStopY) - pixel
         let stripLength = min(
             contactY - stripStartY - pixel,
-            size.height * (0.035 + seed.unit(UInt64(1_240 + index)) * 0.090) * max(pressure, pawPressure)
+            size.height * (0.026 + seed.unit(UInt64(1_240 + index)) * 0.070) * max(pressure, pawPressure)
         )
         let drawStrip = shouldBreakEarly
             && rect.width > pixel * 1.5
