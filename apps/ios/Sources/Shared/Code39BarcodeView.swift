@@ -332,10 +332,10 @@ private enum BarcodeCatDecorationLayout {
         let base: CGFloat = 0.76
         let lift = max(
             tent(u, center: 0.12, radius: 0.12) * 0.24,
-            tent(u, center: 0.28, radius: 0.06) * 0.70,
+            tent(u, center: 0.28, radius: 0.09) * 0.74,
             tent(u, center: 0.43, radius: 0.09) * 0.26,
             tent(u, center: 0.52, radius: 0.32) * 0.24,
-            tent(u, center: 0.67, radius: 0.08) * 0.66,
+            tent(u, center: 0.67, radius: 0.11) * 0.70,
             tent(u, center: 0.86, radius: 0.08) * 0.28
         )
         let topRatio = max(0.04, min(0.76, base - lift))
@@ -354,6 +354,43 @@ private enum BarcodeCatDecorationLayout {
         let distanceFromCenter = abs(x - visibleFrame.midX)
         let radius = visibleFrame.width * 0.68
         return max(0, 1 - distanceFromCenter / max(1, radius))
+    }
+
+    static func pawScratchPressure(for x: CGFloat, in size: CGSize) -> CGFloat {
+        let visibleFrame = catVisibleFrame(in: size)
+        guard x >= visibleFrame.minX, x <= visibleFrame.maxX else {
+            return 0
+        }
+
+        let u = (x - visibleFrame.minX) / max(1, visibleFrame.width)
+        return max(
+            tent(u, center: 0.28, radius: 0.11),
+            tent(u, center: 0.67, radius: 0.13)
+        )
+    }
+
+    static func pawScratchDeflection(
+        for x: CGFloat,
+        in size: CGSize,
+        fallbackDirection: CGFloat
+    ) -> CGFloat {
+        let visibleFrame = catVisibleFrame(in: size)
+        guard x >= visibleFrame.minX, x <= visibleFrame.maxX else {
+            return 0
+        }
+
+        let u = (x - visibleFrame.minX) / max(1, visibleFrame.width)
+        let leftPaw = tent(u, center: 0.28, radius: 0.11)
+        let rightPaw = tent(u, center: 0.67, radius: 0.13)
+        let leftDirection: CGFloat = u < 0.28 ? -1 : 1
+        let rightDirection: CGFloat = u < 0.67 ? -1 : 1
+        let force = leftPaw * leftDirection + rightPaw * rightDirection
+
+        if abs(force) < 0.04 {
+            return fallbackDirection * max(leftPaw, rightPaw) * 0.45
+        }
+
+        return max(-1, min(1, force))
     }
 
     private static func catVisibleFrame(in size: CGSize) -> CGRect {
@@ -574,7 +611,12 @@ private enum BarcodeCatDamageRenderer {
         safeY: CGFloat,
         displayScale: CGFloat
     ) -> Path {
-        let stopY = BarcodeCatDecorationLayout.collisionY(for: rect.midX, in: size)
+        let stopY = scratchContactY(
+            for: rect.midX,
+            in: size,
+            safeY: safeY,
+            displayScale: displayScale
+        )
         let lowerHeight = max(0, stopY - safeY)
         let steps = 7
         let pixel = 1 / displayScale
@@ -645,11 +687,20 @@ private enum BarcodeCatDamageRenderer {
         let normalizedDistance = (rect.midX - catFrame.midX) / max(1, catFrame.width * 0.72)
         let pressure = max(0, 1 - min(1, abs(normalizedDistance)))
         let direction: CGFloat = normalizedDistance < 0 ? -1 : 1
+        let bend = t * t * (3 - 2 * t)
         let shove = direction
             * pressure
             * size.width
-            * 0.014
-            * sin(.pi * t)
+            * 0.011
+            * (sin(.pi * t) * 0.45 + bend * 0.55)
+        let pawShove = BarcodeCatDecorationLayout.pawScratchDeflection(
+            for: rect.midX,
+            in: size,
+            fallbackDirection: seed.signed(UInt64(760 + index)) < 0 ? -1 : 1
+        )
+            * size.width
+            * 0.018
+            * bend
 
         let phase = seed.unit(UInt64(720 + index)) * .pi * 2
         let wave = sin((t * 2.4 + 0.2) * .pi + phase)
@@ -657,7 +708,23 @@ private enum BarcodeCatDamageRenderer {
             * (0.003 + seed.unit(UInt64(740 + index)) * 0.004)
             * t
 
-        return shove + wave
+        return shove + pawShove + wave
+    }
+
+    private static func scratchContactY(
+        for x: CGFloat,
+        in size: CGSize,
+        safeY: CGFloat,
+        displayScale: CGFloat
+    ) -> CGFloat {
+        let pixel = 1 / displayScale
+        let collisionY = BarcodeCatDecorationLayout.collisionY(for: x, in: size)
+        let pawPressure = BarcodeCatDecorationLayout.pawScratchPressure(for: x, in: size)
+
+        return max(
+            safeY + pixel,
+            collisionY - size.height * (0.016 + pawPressure * 0.110)
+        )
     }
 
     private static func barTearProfile(
@@ -669,31 +736,37 @@ private enum BarcodeCatDamageRenderer {
         displayScale: CGFloat
     ) -> BarTearProfile {
         let pixel = 1 / displayScale
-        let collisionY = BarcodeCatDecorationLayout.collisionY(for: rect.midX, in: size)
         let pressure = BarcodeCatDecorationLayout.interactionPressure(for: rect.midX, in: size)
+        let pawPressure = BarcodeCatDecorationLayout.pawScratchPressure(for: rect.midX, in: size)
+        let contactY = scratchContactY(
+            for: rect.midX,
+            in: size,
+            safeY: safeY,
+            displayScale: displayScale
+        )
         let tearChance = seed.unit(UInt64(1_000 + index))
-        let shouldBreakEarly = pressure > 0.16 && tearChance > 0.42
-        let maximumLift = size.height * (0.05 + pressure * 0.16)
+        let shouldBreakEarly = pressure > 0.16 && (tearChance > 0.42 || pawPressure > 0.35)
+        let maximumLift = size.height * (0.05 + pressure * 0.12 + pawPressure * 0.15)
         let lift = shouldBreakEarly
             ? maximumLift * (0.35 + seed.unit(UInt64(1_040 + index)) * 0.65)
             : 0
-        let baseStopY = max(safeY + size.height * 0.05, collisionY - lift)
+        let baseStopY = max(safeY + size.height * 0.05, contactY - lift)
         let raggedness = shouldBreakEarly
-            ? size.height * (0.012 + seed.unit(UInt64(1_080 + index)) * 0.035) * pressure
-            : size.height * 0.004 * pressure
+            ? size.height * (0.012 + seed.unit(UInt64(1_080 + index)) * 0.035) * max(pressure, pawPressure)
+            : size.height * 0.004 * max(pressure, pawPressure)
         let leftStopY = max(
             safeY + pixel,
-            min(collisionY - pixel, baseStopY + seed.signed(UInt64(1_120 + index)) * raggedness)
+            min(contactY - pixel, baseStopY + seed.signed(UInt64(1_120 + index)) * raggedness)
         )
         let rightStopY = max(
             safeY + pixel,
-            min(collisionY - pixel, baseStopY + seed.signed(UInt64(1_160 + index)) * raggedness)
+            min(contactY - pixel, baseStopY + seed.signed(UInt64(1_160 + index)) * raggedness)
         )
         let stripGap = size.height * (0.006 + seed.unit(UInt64(1_200 + index)) * 0.014)
         let stripStartY = max(leftStopY, rightStopY) + stripGap
         let stripLength = min(
-            collisionY - stripStartY - pixel,
-            size.height * (0.035 + seed.unit(UInt64(1_240 + index)) * 0.090) * pressure
+            contactY - stripStartY - pixel,
+            size.height * (0.035 + seed.unit(UInt64(1_240 + index)) * 0.090) * max(pressure, pawPressure)
         )
         let drawStrip = shouldBreakEarly
             && rect.width > pixel * 1.5
