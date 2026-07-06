@@ -4,6 +4,16 @@ import SwiftUI
 import UIKit
 import WidgetKit
 
+enum BarcodeDecorationStyle: String, CaseIterable, Identifiable {
+    case none
+    case wave
+    case cat
+
+    var id: Self {
+        self
+    }
+}
+
 @MainActor
 final class CarrierEditorModel: ObservableObject {
     private static let autosaveDelayNanoseconds: UInt64 = 350_000_000
@@ -74,6 +84,18 @@ final class CarrierEditorModel: ObservableObject {
 
     var selectedWaveColor: RGBAColor? {
         waveColor ?? wallpaperDominantColors.first
+    }
+
+    var decorationStyle: BarcodeDecorationStyle {
+        if showsCat {
+            return .cat
+        }
+
+        if showsWave {
+            return .wave
+        }
+
+        return .none
     }
 
     var widgetStatusText: String {
@@ -183,6 +205,18 @@ final class CarrierEditorModel: ObservableObject {
         scheduleSettingsSave()
     }
 
+    func selectDecorationStyle(_ style: BarcodeDecorationStyle) {
+        let nextShowsWave = style == .wave
+        let nextShowsCat = style == .cat
+        guard showsWave != nextShowsWave || showsCat != nextShowsCat else {
+            return
+        }
+
+        showsWave = nextShowsWave
+        showsCat = nextShowsCat
+        scheduleSettingsSave()
+    }
+
     func setShowsBarcodeValue(_ showsBarcodeValue: Bool) {
         guard self.showsBarcodeValue != showsBarcodeValue else {
             return
@@ -200,7 +234,6 @@ final class CarrierEditorModel: ObservableObject {
         self.showsCat = showsCat
         if showsCat {
             showsWave = false
-            showsBarcodeValue = false
         }
         scheduleSettingsSave()
     }

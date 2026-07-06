@@ -83,8 +83,6 @@ struct ContentView: View {
         carrierSection
         colorSection
         displayOptionsSection
-        widgetSection
-            .id(Self.widgetScreenshotSectionID)
     }
 
     private var carrierSection: some View {
@@ -334,26 +332,39 @@ struct ContentView: View {
             Text("顯示項目")
                 .colorInvoText(.heading)
 
-            HStack(spacing: 8) {
-                checkboxButton(
-                    title: "波浪",
-                    isChecked: model.showsWave
-                ) {
-                    model.setShowsWave(!model.showsWave)
-                }
+            checkboxButton(
+                title: "載具文字",
+                isChecked: model.showsBarcodeValue
+            ) {
+                model.setShowsBarcodeValue(!model.showsBarcodeValue)
+            }
 
-                checkboxButton(
-                    title: "載具文字",
-                    isChecked: model.showsBarcodeValue
-                ) {
-                    model.setShowsBarcodeValue(!model.showsBarcodeValue)
-                }
+            VStack(alignment: .leading, spacing: 8) {
+                Text("條碼樣式")
+                    .colorInvoText(.secondary)
 
-                checkboxButton(
-                    title: "貓咪",
-                    isChecked: model.showsCat
-                ) {
-                    model.setShowsCat(!model.showsCat)
+                HStack(spacing: 8) {
+                    ForEach(BarcodeDecorationStyle.allCases) { style in
+                        let isSelected = style == model.decorationStyle
+
+                        Button {
+                            model.selectDecorationStyle(style)
+                        } label: {
+                            BarcodeDecorationStyleCard(
+                                style: style,
+                                palette: model.draftPalette,
+                                dominantColors: model.wallpaperDominantColors,
+                                waveColor: model.selectedWaveColor,
+                                isSelected: isSelected
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .frame(maxWidth: .infinity)
+                        .accessibilityLabel(style.accessibilityLabel)
+                        .accessibilityValue(isSelected ? "selected" : "not selected")
+                        .accessibilityAddTraits(isSelected ? .isSelected : [])
+                        .accessibilityIdentifier("barcodeDecorationStyle.\(style.rawValue)")
+                    }
                 }
             }
         }
@@ -489,6 +500,89 @@ private struct WaveColorDot: View {
         }
         .frame(width: 44, height: 44)
         .contentShape(Rectangle())
+    }
+}
+
+private struct BarcodeDecorationStyleCard: View {
+    let style: BarcodeDecorationStyle
+    let palette: BarcodePalette
+    let dominantColors: [RGBAColor]
+    let waveColor: RGBAColor?
+    let isSelected: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            ZStack(alignment: .topTrailing) {
+                CarrierBarcodePanel(
+                    value: "/A1B2",
+                    palette: palette,
+                    showsWave: style.showsWave,
+                    showsValue: false,
+                    barcodeHeight: 44,
+                    horizontalPadding: 6,
+                    verticalPadding: 4,
+                    dominantColors: dominantColors,
+                    waveColor: waveColor,
+                    showsCat: style.showsCat
+                )
+                .frame(height: 52)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+                        .allowsHitTesting(false)
+                }
+
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.callout)
+                    .foregroundStyle(isSelected ? ColorInvoColor.primary : ColorInvoColor.muted)
+                    .padding(4)
+            }
+
+            Text(style.title)
+                .colorInvoText(.control)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .padding(6)
+        .frame(maxWidth: .infinity, minHeight: 92, alignment: .topLeading)
+        .background {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(isSelected ? ColorInvoColor.primarySoft : ColorInvoColor.surface)
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(
+                    isSelected ? ColorInvoColor.primary : ColorInvoColor.hairline,
+                    lineWidth: isSelected ? 2 : 1
+                )
+                .allowsHitTesting(false)
+        }
+        .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+}
+
+private extension BarcodeDecorationStyle {
+    var title: String {
+        switch self {
+        case .none:
+            "無"
+        case .wave:
+            "波浪"
+        case .cat:
+            "貓咪"
+        }
+    }
+
+    var accessibilityLabel: String {
+        "條碼樣式\(title)"
+    }
+
+    var showsWave: Bool {
+        self == .wave
+    }
+
+    var showsCat: Bool {
+        self == .cat
     }
 }
 
