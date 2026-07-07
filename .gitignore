@@ -8,6 +8,7 @@ DerivedData/
 *.xcuserstate
 *.moved-aside
 xcuserdata/
+.codex-screenshots/
 .env
 .env.local
 *.local

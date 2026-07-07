@@ -1,4 +1,4 @@
-.PHONY: all generate check build simulator device mock test screenshots archive export upload release clean
+.PHONY: all generate check build simulator device mock test screenshot-chat screenshots archive export upload release clean
 
 all: check
 
@@ -22,6 +22,9 @@ mock:
 
 test:
 	bun run ios:test
+
+screenshot-chat:
+	bun run ios:screenshot-chat
 
 screenshots:
 	bun run ios:screenshots
