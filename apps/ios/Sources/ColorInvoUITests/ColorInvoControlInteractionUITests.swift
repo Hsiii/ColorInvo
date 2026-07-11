@@ -92,6 +92,7 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
         let identifiers = [
             "backgroundColorPicker",
             "barColorPicker",
+            "displayVisibilityMenu",
         ]
 
         for identifier in identifiers {

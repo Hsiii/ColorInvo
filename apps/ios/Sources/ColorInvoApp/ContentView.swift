@@ -324,7 +324,7 @@ struct ContentView: View {
                     .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
                     .allowsHitTesting(false)
             }
-        .accessibilityIdentifier(identifier)
+            .accessibilityIdentifier(identifier)
     }
 
     private var displayOptionsSection: some View {
@@ -332,75 +332,103 @@ struct ContentView: View {
             Text("顯示項目")
                 .colorInvoText(.heading)
 
-            checkboxButton(
-                title: "載具文字",
-                isChecked: model.showsBarcodeValue
-            ) {
-                model.setShowsBarcodeValue(!model.showsBarcodeValue)
-            }
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("條碼樣式")
-                    .colorInvoText(.secondary)
-
-                HStack(spacing: 8) {
-                    ForEach(BarcodeDecorationStyle.allCases) { style in
-                        let isSelected = style == model.decorationStyle
-
-                        Button {
-                            model.selectDecorationStyle(style)
-                        } label: {
-                            BarcodeDecorationStyleCard(
-                                style: style,
-                                palette: model.draftPalette,
-                                dominantColors: model.wallpaperDominantColors,
-                                waveColor: model.selectedWaveColor,
-                                isSelected: isSelected
-                            )
-                        }
-                        .buttonStyle(.plain)
-                        .frame(maxWidth: .infinity)
-                        .accessibilityLabel(style.accessibilityLabel)
-                        .accessibilityValue(isSelected ? "selected" : "not selected")
-                        .accessibilityAddTraits(isSelected ? .isSelected : [])
-                        .accessibilityIdentifier("barcodeDecorationStyle.\(style.rawValue)")
-                    }
-                }
-            }
+            displayVisibilityMenu
         }
     }
 
-    private func checkboxButton(
-        title: String,
-        isChecked: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Label {
-                Text(title)
-                    .colorInvoText(.control)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            } icon: {
-                Image(systemName: isChecked ? "checkmark.square.fill" : "square")
-                    .font(.title3)
-                    .foregroundStyle(isChecked ? ColorInvoColor.primary : ColorInvoColor.muted)
+    private var displayVisibilityMenu: some View {
+        Menu {
+            Toggle(isOn: showsBarcodeValueBinding) {
+                Label("載具文字", systemImage: "textformat")
             }
-            .frame(maxWidth: .infinity, minHeight: 44)
+
+            Toggle(isOn: showsWaveBinding) {
+                Label("波浪", systemImage: "water.waves")
+            }
+
+            Toggle(isOn: showsCatBinding) {
+                Label("貓咪", systemImage: "pawprint.fill")
+            }
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(ColorInvoColor.primary)
+                    .frame(width: 32, height: 32)
+                    .background(ColorInvoColor.primarySoft)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("顯示設定")
+                        .colorInvoText(.control)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+
+                    Text(displayVisibilitySummary)
+                        .colorInvoText(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(ColorInvoColor.muted)
+            }
+            .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
             .padding(.horizontal, 12)
             .background(ColorInvoColor.surface)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .strokeBorder(
-                        isChecked ? ColorInvoColor.primary : ColorInvoColor.hairline,
-                        lineWidth: 1
-                    )
+                    .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
                     .allowsHitTesting(false)
             }
         }
         .buttonStyle(.plain)
-        .accessibilityAddTraits(isChecked ? .isSelected : [])
+        .accessibilityIdentifier("displayVisibilityMenu")
+        .accessibilityLabel("顯示設定")
+        .accessibilityValue(displayVisibilitySummary)
+    }
+
+    private var showsBarcodeValueBinding: Binding<Bool> {
+        Binding(
+            get: { model.showsBarcodeValue },
+            set: { model.setShowsBarcodeValue($0) }
+        )
+    }
+
+    private var showsWaveBinding: Binding<Bool> {
+        Binding(
+            get: { model.showsWave },
+            set: { model.setShowsWave($0) }
+        )
+    }
+
+    private var showsCatBinding: Binding<Bool> {
+        Binding(
+            get: { model.showsCat },
+            set: { model.setShowsCat($0) }
+        )
+    }
+
+    private var displayVisibilitySummary: String {
+        var visibleItems: [String] = []
+
+        if model.showsBarcodeValue {
+            visibleItems.append("載具文字")
+        }
+
+        if model.showsWave {
+            visibleItems.append("波浪")
+        }
+
+        if model.showsCat {
+            visibleItems.append("貓咪")
+        }
+
+        return visibleItems.isEmpty ? "全部隱藏" : visibleItems.joined(separator: "、")
     }
 
     private var contrastStatus: some View {
@@ -500,89 +528,6 @@ private struct WaveColorDot: View {
         }
         .frame(width: 44, height: 44)
         .contentShape(Rectangle())
-    }
-}
-
-private struct BarcodeDecorationStyleCard: View {
-    let style: BarcodeDecorationStyle
-    let palette: BarcodePalette
-    let dominantColors: [RGBAColor]
-    let waveColor: RGBAColor?
-    let isSelected: Bool
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            ZStack(alignment: .topTrailing) {
-                CarrierBarcodePanel(
-                    value: "/A1B2",
-                    palette: palette,
-                    showsWave: style.showsWave,
-                    showsValue: false,
-                    barcodeHeight: 44,
-                    horizontalPadding: 6,
-                    verticalPadding: 4,
-                    dominantColors: dominantColors,
-                    waveColor: waveColor,
-                    showsCat: style.showsCat
-                )
-                .frame(height: 52)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
-                        .allowsHitTesting(false)
-                }
-
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.callout)
-                    .foregroundStyle(isSelected ? ColorInvoColor.primary : ColorInvoColor.muted)
-                    .padding(4)
-            }
-
-            Text(style.title)
-                .colorInvoText(.control)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-        }
-        .padding(6)
-        .frame(maxWidth: .infinity, minHeight: 92, alignment: .topLeading)
-        .background {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(isSelected ? ColorInvoColor.primarySoft : ColorInvoColor.surface)
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(
-                    isSelected ? ColorInvoColor.primary : ColorInvoColor.hairline,
-                    lineWidth: isSelected ? 2 : 1
-                )
-                .allowsHitTesting(false)
-        }
-        .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-    }
-}
-
-private extension BarcodeDecorationStyle {
-    var title: String {
-        switch self {
-        case .none:
-            "無"
-        case .wave:
-            "波浪"
-        case .cat:
-            "貓咪"
-        }
-    }
-
-    var accessibilityLabel: String {
-        "條碼樣式\(title)"
-    }
-
-    var showsWave: Bool {
-        self == .wave
-    }
-
-    var showsCat: Bool {
-        self == .cat
     }
 }
 
