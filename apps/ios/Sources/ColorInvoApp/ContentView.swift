@@ -172,7 +172,6 @@ struct ContentView: View {
 
             wallpaperColorSection
             wallpaperPaletteChoices
-            wallpaperWaveColorChoices
             paletteFineTuningSection
         }
     }
@@ -343,61 +342,6 @@ struct ContentView: View {
                 }
             )
         )
-    }
-
-    private var wallpaperWaveColorChoices: some View {
-        let colors = Array(model.wallpaperDominantColors.prefix(3))
-        let selectedIndex = colors.firstIndex { $0 == model.selectedWaveColor } ?? -1
-        let isDisabled = !model.canSelectWaveColor
-
-        return HStack(spacing: 12) {
-            Text("波浪顏色")
-                .colorInvoText(.secondary)
-                .accessibilityIdentifier("selectedWaveColorIndex")
-                .accessibilityValue("\(selectedIndex)")
-
-            Spacer()
-
-            HStack(spacing: 8) {
-                ForEach(0..<3, id: \.self) { index in
-                    let color = colors.indices.contains(index) ? colors[index] : nil
-                    let isSelected = index == selectedIndex
-
-                    Button {
-                        if let color {
-                            model.updateWaveColor(color)
-                        }
-                    } label: {
-                        WaveColorDot(color: color, isSelected: isSelected)
-                    }
-                    .frame(width: 44, height: 44)
-                    .contentShape(Rectangle())
-                    .buttonStyle(.plain)
-                    .disabled(color == nil || isDisabled)
-                    .colorInvoDisabledState(color == nil && !isDisabled)
-                    .accessibilityLabel(
-                        color == nil
-                            ? "波浪色彩 \(index + 1)，尚未產生"
-                            : "波浪色彩 \(index + 1)"
-                    )
-                    .accessibilityValue(isSelected ? "selected" : "not selected")
-                    .accessibilityAddTraits(isSelected ? .isSelected : [])
-                    .accessibilityIdentifier("waveColorDot.\(index)")
-                }
-            }
-        }
-        .padding(.leading, 12)
-        .padding(.trailing, 8)
-        .frame(maxWidth: .infinity)
-        .frame(height: 44)
-        .background(ColorInvoColor.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
-                .allowsHitTesting(false)
-        }
-        .colorInvoDisabledState(isDisabled)
     }
 
     private func compactColorPicker(
@@ -586,43 +530,6 @@ private struct HeaderStatusLabel: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityText)
-    }
-}
-
-private struct WaveColorDot: View {
-    let color: RGBAColor?
-    let isSelected: Bool
-
-    var body: some View {
-        ZStack {
-            Circle()
-                .fill(isSelected ? ColorInvoColor.primarySoft : ColorInvoColor.surface)
-                .frame(width: 40, height: 40)
-
-            Circle()
-                .fill(color?.color ?? ColorInvoColor.primarySoft)
-                .frame(width: 28, height: 28)
-                .overlay {
-                    Circle()
-                        .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
-                        .allowsHitTesting(false)
-                }
-                .overlay {
-                    Circle()
-                        .strokeBorder(
-                            isSelected ? ColorInvoColor.primary : .clear,
-                            lineWidth: 4
-                        )
-                        .allowsHitTesting(false)
-                }
-        }
-        .overlay(alignment: .topTrailing) {
-            if isSelected {
-                SelectionCheckmark()
-            }
-        }
-        .frame(width: 44, height: 44)
-        .contentShape(Rectangle())
     }
 }
 

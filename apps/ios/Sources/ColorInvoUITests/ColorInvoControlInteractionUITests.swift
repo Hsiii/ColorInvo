@@ -12,22 +12,17 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
         app = nil
     }
 
-    func testWallpaperControlsStayInteractiveAcrossPaletteAndWaveSequences() {
+    func testWallpaperPaletteControlsStayInteractiveAcrossStyles() {
         launchShowcaseApp()
-        selectDecoration("顏料")
-        assertCoreControlsHittable()
 
-        let operationSequences: [[ControlOperation]] = [
-            [.palette(1), .palette(2), .palette(0), .wave(1), .wave(2), .wave(0)],
-            [.wave(2), .palette(2), .wave(1), .palette(1), .wave(0), .palette(0)],
-            [.palette(2), .palette(1), .palette(2), .wave(2), .wave(1), .wave(2)],
-        ]
+        for style in ["貓貓", "顏料", "極簡"] {
+            selectDecoration(style)
 
-        for sequence in operationSequences {
-            for operation in sequence {
-                perform(operation)
-                assertCoreControlsHittable()
+            for index in [1, 2, 0] {
+                perform(.palette(index))
             }
+
+            assertCoreControlsHittable()
         }
     }
 
@@ -50,22 +45,21 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
         }
     }
 
-    func testWaveColorControlsStayVisibleAndFollowWaveAvailability() {
+    func testWallpaperPaletteControlsStayAvailableForEveryStyle() {
         launchShowcaseApp()
 
-        let waveColorButton = waveColorButton(at: 0)
+        let paletteButton = app.buttons["wallpaperPaletteOption.0"]
         XCTAssertTrue(
-            waveColorButton.waitForExistence(timeout: 3),
-            "wave colors should remain visible for the cat decoration"
+            paletteButton.waitForExistence(timeout: 3),
+            "wallpaper palettes should exist"
         )
-        XCTAssertFalse(waveColorButton.isEnabled, "wave colors should be disabled for cat")
+        XCTAssertTrue(paletteButton.isEnabled, "wallpaper palettes should be enabled for cat")
 
         selectDecoration("顏料")
-        XCTAssertTrue(waveColorButton.isEnabled, "wave colors should enable for wallpaper paint")
+        XCTAssertTrue(paletteButton.isEnabled, "wallpaper palettes should be enabled for paint")
 
-        selectDecoration("貓貓")
-        XCTAssertTrue(waveColorButton.exists, "wave colors should remain visible after leaving paint")
-        XCTAssertFalse(waveColorButton.isEnabled, "wave colors should disable after leaving paint")
+        selectDecoration("極簡")
+        XCTAssertTrue(paletteButton.isEnabled, "wallpaper palettes should be enabled for minimal")
     }
 
     private func launchShowcaseApp() {
@@ -91,17 +85,6 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
             button.tap()
             XCTAssertTrue(
                 button.waitForValue("selected", timeout: 3),
-                "\(operation.identifier) should become selected"
-            )
-        case .wave(let index):
-            let button = waveColorButton(at: index)
-            XCTAssertTrue(button.waitForExistence(timeout: 3), "\(operation.identifier) should exist")
-            scrollToHittable(button)
-            XCTAssertTrue(button.isHittable, "\(operation.identifier) should be hittable")
-            XCTAssertTrue(button.hasUsableFrame, "\(operation.identifier) should have a usable tap frame")
-            button.tap()
-            XCTAssertTrue(
-                selectedWaveColorIndicator().waitForValue("\(index)", timeout: 3),
                 "\(operation.identifier) should become selected"
             )
         }
@@ -135,33 +118,10 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
             XCTAssertTrue(element.hasUsableFrame, "\(identifier) should keep a usable frame", file: file, line: line)
         }
 
-        for index in 0..<3 {
-            let button = waveColorButton(at: index)
-            XCTAssertTrue(
-                button.waitForExistence(timeout: 3),
-                "wave color button \(index) should exist",
-                file: file,
-                line: line
-            )
-            XCTAssertTrue(
-                button.hasUsableFrame,
-                "wave color button \(index) should keep a 40 point tap frame",
-                file: file,
-                line: line
-            )
-        }
     }
 
     private func control(_ identifier: String) -> XCUIElement {
         app.descendants(matching: .any)[identifier]
-    }
-
-    private func waveColorButton(at index: Int) -> XCUIElement {
-        app.buttons["波浪色彩 \(index + 1)"]
-    }
-
-    private func selectedWaveColorIndicator() -> XCUIElement {
-        control("selectedWaveColorIndex")
     }
 
     private func scrollToHittable(_ element: XCUIElement) {
@@ -177,14 +137,11 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
 
 private enum ControlOperation {
     case palette(Int)
-    case wave(Int)
 
     var identifier: String {
         switch self {
         case .palette(let index):
             return "wallpaperPaletteOption.\(index)"
-        case .wave(let index):
-            return "波浪色彩 \(index + 1)"
         }
     }
 }

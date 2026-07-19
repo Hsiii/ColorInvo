@@ -77,7 +77,13 @@ final class CarrierEditorModel: ObservableObject {
     }
 
     var selectedWaveColor: RGBAColor? {
-        waveColor ?? wallpaperDominantColors.first
+        guard let selectedWallpaperPaletteIndex else {
+            return waveColor ?? wallpaperDominantColors.first
+        }
+
+        return wallpaperDominantColors.indices.contains(selectedWallpaperPaletteIndex)
+            ? wallpaperDominantColors[selectedWallpaperPaletteIndex]
+            : wallpaperDominantColors.first
     }
 
     var selectedWallpaperPaletteIndex: Int? {
@@ -100,10 +106,6 @@ final class CarrierEditorModel: ObservableObject {
         wallpaperPreviewImage != nil
             && !wallpaperPalettes.isEmpty
             && !wallpaperDominantColors.isEmpty
-    }
-
-    var canSelectWaveColor: Bool {
-        hasWallpaperColors && decoration == .wave && !isAnalyzingWallpaper
     }
 
     var widgetStatusText: String {
@@ -169,6 +171,10 @@ final class CarrierEditorModel: ObservableObject {
 
         wallpaperBasePalette = palette
         draftPalette = palette
+        if let index = wallpaperPalettes.firstIndex(of: palette),
+           wallpaperDominantColors.indices.contains(index) {
+            waveColor = wallpaperDominantColors[index]
+        }
         paletteRevision += 1
         scheduleSettingsSave()
     }
@@ -189,15 +195,6 @@ final class CarrierEditorModel: ObservableObject {
 
     func updateBarColor(_ color: Color) {
         updatePalette(draftPalette.replacing(barColor: RGBAColor(color: color)))
-    }
-
-    func updateWaveColor(_ color: RGBAColor) {
-        guard waveColor != color else {
-            return
-        }
-
-        waveColor = color
-        scheduleSettingsSave()
     }
 
     func setShowsBarcodeValue(_ showsBarcodeValue: Bool) {
@@ -276,6 +273,11 @@ final class CarrierEditorModel: ObservableObject {
                 : snapshot.wallpaperPalettes.first)
         var normalizedSettings = snapshot.settings
         normalizedSettings.wallpaperBasePalette = inferredBasePalette
+        if let selectedPaletteIndex = inferredBasePalette.flatMap({
+            snapshot.wallpaperPalettes.firstIndex(of: $0)
+        }), snapshot.settings.wallpaperDominantColors.indices.contains(selectedPaletteIndex) {
+            normalizedSettings.waveColor = snapshot.settings.wallpaperDominantColors[selectedPaletteIndex]
+        }
 
         savedSettings = normalizedSettings
         draftCode = normalizedSettings.carrierCode
