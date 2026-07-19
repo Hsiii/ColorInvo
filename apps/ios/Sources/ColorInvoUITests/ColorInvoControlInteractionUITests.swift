@@ -38,6 +38,7 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
             perform(.palette(2))
             perform(.palette(0))
             perform(.palette(2))
+            showCustomThemeControls()
 
             let picker = control(identifier)
             XCTAssertTrue(picker.waitForExistence(timeout: 3), "\(identifier) should exist")
@@ -89,11 +90,7 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
-        let identifiers = [
-            "backgroundColorPicker",
-            "barColorPicker",
-            "displayVisibilityMenu",
-        ]
+        let identifiers = ["themeModePicker"]
 
         for identifier in identifiers {
             let element = control(identifier)
@@ -144,6 +141,13 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
 
     private func selectedWaveColorIndicator() -> XCUIElement {
         control("selectedWaveColorIndex")
+    }
+
+    private func showCustomThemeControls() {
+        let customThemeButton = app.buttons["自訂"]
+        XCTAssertTrue(customThemeButton.waitForExistence(timeout: 3), "Custom theme option should exist")
+        XCTAssertTrue(customThemeButton.isHittable, "Custom theme option should be hittable")
+        customThemeButton.tap()
     }
 }
 

@@ -4,6 +4,7 @@ import UIKit
 
 struct ContentView: View {
     @StateObject private var model: CarrierEditorModel
+    @State private var themeMode: ThemeEditingMode = .wallpaper
     @FocusState private var carrierFieldFocused: Bool
 
     private var carrierSuffixBinding: Binding<String> {
@@ -82,7 +83,7 @@ struct ContentView: View {
     private var editorSections: some View {
         widgetSection
         carrierSection
-        colorSection
+        themeSection
         displayOptionsSection
     }
 
@@ -145,20 +146,35 @@ struct ContentView: View {
         }
     }
 
-    private var colorSection: some View {
+    private var themeSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
-                Text("條碼顏色")
+                Text("主題")
                     .colorInvoText(.heading)
 
                 Spacer()
 
-                contrastStatus
+                if model.isValid {
+                    scanReadinessStatus
+                }
             }
 
-            wallpaperColorSection
-            wallpaperPaletteChoices
-            customColorSection
+            Picker("配色方式", selection: $themeMode) {
+                Text("桌布").tag(ThemeEditingMode.wallpaper)
+                Text("自訂").tag(ThemeEditingMode.custom)
+            }
+            .pickerStyle(.segmented)
+            .accessibilityIdentifier("themeModePicker")
+
+            switch themeMode {
+            case .wallpaper:
+                wallpaperColorSection
+                wallpaperPaletteChoices
+            case .custom:
+                customColorSection
+            }
+
+            wallpaperWaveColorChoices
         }
     }
 
@@ -229,30 +245,26 @@ struct ContentView: View {
     }
 
     private var customColorSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                compactColorPicker(
-                    title: "背景",
-                    color: Binding(
-                        get: { model.draftPalette.backgroundColor.color },
-                        set: { color in
-                            model.updateBackgroundColor(color)
-                        }
-                    )
+        HStack(spacing: 8) {
+            compactColorPicker(
+                title: "背景",
+                color: Binding(
+                    get: { model.draftPalette.backgroundColor.color },
+                    set: { color in
+                        model.updateBackgroundColor(color)
+                    }
                 )
+            )
 
-                compactColorPicker(
-                    title: "條碼",
-                    color: Binding(
-                        get: { model.draftPalette.barColor.color },
-                        set: { color in
-                            model.updateBarColor(color)
-                        }
-                    )
+            compactColorPicker(
+                title: "條碼",
+                color: Binding(
+                    get: { model.draftPalette.barColor.color },
+                    set: { color in
+                        model.updateBarColor(color)
+                    }
                 )
-            }
-
-            wallpaperWaveColorChoices
+            )
         }
     }
 
@@ -264,7 +276,7 @@ struct ContentView: View {
             let selectedIndex = colors.firstIndex { $0 == model.selectedWaveColor } ?? -1
 
             HStack(spacing: 12) {
-                Text("波浪")
+                Text("波浪顏色")
                     .colorInvoText(.secondary)
                     .accessibilityIdentifier("selectedWaveColorIndex")
                     .accessibilityValue("\(selectedIndex)")
@@ -330,54 +342,33 @@ struct ContentView: View {
 
     private var displayOptionsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("顯示項目")
+            Text("內容")
                 .colorInvoText(.heading)
 
-            displayVisibilityMenu
-        }
-    }
-
-    private var displayVisibilityMenu: some View {
-        Menu {
-            Toggle(isOn: showsBarcodeValueBinding) {
-                Label("載具文字", systemImage: "textformat")
-            }
-
-            Toggle(isOn: showsWaveBinding) {
-                Label("波浪", systemImage: "water.waves")
-            }
-
-            Toggle(isOn: showsCatBinding) {
-                Label("貓咪", systemImage: "pawprint.fill")
-            }
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: "slider.horizontal.3")
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(ColorInvoColor.primary)
-                    .frame(width: 32, height: 32)
-                    .background(ColorInvoColor.primarySoft)
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("顯示設定")
+            VStack(spacing: 0) {
+                Toggle(isOn: showsBarcodeValueBinding) {
+                    Label("顯示載具文字", systemImage: "textformat")
                         .colorInvoText(.control)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-
-                    Text(displayVisibilitySummary)
-                        .colorInvoText(.secondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
                 }
+                .frame(minHeight: 52)
+                .accessibilityIdentifier("showsBarcodeValueToggle")
 
-                Spacer(minLength: 8)
+                Divider()
 
-                Image(systemName: "chevron.up.chevron.down")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(ColorInvoColor.muted)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("裝飾")
+                        .colorInvoText(.secondary)
+
+                    Picker("裝飾", selection: decorationBinding) {
+                        Text("無").tag(CarrierDecoration.none)
+                        Text("波浪").tag(CarrierDecoration.wave)
+                        Text("貓咪").tag(CarrierDecoration.cat)
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier("decorationPicker")
+                }
+                .padding(.vertical, 12)
             }
-            .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
             .padding(.horizontal, 12)
             .background(ColorInvoColor.surface)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
@@ -387,10 +378,6 @@ struct ContentView: View {
                     .allowsHitTesting(false)
             }
         }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier("displayVisibilityMenu")
-        .accessibilityLabel("顯示設定")
-        .accessibilityValue(displayVisibilitySummary)
     }
 
     private var showsBarcodeValueBinding: Binding<Bool> {
@@ -400,39 +387,14 @@ struct ContentView: View {
         )
     }
 
-    private var showsWaveBinding: Binding<Bool> {
+    private var decorationBinding: Binding<CarrierDecoration> {
         Binding(
-            get: { model.decoration == .wave },
-            set: { model.setDecoration($0 ? .wave : .none) }
+            get: { model.decoration },
+            set: { model.setDecoration($0) }
         )
     }
 
-    private var showsCatBinding: Binding<Bool> {
-        Binding(
-            get: { model.decoration == .cat },
-            set: { model.setDecoration($0 ? .cat : .none) }
-        )
-    }
-
-    private var displayVisibilitySummary: String {
-        var visibleItems: [String] = []
-
-        if model.showsBarcodeValue {
-            visibleItems.append("載具文字")
-        }
-
-        if model.decoration == .wave {
-            visibleItems.append("波浪")
-        }
-
-        if model.decoration == .cat {
-            visibleItems.append("貓咪")
-        }
-
-        return visibleItems.isEmpty ? "全部隱藏" : visibleItems.joined(separator: "、")
-    }
-
-    private var contrastStatus: some View {
+    private var scanReadinessStatus: some View {
         let statusColor = model.draftPalette.meetsCommercialGuidance
             ? ColorInvoColor.success
             : ColorInvoColor.warning
@@ -446,12 +408,9 @@ struct ContentView: View {
             .font(.callout)
             .foregroundStyle(statusColor)
 
-            Text(model.draftPalette.contrastSummary)
+            Text(model.draftPalette.meetsCommercialGuidance ? "適合掃描" : "對比不足")
                 .colorInvoText(.secondary)
                 .foregroundStyle(statusColor)
-                .monospacedDigit()
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(model.draftPalette.standardMessage)
@@ -515,6 +474,11 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
     }
+}
+
+private enum ThemeEditingMode {
+    case wallpaper
+    case custom
 }
 
 private struct WaveColorDot: View {
