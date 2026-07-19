@@ -121,12 +121,16 @@ final class CarrierEditorModel: ObservableObject {
         return String(code.dropFirst())
     }
 
-    var validationText: String {
+    var validationText: String? {
+        guard !carrierSuffix.isEmpty else {
+            return nil
+        }
+
         if isValid {
             return "格式符合"
         }
 
-        return carrierSuffix.isEmpty ? "未填" : "格式不符"
+        return "格式不符"
     }
 
     func start() async {

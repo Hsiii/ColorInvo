@@ -141,18 +141,13 @@ struct ContentView: View {
         }
     }
 
+    @ViewBuilder
     private var validationBadge: some View {
-        let statusColor = model.isValid ? ColorInvoColor.success : ColorInvoColor.muted
-
-        return Label {
-            Text(model.validationText)
-                .colorInvoText(.control)
-                .foregroundStyle(statusColor)
-                .fixedSize(horizontal: false, vertical: true)
-        } icon: {
-            Image(systemName: model.isValid ? "checkmark.circle.fill" : "exclamationmark.circle")
-                .font(.callout)
-                .foregroundStyle(statusColor)
+        if let validationText = model.validationText {
+            HeaderStatusLabel(
+                validationText,
+                tone: model.isValid ? .success : .warning
+            )
         }
     }
 
@@ -163,9 +158,7 @@ struct ContentView: View {
                     Text("主題")
                         .colorInvoText(.heading)
 
-                    if model.isValid {
-                        scanReadinessStatus
-                    }
+                    scanReadinessStatus
                 }
             } else {
                 HStack(alignment: .firstTextBaseline, spacing: 12) {
@@ -174,9 +167,7 @@ struct ContentView: View {
 
                     Spacer()
 
-                    if model.isValid {
-                        scanReadinessStatus
-                    }
+                    scanReadinessStatus
                 }
             }
 
@@ -470,26 +461,11 @@ struct ContentView: View {
     }
 
     private var scanReadinessStatus: some View {
-        let statusColor = model.draftPalette.meetsCommercialGuidance
-            ? ColorInvoColor.success
-            : ColorInvoColor.warning
-
-        return HStack(spacing: 6) {
-            Image(
-                systemName: model.draftPalette.meetsCommercialGuidance
-                    ? "checkmark.circle.fill"
-                    : "exclamationmark.triangle.fill"
-            )
-            .font(.callout)
-            .foregroundStyle(statusColor)
-
-            Text(model.draftPalette.meetsCommercialGuidance ? "適合掃描" : "對比不足")
-                .colorInvoText(.secondary)
-                .foregroundStyle(statusColor)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(model.draftPalette.standardMessage)
+        HeaderStatusLabel(
+            model.draftPalette.meetsCommercialGuidance ? "適合掃描" : "對比不足",
+            tone: model.draftPalette.meetsCommercialGuidance ? .success : .warning,
+            accessibilityLabel: model.draftPalette.standardMessage
+        )
     }
 
     private var widgetSection: some View {
@@ -542,22 +518,79 @@ struct ContentView: View {
 
     private var widgetSaveStatus: some View {
         let isReady = model.widgetIsReady
-        let iconName = model.isSavingSettings
-            ? "arrow.triangle.2.circlepath"
-            : isReady ? "checkmark.circle.fill" : "exclamationmark.circle"
-        let statusColor = isReady ? ColorInvoColor.success : ColorInvoColor.muted
+        let isWarning = !model.isValid || !model.draftPalette.meetsCommercialGuidance
+        let tone: HeaderStatusTone = isWarning ? .warning : isReady ? .success : .neutral
+        let iconName = isWarning
+            ? nil
+            : model.isSavingSettings ? "arrow.triangle.2.circlepath" : nil
 
-        return Label {
-            Text(model.widgetStatusText)
+        return HeaderStatusLabel(
+            model.widgetStatusText,
+            tone: tone,
+            systemImage: iconName
+        )
+    }
+}
+
+private enum HeaderStatusTone {
+    case success
+    case warning
+    case neutral
+
+    var color: Color {
+        switch self {
+        case .success:
+            ColorInvoColor.success
+        case .warning:
+            ColorInvoColor.warning
+        case .neutral:
+            ColorInvoColor.muted
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .success:
+            "checkmark.circle.fill"
+        case .warning:
+            "exclamationmark.triangle.fill"
+        case .neutral:
+            "clock"
+        }
+    }
+}
+
+private struct HeaderStatusLabel: View {
+    let text: String
+    let tone: HeaderStatusTone
+    let systemImage: String
+    let accessibilityText: String
+
+    init(
+        _ text: String,
+        tone: HeaderStatusTone,
+        systemImage: String? = nil,
+        accessibilityLabel: String? = nil
+    ) {
+        self.text = text
+        self.tone = tone
+        self.systemImage = systemImage ?? tone.systemImage
+        accessibilityText = accessibilityLabel ?? text
+    }
+
+    var body: some View {
+        Label {
+            Text(text)
                 .colorInvoText(.secondary)
-                .foregroundStyle(statusColor)
+                .foregroundStyle(tone.color)
                 .fixedSize(horizontal: false, vertical: true)
         } icon: {
-            Image(systemName: iconName)
+            Image(systemName: systemImage)
                 .font(.callout)
-                .foregroundStyle(statusColor)
+                .foregroundStyle(tone.color)
         }
         .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityText)
     }
 }
 
