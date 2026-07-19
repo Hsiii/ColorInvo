@@ -183,7 +183,7 @@ struct ContentView: View {
             matching: .images,
             photoLibrary: .shared()
         ) {
-            Label("使用桌布配色", systemImage: "photo.on.rectangle")
+            Label("匯入桌布", systemImage: "photo.on.rectangle")
                 .colorInvoText(.control)
                 .foregroundStyle(ColorInvoColor.primary)
                 .multilineTextAlignment(.center)
@@ -196,6 +196,7 @@ struct ContentView: View {
         }
         .buttonStyle(.plain)
         .disabled(model.isAnalyzingWallpaper)
+        .colorInvoDisabledState(model.isAnalyzingWallpaper)
         .onChange(of: model.wallpaperPickerItem) { _, item in
             model.loadWallpaperPalettes(from: item)
         }
@@ -218,16 +219,14 @@ struct ContentView: View {
             Text(wallpaperStatusText)
                 .colorInvoText(.secondary)
                 .frame(minHeight: 40, alignment: .leading)
-        } else if model.wallpaperPalettes.isEmpty {
-            Text("選擇桌布後會產生三組條碼配色")
-                .colorInvoText(.secondary)
-                .frame(minHeight: 40, alignment: .leading)
         }
     }
 
     private func paletteButtonRow(_ palettes: [BarcodePalette]) -> some View {
-        HStack(spacing: 12) {
-            Text("配色組合")
+        let isDisabled = !model.hasWallpaperColors || model.isAnalyzingWallpaper
+
+        return HStack(spacing: 12) {
+            Text("桌布配色")
                 .colorInvoText(.secondary)
 
             Spacer()
@@ -252,9 +251,9 @@ struct ContentView: View {
                     .buttonStyle(.plain)
                     .disabled(
                         palette == nil
-                            || !model.hasWallpaperColors
-                            || model.isAnalyzingWallpaper
+                            || isDisabled
                     )
+                    .colorInvoDisabledState(palette == nil && !isDisabled)
                     .accessibilityLabel(
                         palette == nil
                             ? "條碼配色 \(index + 1)，尚未產生"
@@ -277,6 +276,7 @@ struct ContentView: View {
                 .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
                 .allowsHitTesting(false)
         }
+        .colorInvoDisabledState(isDisabled)
     }
 
     private var paletteFineTuningSection: some View {
@@ -292,15 +292,12 @@ struct ContentView: View {
                 } label: {
                     Label("重設", systemImage: "arrow.counterclockwise")
                         .colorInvoText(.control)
-                        .foregroundStyle(
-                            model.canResetWallpaperPalette
-                                ? ColorInvoColor.primary
-                                : ColorInvoColor.muted
-                        )
+                        .foregroundStyle(ColorInvoColor.primary)
                         .frame(minHeight: 44)
                 }
                 .buttonStyle(.plain)
                 .disabled(!model.canResetWallpaperPalette)
+                .colorInvoDisabledState(!model.canResetWallpaperPalette)
                 .accessibilityIdentifier("resetWallpaperPaletteButton")
             }
 
@@ -351,6 +348,7 @@ struct ContentView: View {
     private var wallpaperWaveColorChoices: some View {
         let colors = Array(model.wallpaperDominantColors.prefix(3))
         let selectedIndex = colors.firstIndex { $0 == model.selectedWaveColor } ?? -1
+        let isDisabled = !model.canSelectWaveColor
 
         return HStack(spacing: 12) {
             Text("波浪顏色")
@@ -375,7 +373,8 @@ struct ContentView: View {
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
                     .buttonStyle(.plain)
-                    .disabled(color == nil || !model.canSelectWaveColor)
+                    .disabled(color == nil || isDisabled)
+                    .colorInvoDisabledState(color == nil && !isDisabled)
                     .accessibilityLabel(
                         color == nil
                             ? "波浪色彩 \(index + 1)，尚未產生"
@@ -398,7 +397,7 @@ struct ContentView: View {
                 .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
                 .allowsHitTesting(false)
         }
-        .opacity(model.canSelectWaveColor ? 1 : 0.44)
+        .colorInvoDisabledState(isDisabled)
     }
 
     private func compactColorPicker(
@@ -746,6 +745,14 @@ private extension View {
     nonisolated func colorInvoText(_ style: ColorInvoTextStyle) -> some View {
         modifier(ColorInvoTextStyleModifier(style: style))
     }
+
+    nonisolated func colorInvoDisabledState(_ isDisabled: Bool) -> some View {
+        opacity(isDisabled ? ColorInvoControlState.disabledOpacity : 1)
+    }
+}
+
+private enum ColorInvoControlState {
+    static let disabledOpacity = 0.44
 }
 
 private enum ColorInvoColor {
