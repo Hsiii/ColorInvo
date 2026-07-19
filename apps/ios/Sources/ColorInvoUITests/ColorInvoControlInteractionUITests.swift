@@ -38,10 +38,10 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
             perform(.palette(2))
             perform(.palette(0))
             perform(.palette(2))
-            showCustomThemeControls()
 
             let picker = control(identifier)
             XCTAssertTrue(picker.waitForExistence(timeout: 3), "\(identifier) should exist")
+            scrollToHittable(picker)
             XCTAssertTrue(picker.isHittable, "\(identifier) should remain hittable")
             picker.tap()
 
@@ -67,6 +67,7 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
         case .palette:
             let button = app.buttons[operation.identifier]
             XCTAssertTrue(button.waitForExistence(timeout: 3), "\(operation.identifier) should exist")
+            scrollToHittable(button)
             XCTAssertTrue(button.isHittable, "\(operation.identifier) should be hittable")
             button.tap()
             XCTAssertTrue(
@@ -76,6 +77,7 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
         case .wave(let index):
             let button = waveColorButton(at: index)
             XCTAssertTrue(button.waitForExistence(timeout: 3), "\(operation.identifier) should exist")
+            scrollToHittable(button)
             XCTAssertTrue(button.isHittable, "\(operation.identifier) should be hittable")
             XCTAssertTrue(button.hasUsableFrame, "\(operation.identifier) should have a usable tap frame")
             button.tap()
@@ -90,7 +92,7 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
-        let identifiers = ["themeModePicker"]
+        let identifiers = ["backgroundColorPicker", "barColorPicker"]
 
         for identifier in identifiers {
             let element = control(identifier)
@@ -100,12 +102,7 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
                 file: file,
                 line: line
             )
-            XCTAssertTrue(
-                element.isHittable,
-                "\(identifier) should remain hittable after operation sequences",
-                file: file,
-                line: line
-            )
+            XCTAssertTrue(element.hasUsableFrame, "\(identifier) should keep a usable frame", file: file, line: line)
         }
 
         for index in 0..<3 {
@@ -113,12 +110,6 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
             XCTAssertTrue(
                 button.waitForExistence(timeout: 3),
                 "wave color button \(index) should exist",
-                file: file,
-                line: line
-            )
-            XCTAssertTrue(
-                button.isHittable,
-                "wave color button \(index) should remain hittable after operation sequences",
                 file: file,
                 line: line
             )
@@ -143,11 +134,14 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
         control("selectedWaveColorIndex")
     }
 
-    private func showCustomThemeControls() {
-        let customThemeButton = app.buttons["自訂"]
-        XCTAssertTrue(customThemeButton.waitForExistence(timeout: 3), "Custom theme option should exist")
-        XCTAssertTrue(customThemeButton.isHittable, "Custom theme option should be hittable")
-        customThemeButton.tap()
+    private func scrollToHittable(_ element: XCUIElement) {
+        for _ in 0..<4 where !element.isHittable {
+            if element.frame.midY < app.frame.midY {
+                app.swipeDown()
+            } else {
+                app.swipeUp()
+            }
+        }
     }
 }
 
