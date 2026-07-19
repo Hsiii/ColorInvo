@@ -235,10 +235,6 @@ struct ContentView: View {
             Text("選擇桌布後會產生三組條碼配色")
                 .colorInvoText(.secondary)
                 .frame(minHeight: 40, alignment: .leading)
-        } else {
-            Text("選擇一組，再用下方控制微調顏色")
-                .colorInvoText(.secondary)
-                .frame(minHeight: 40, alignment: .leading)
         }
     }
 
@@ -277,7 +273,7 @@ struct ContentView: View {
     private var paletteFineTuningSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 12) {
-                Text("微調配色")
+                Text("手動微調")
                     .colorInvoText(.secondary)
 
                 Spacer()
@@ -498,37 +494,48 @@ struct ContentView: View {
 
     private var widgetSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("主畫面預覽")
-                .colorInvoText(.heading)
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("主畫面預覽")
+                        .colorInvoText(.heading)
 
-            VStack(alignment: .leading, spacing: 8) {
-                ZStack {
-                    WallpaperPreviewBackground(preview: model.wallpaperPreviewImage)
-
-                    CarrierWidgetContentView(
-                        carrierCode: model.normalizedCode,
-                        palette: model.draftPalette,
-                        dominantColors: model.wallpaperDominantColors,
-                        waveColor: model.selectedWaveColor,
-                        showsWave: model.decoration.showsWave,
-                        showsBarcodeValue: model.showsBarcodeValue,
-                        showsCat: model.decoration.showsCat,
-                        emptyStateText: "輸入載具即可預覽"
-                    )
-                    .aspectRatio(329 / 155, contentMode: .fit)
-                    .frame(maxWidth: .infinity)
-                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                    .shadow(color: .black.opacity(0.16), radius: 12, x: 0, y: 8)
-                    .padding(16)
+                    widgetSaveStatus
                 }
-                .frame(height: 220)
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .strokeBorder(.black.opacity(0.10), lineWidth: 1)
-                }
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    Text("主畫面預覽")
+                        .colorInvoText(.heading)
 
-                widgetSaveStatus
+                    Spacer()
+
+                    widgetSaveStatus
+                }
+            }
+
+            ZStack {
+                WallpaperPreviewBackground(preview: model.wallpaperPreviewImage)
+
+                CarrierWidgetContentView(
+                    carrierCode: model.normalizedCode,
+                    palette: model.draftPalette,
+                    dominantColors: model.wallpaperDominantColors,
+                    waveColor: model.selectedWaveColor,
+                    showsWave: model.decoration.showsWave,
+                    showsBarcodeValue: model.showsBarcodeValue,
+                    showsCat: model.decoration.showsCat,
+                    emptyStateText: "輸入載具即可預覽"
+                )
+                .aspectRatio(329 / 155, contentMode: .fit)
+                .frame(maxWidth: .infinity)
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .shadow(color: .black.opacity(0.16), radius: 12, x: 0, y: 8)
+                .padding(16)
+            }
+            .frame(height: 220)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(.black.opacity(0.10), lineWidth: 1)
             }
         }
     }
@@ -550,8 +557,6 @@ struct ContentView: View {
                 .font(.callout)
                 .foregroundStyle(statusColor)
         }
-        .frame(minHeight: 44, alignment: .leading)
-        .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
     }
 }

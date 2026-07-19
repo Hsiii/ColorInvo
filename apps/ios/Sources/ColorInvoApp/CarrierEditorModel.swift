@@ -93,12 +93,12 @@ final class CarrierEditorModel: ObservableObject {
     }
 
     var widgetStatusText: String {
-        if isSavingSettings {
-            return "正在自動儲存變更…"
+        if !isValid {
+            return "暫無載具"
         }
 
-        if !isValid {
-            return "輸入有效載具後會自動儲存"
+        if isSavingSettings {
+            return "正在自動儲存變更…"
         }
 
         if !draftPalette.meetsCommercialGuidance {
@@ -106,7 +106,7 @@ final class CarrierEditorModel: ObservableObject {
         }
 
         if widgetIsReady {
-            return "已自動儲存至小工具"
+            return "小工具已同步"
         }
 
         return "準備自動儲存變更…"
