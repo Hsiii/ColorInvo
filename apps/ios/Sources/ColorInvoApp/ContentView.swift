@@ -111,7 +111,7 @@ struct ContentView: View {
                     .colorInvoText(.code)
                     .padding(.leading, 16)
 
-                TextField("請輸入", text: carrierSuffixBinding)
+                TextField("ABC1234", text: carrierSuffixBinding)
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled()
                     .keyboardType(.asciiCapable)
@@ -515,7 +515,7 @@ struct ContentView: View {
                 WallpaperPreviewBackground(preview: model.wallpaperPreviewImage)
 
                 CarrierWidgetContentView(
-                    carrierCode: model.normalizedCode,
+                    carrierCode: model.previewCode,
                     palette: model.draftPalette,
                     dominantColors: model.wallpaperDominantColors,
                     waveColor: model.selectedWaveColor,

@@ -44,6 +44,10 @@ final class CarrierEditorModel: ObservableObject {
         CarrierCode.normalize(draftCode)
     }
 
+    var previewCode: String {
+        normalizedCode.isEmpty ? "/ABC1234" : normalizedCode
+    }
+
     var isValid: Bool {
         CarrierCode.isValid(normalizedCode)
     }
