@@ -111,7 +111,8 @@ struct CarrierBarcodePanel: View {
                 CarrierBarcodeValueOverlay(
                     value: value,
                     palette: palette,
-                    horizontalPadding: horizontalPadding
+                    horizontalPadding: horizontalPadding,
+                    isTopAligned: showsWave && !showsCat
                 )
             }
         }
@@ -829,6 +830,7 @@ private struct CarrierBarcodeValueOverlay: View {
     let value: String
     let palette: BarcodePalette
     let horizontalPadding: CGFloat
+    let isTopAligned: Bool
 
     private var edgeInset: CGFloat {
         max(8, horizontalPadding + 8)
@@ -848,8 +850,12 @@ private struct CarrierBarcodeValueOverlay: View {
                     .fill(palette.barColor.color)
             }
             .padding(.trailing, edgeInset)
-            .padding(.bottom, edgeInset)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            .padding(isTopAligned ? .top : .bottom, edgeInset)
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity,
+                alignment: isTopAligned ? .topTrailing : .bottomTrailing
+            )
     }
 }
 
