@@ -5,7 +5,6 @@ import UIKit
 struct ContentView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @StateObject private var model: CarrierEditorModel
-    @State private var themeMode: ThemeEditingMode = .wallpaper
     @FocusState private var carrierFieldFocused: Bool
 
     private var carrierSuffixBinding: Binding<String> {
@@ -181,22 +180,9 @@ struct ContentView: View {
                 }
             }
 
-            Picker("配色方式", selection: $themeMode) {
-                Text("桌布").tag(ThemeEditingMode.wallpaper)
-                Text("自訂").tag(ThemeEditingMode.custom)
-            }
-            .pickerStyle(.segmented)
-            .frame(minHeight: 44)
-            .accessibilityIdentifier("themeModePicker")
-
-            switch themeMode {
-            case .wallpaper:
-                wallpaperColorSection
-                wallpaperPaletteChoices
-            case .custom:
-                customColorSection
-            }
-
+            wallpaperColorSection
+            wallpaperPaletteChoices
+            paletteFineTuningSection
             wallpaperWaveColorChoices
         }
     }
@@ -225,21 +211,32 @@ struct ContentView: View {
         }
     }
 
-    @ViewBuilder
     private var wallpaperPaletteChoices: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("條碼配色")
+                .colorInvoText(.secondary)
+
+            paletteStatus
+            paletteButtonGrid(model.wallpaperPalettes)
+        }
+    }
+
+    @ViewBuilder
+    private var paletteStatus: some View {
         if model.isAnalyzingWallpaper {
-            Label("分析中", systemImage: "sparkles")
+            Label("正在分析桌布…", systemImage: "sparkles")
                 .colorInvoText(.secondary)
                 .frame(minHeight: 40, alignment: .leading)
-        } else if !model.wallpaperPalettes.isEmpty {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("桌布配色")
-                    .colorInvoText(.secondary)
-
-                paletteButtonGrid(model.wallpaperPalettes)
-            }
         } else if let wallpaperStatusText = model.wallpaperStatusText {
             Text(wallpaperStatusText)
+                .colorInvoText(.secondary)
+                .frame(minHeight: 40, alignment: .leading)
+        } else if model.wallpaperPalettes.isEmpty {
+            Text("選擇桌布後會產生三組條碼配色")
+                .colorInvoText(.secondary)
+                .frame(minHeight: 40, alignment: .leading)
+        } else {
+            Text("選擇一組，再用下方控制微調顏色")
                 .colorInvoText(.secondary)
                 .frame(minHeight: 40, alignment: .leading)
         }
@@ -247,26 +244,64 @@ struct ContentView: View {
 
     private func paletteButtonGrid(_ palettes: [BarcodePalette]) -> some View {
         HStack(spacing: 8) {
-            ForEach(Array(palettes.prefix(3).indices), id: \.self) { index in
-                let palette = palettes[index]
+            ForEach(0..<3, id: \.self) { index in
+                let palette = palettes.indices.contains(index) ? palettes[index] : nil
+                let isSelected = index == model.selectedWallpaperPaletteIndex
 
                 Button {
-                    model.selectPalette(palette)
+                    if let palette {
+                        model.selectPalette(palette)
+                    }
                 } label: {
                     PaletteOptionButtonContent(
                         palette: palette,
-                        isSelected: palette == model.draftPalette
+                        isSelected: isSelected
                     )
                 }
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
-                .accessibilityLabel("桌布配色 \(index + 1)")
-                .accessibilityValue(palette == model.draftPalette ? "selected" : "not selected")
-                .accessibilityAddTraits(palette == model.draftPalette ? .isSelected : [])
+                .disabled(palette == nil || model.isAnalyzingWallpaper)
+                .accessibilityLabel(
+                    palette == nil
+                        ? "條碼配色 \(index + 1)，尚未產生"
+                        : "條碼配色 \(index + 1)"
+                )
+                .accessibilityValue(isSelected ? "selected" : "not selected")
+                .accessibilityAddTraits(isSelected ? .isSelected : [])
                 .accessibilityIdentifier("wallpaperPaletteOption.\(index)")
             }
         }
         .frame(height: 88)
+    }
+
+    private var paletteFineTuningSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                Text("微調配色")
+                    .colorInvoText(.secondary)
+
+                Spacer()
+
+                Button {
+                    model.resetPaletteToWallpaper()
+                } label: {
+                    Label("重設", systemImage: "arrow.counterclockwise")
+                        .colorInvoText(.control)
+                        .foregroundStyle(
+                            model.canResetWallpaperPalette
+                                ? ColorInvoColor.primary
+                                : ColorInvoColor.muted
+                        )
+                        .frame(minHeight: 44)
+                }
+                .buttonStyle(.plain)
+                .disabled(!model.canResetWallpaperPalette)
+                .accessibilityIdentifier("resetWallpaperPaletteButton")
+            }
+
+            customColorSection
+        }
+        .disabled(model.wallpaperBasePalette == nil || model.isAnalyzingWallpaper)
     }
 
     private var customColorSection: some View {
@@ -309,52 +344,55 @@ struct ContentView: View {
         )
     }
 
-    @ViewBuilder
     private var wallpaperWaveColorChoices: some View {
         let colors = Array(model.wallpaperDominantColors.prefix(3))
+        let selectedIndex = colors.firstIndex { $0 == model.selectedWaveColor } ?? -1
 
-        if !model.isAnalyzingWallpaper, !colors.isEmpty {
-            let selectedIndex = colors.firstIndex { $0 == model.selectedWaveColor } ?? -1
+        return HStack(spacing: 12) {
+            Text("波浪顏色")
+                .colorInvoText(.secondary)
+                .accessibilityIdentifier("selectedWaveColorIndex")
+                .accessibilityValue("\(selectedIndex)")
 
-            HStack(spacing: 12) {
-                Text("波浪顏色")
-                    .colorInvoText(.secondary)
-                    .accessibilityIdentifier("selectedWaveColorIndex")
-                    .accessibilityValue("\(selectedIndex)")
+            Spacer()
 
-                Spacer()
+            HStack(spacing: 8) {
+                ForEach(0..<3, id: \.self) { index in
+                    let color = colors.indices.contains(index) ? colors[index] : nil
+                    let isSelected = index == selectedIndex
 
-                HStack(spacing: 8) {
-                    ForEach(colors.indices, id: \.self) { index in
-                        let color = colors[index]
-                        let isSelected = color == model.selectedWaveColor
-
-                        Button {
+                    Button {
+                        if let color {
                             model.updateWaveColor(color)
-                        } label: {
-                            WaveColorDot(color: color, isSelected: isSelected)
                         }
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("波浪色彩 \(index + 1)")
-                        .accessibilityValue(isSelected ? "selected" : "not selected")
-                        .accessibilityAddTraits(isSelected ? .isSelected : [])
-                        .accessibilityIdentifier("waveColorDot.\(index)")
+                    } label: {
+                        WaveColorDot(color: color, isSelected: isSelected)
                     }
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+                    .buttonStyle(.plain)
+                    .disabled(color == nil || model.isAnalyzingWallpaper)
+                    .accessibilityLabel(
+                        color == nil
+                            ? "波浪色彩 \(index + 1)，尚未產生"
+                            : "波浪色彩 \(index + 1)"
+                    )
+                    .accessibilityValue(isSelected ? "selected" : "not selected")
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
+                    .accessibilityIdentifier("waveColorDot.\(index)")
                 }
             }
-            .padding(.leading, 12)
-            .padding(.trailing, 8)
-            .frame(maxWidth: .infinity)
-            .frame(height: 44)
-            .background(ColorInvoColor.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
-                    .allowsHitTesting(false)
-            }
+        }
+        .padding(.leading, 12)
+        .padding(.trailing, 8)
+        .frame(maxWidth: .infinity)
+        .frame(height: 44)
+        .background(ColorInvoColor.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+                .allowsHitTesting(false)
         }
     }
 
@@ -518,13 +556,8 @@ struct ContentView: View {
     }
 }
 
-private enum ThemeEditingMode {
-    case wallpaper
-    case custom
-}
-
 private struct WaveColorDot: View {
-    let color: RGBAColor
+    let color: RGBAColor?
     let isSelected: Bool
 
     var body: some View {
@@ -534,7 +567,7 @@ private struct WaveColorDot: View {
                 .frame(width: 40, height: 40)
 
             Circle()
-                .fill(color.color)
+                .fill(color?.color ?? ColorInvoColor.primarySoft)
                 .frame(width: 28, height: 28)
                 .overlay {
                     Circle()
@@ -561,22 +594,28 @@ private struct WaveColorDot: View {
 }
 
 private struct PaletteOptionButtonContent: View {
-    let palette: BarcodePalette
+    let palette: BarcodePalette?
     let isSelected: Bool
 
     var body: some View {
         VStack(spacing: 8) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(palette.backgroundColor.color)
+                    .fill(palette?.backgroundColor.color ?? ColorInvoColor.primarySoft)
 
-                Code39BarcodeView(
-                    value: "/A1B2",
-                    barColor: palette.barColor.color,
-                    backgroundColor: palette.backgroundColor.color
-                )
-                .padding(.horizontal, 4)
-                .padding(.vertical, 8)
+                if let palette {
+                    Code39BarcodeView(
+                        value: "/A1B2",
+                        barColor: palette.barColor.color,
+                        backgroundColor: palette.backgroundColor.color
+                    )
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 8)
+                } else {
+                    Image(systemName: "barcode")
+                        .font(.title2)
+                        .foregroundStyle(ColorInvoColor.muted)
+                }
             }
             .frame(maxWidth: .infinity)
             .aspectRatio(1, contentMode: .fit)
