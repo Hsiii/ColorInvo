@@ -14,6 +14,7 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
 
     func testWallpaperControlsStayInteractiveAcrossPaletteAndWaveSequences() {
         launchShowcaseApp()
+        selectDecoration("波浪")
         assertCoreControlsHittable()
 
         let operationSequences: [[ControlOperation]] = [
@@ -47,6 +48,27 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
 
             app.terminate()
         }
+    }
+
+    func testWaveColorControlsOnlyAppearForWaveDecoration() {
+        launchShowcaseApp()
+
+        XCTAssertFalse(
+            waveColorButton(at: 0).waitForExistence(timeout: 0.5),
+            "wave colors should stay hidden for the cat decoration"
+        )
+
+        selectDecoration("波浪")
+        XCTAssertTrue(
+            waveColorButton(at: 0).waitForExistence(timeout: 3),
+            "wave colors should appear with the wave decoration"
+        )
+
+        selectDecoration("貓咪")
+        XCTAssertFalse(
+            waveColorButton(at: 0).waitForExistence(timeout: 1),
+            "wave colors should hide when another decoration is selected"
+        )
     }
 
     private func launchShowcaseApp() {
@@ -86,6 +108,17 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
                 "\(operation.identifier) should become selected"
             )
         }
+    }
+
+    private func selectDecoration(_ label: String) {
+        let picker = app.segmentedControls["decorationPicker"]
+        XCTAssertTrue(picker.waitForExistence(timeout: 3), "decoration picker should exist")
+
+        let button = picker.buttons[label]
+        XCTAssertTrue(button.waitForExistence(timeout: 3), "\(label) decoration should exist")
+        scrollToHittable(button)
+        XCTAssertTrue(button.isHittable, "\(label) decoration should be hittable")
+        button.tap()
     }
 
     private func assertCoreControlsHittable(

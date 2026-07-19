@@ -81,10 +81,9 @@ struct ContentView: View {
 
     @ViewBuilder
     private var editorSections: some View {
-        widgetSection
+        previewEditorSection
         carrierSection
         themeSection
-        displayOptionsSection
     }
 
     private var carrierSection: some View {
@@ -155,14 +154,14 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 12) {
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("主題")
+                    Text("條碼配色")
                         .colorInvoText(.heading)
 
                     scanReadinessStatus
                 }
             } else {
                 HStack(alignment: .firstTextBaseline, spacing: 12) {
-                    Text("主題")
+                    Text("條碼配色")
                         .colorInvoText(.heading)
 
                     Spacer()
@@ -174,7 +173,6 @@ struct ContentView: View {
             wallpaperColorSection
             wallpaperPaletteChoices
             paletteFineTuningSection
-            wallpaperWaveColorChoices
         }
     }
 
@@ -228,7 +226,7 @@ struct ContentView: View {
 
     private func paletteButtonRow(_ palettes: [BarcodePalette]) -> some View {
         HStack(spacing: 12) {
-            Text("條碼配色")
+            Text("配色方案")
                 .colorInvoText(.secondary)
 
             Spacer()
@@ -385,17 +383,8 @@ struct ContentView: View {
                 }
             }
         }
-        .padding(.leading, 12)
-        .padding(.trailing, 8)
         .frame(maxWidth: .infinity)
-        .frame(height: 44)
-        .background(ColorInvoColor.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
-                .allowsHitTesting(false)
-        }
+        .frame(minHeight: 44)
     }
 
     private func compactColorPicker(
@@ -419,10 +408,10 @@ struct ContentView: View {
             .accessibilityIdentifier(identifier)
     }
 
-    private var displayOptionsSection: some View {
+    private var previewContentControls: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("內容")
-                .colorInvoText(.heading)
+            Text("預覽內容")
+                .colorInvoText(.secondary)
 
             VStack(spacing: 0) {
                 Toggle(isOn: showsBarcodeValueBinding) {
@@ -447,6 +436,11 @@ struct ContentView: View {
                     .pickerStyle(.segmented)
                     .frame(minHeight: 44)
                     .accessibilityIdentifier("decorationPicker")
+
+                    if model.decoration == .wave {
+                        wallpaperWaveColorChoices
+                            .padding(.top, 4)
+                    }
                 }
                 .padding(.vertical, 12)
             }
@@ -458,6 +452,13 @@ struct ContentView: View {
                     .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
                     .allowsHitTesting(false)
             }
+        }
+    }
+
+    private var previewEditorSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            widgetSection
+            previewContentControls
         }
     }
 
