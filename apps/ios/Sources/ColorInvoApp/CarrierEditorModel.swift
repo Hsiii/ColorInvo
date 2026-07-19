@@ -76,22 +76,22 @@ final class CarrierEditorModel: ObservableObject {
 
     var widgetStatusText: String {
         if isSavingSettings {
-            return "正在更新小工具設定"
+            return "正在自動儲存變更…"
         }
 
         if !isValid {
-            return "填入載具以產生小工具"
+            return "輸入有效載具後會自動儲存"
         }
 
         if !draftPalette.meetsCommercialGuidance {
-            return "配色可掃描後即可更新小工具"
+            return "改用適合掃描的配色後會自動儲存"
         }
 
         if widgetIsReady {
-            return "小工具已準備好，可在主畫面加入"
+            return "已自動儲存至小工具"
         }
 
-        return "正在等待更新小工具"
+        return "準備自動儲存變更…"
     }
 
     var carrierSuffix: String {

@@ -159,6 +159,7 @@ struct CarrierWidgetContentView: View {
     var showsWave = true
     var showsBarcodeValue = true
     var showsCat = false
+    var emptyStateText = "開啟 App 儲存載具"
 
     var body: some View {
         ZStack {
@@ -182,8 +183,9 @@ struct CarrierWidgetContentView: View {
                 VStack(spacing: 8) {
                     Image(systemName: "barcode.viewfinder")
                         .font(.title2)
-                    Text("開啟 App 儲存載具")
+                    Text(emptyStateText)
                         .font(.headline)
+                        .multilineTextAlignment(.center)
                 }
                 .foregroundStyle(.secondary)
             }

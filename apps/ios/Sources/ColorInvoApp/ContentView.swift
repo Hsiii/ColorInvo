@@ -80,6 +80,7 @@ struct ContentView: View {
 
     @ViewBuilder
     private var editorSections: some View {
+        widgetSection
         carrierSection
         colorSection
         displayOptionsSection
@@ -457,7 +458,7 @@ struct ContentView: View {
     }
 
     private var widgetSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("主畫面預覽")
                 .colorInvoText(.heading)
 
@@ -472,7 +473,8 @@ struct ContentView: View {
                         waveColor: model.selectedWaveColor,
                         showsWave: model.decoration.showsWave,
                         showsBarcodeValue: model.showsBarcodeValue,
-                        showsCat: model.decoration.showsCat
+                        showsCat: model.decoration.showsCat,
+                        emptyStateText: "輸入載具即可預覽"
                     )
                     .aspectRatio(329 / 155, contentMode: .fit)
                     .frame(maxWidth: .infinity)
@@ -487,15 +489,31 @@ struct ContentView: View {
                         .strokeBorder(.black.opacity(0.10), lineWidth: 1)
                 }
 
-                Text(model.widgetStatusText)
-                    .colorInvoText(.secondary)
-                    .foregroundStyle(model.widgetIsReady ? ColorInvoColor.success : ColorInvoColor.muted)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(minHeight: 40, alignment: .leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                widgetSaveStatus
             }
         }
+    }
+
+    private var widgetSaveStatus: some View {
+        let isReady = model.widgetIsReady
+        let iconName = model.isSavingSettings
+            ? "arrow.triangle.2.circlepath"
+            : isReady ? "checkmark.circle.fill" : "exclamationmark.circle"
+        let statusColor = isReady ? ColorInvoColor.success : ColorInvoColor.muted
+
+        return Label {
+            Text(model.widgetStatusText)
+                .colorInvoText(.secondary)
+                .foregroundStyle(statusColor)
+                .fixedSize(horizontal: false, vertical: true)
+        } icon: {
+            Image(systemName: iconName)
+                .font(.callout)
+                .foregroundStyle(statusColor)
+        }
+        .frame(minHeight: 44, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
     }
 }
 
