@@ -17,6 +17,7 @@ enum CarrierDecoration: String, CaseIterable, Codable, Equatable, Sendable {
 struct CarrierSettings: Codable, Equatable, Sendable {
     var carrierCode: String
     var palette: BarcodePalette
+    var wallpaperBasePalette: BarcodePalette?
     var wallpaperDominantColors: [RGBAColor]
     var waveColor: RGBAColor?
     var decoration: CarrierDecoration
@@ -30,6 +31,7 @@ struct CarrierSettings: Codable, Equatable, Sendable {
     static let showcase = CarrierSettings(
         carrierCode: "/AB12345",
         palette: .showcase,
+        wallpaperBasePalette: .showcase,
         wallpaperDominantColors: BarcodePalette.showcaseSourceColors,
         decoration: .cat,
         showsBarcodeValue: false,
@@ -38,6 +40,7 @@ struct CarrierSettings: Codable, Equatable, Sendable {
     init(
         carrierCode: String,
         palette: BarcodePalette = .classic,
+        wallpaperBasePalette: BarcodePalette? = nil,
         wallpaperDominantColors: [RGBAColor] = [],
         waveColor: RGBAColor? = nil,
         decoration: CarrierDecoration = .wave,
@@ -45,6 +48,7 @@ struct CarrierSettings: Codable, Equatable, Sendable {
     ) {
         self.carrierCode = carrierCode
         self.palette = palette
+        self.wallpaperBasePalette = wallpaperBasePalette
         self.wallpaperDominantColors = Array(wallpaperDominantColors.prefix(3))
         self.waveColor = waveColor
         self.decoration = decoration
@@ -57,6 +61,10 @@ struct CarrierSettings: Codable, Equatable, Sendable {
         carrierCode = try container.decode(String.self, forKey: .carrierCode)
         palette = try container.decodeIfPresent(BarcodePalette.self, forKey: .palette)
             ?? .classic
+        wallpaperBasePalette = try container.decodeIfPresent(
+            BarcodePalette.self,
+            forKey: .wallpaperBasePalette
+        )
         wallpaperDominantColors = try container
             .decodeIfPresent([RGBAColor].self, forKey: .wallpaperDominantColors)
             ?? []
@@ -82,6 +90,7 @@ struct CarrierSettings: Codable, Equatable, Sendable {
 
         try container.encode(carrierCode, forKey: .carrierCode)
         try container.encode(palette, forKey: .palette)
+        try container.encodeIfPresent(wallpaperBasePalette, forKey: .wallpaperBasePalette)
         try container.encode(wallpaperDominantColors, forKey: .wallpaperDominantColors)
         try container.encodeIfPresent(waveColor, forKey: .waveColor)
         try container.encode(decoration, forKey: .decoration)
@@ -95,6 +104,7 @@ struct CarrierSettings: Codable, Equatable, Sendable {
         case showsBarcodeValue
         case showsCat
         case showsWave
+        case wallpaperBasePalette
         case wallpaperDominantColors
         case waveColor
     }

@@ -10,6 +10,7 @@ final class CarrierEditorModel: ObservableObject {
 
     @Published private(set) var draftCode = ""
     @Published private(set) var draftPalette: BarcodePalette = .classic
+    @Published private(set) var wallpaperBasePalette: BarcodePalette?
     @Published private(set) var savedSettings: CarrierSettings = .empty
     @Published var wallpaperPickerItem: PhotosPickerItem?
     @Published private(set) var wallpaperPreviewImage: WallpaperPreviewImage?
@@ -59,6 +60,7 @@ final class CarrierEditorModel: ObservableObject {
         return CarrierSettings(
             carrierCode: carrierCode.value,
             palette: draftPalette,
+            wallpaperBasePalette: wallpaperBasePalette,
             wallpaperDominantColors: wallpaperDominantColors,
             waveColor: waveColor,
             decoration: decoration,
@@ -72,6 +74,22 @@ final class CarrierEditorModel: ObservableObject {
 
     var selectedWaveColor: RGBAColor? {
         waveColor ?? wallpaperDominantColors.first
+    }
+
+    var selectedWallpaperPaletteIndex: Int? {
+        guard let wallpaperBasePalette else {
+            return nil
+        }
+
+        return wallpaperPalettes.firstIndex(of: wallpaperBasePalette)
+    }
+
+    var canResetWallpaperPalette: Bool {
+        guard let wallpaperBasePalette else {
+            return false
+        }
+
+        return draftPalette != wallpaperBasePalette
     }
 
     var widgetStatusText: String {
@@ -143,11 +161,22 @@ final class CarrierEditorModel: ObservableObject {
     }
 
     func selectPalette(_ palette: BarcodePalette) {
-        guard draftPalette != palette else {
+        guard wallpaperBasePalette != palette || draftPalette != palette else {
             return
         }
 
+        wallpaperBasePalette = palette
         draftPalette = palette
+        paletteRevision += 1
+        scheduleSettingsSave()
+    }
+
+    func resetPaletteToWallpaper() {
+        guard let wallpaperBasePalette, draftPalette != wallpaperBasePalette else {
+            return
+        }
+
+        draftPalette = wallpaperBasePalette
         paletteRevision += 1
         scheduleSettingsSave()
     }
@@ -238,14 +267,23 @@ final class CarrierEditorModel: ObservableObject {
 
     private func apply(_ snapshot: CarrierEditorSnapshot) {
         autosaveTask?.cancel()
-        savedSettings = snapshot.settings
-        draftCode = snapshot.settings.carrierCode
-        draftPalette = snapshot.settings.palette
+        let inferredBasePalette = snapshot.settings.wallpaperBasePalette
+            ?? snapshot.wallpaperPalettes.first(where: { $0 == snapshot.settings.palette })
+            ?? (snapshot.settings.wallpaperDominantColors.isEmpty
+                ? nil
+                : snapshot.wallpaperPalettes.first)
+        var normalizedSettings = snapshot.settings
+        normalizedSettings.wallpaperBasePalette = inferredBasePalette
+
+        savedSettings = normalizedSettings
+        draftCode = normalizedSettings.carrierCode
+        draftPalette = normalizedSettings.palette
+        wallpaperBasePalette = inferredBasePalette
         paletteRevision = 0
-        wallpaperDominantColors = snapshot.settings.wallpaperDominantColors
-        waveColor = snapshot.settings.waveColor
-        decoration = snapshot.settings.decoration
-        showsBarcodeValue = snapshot.settings.showsBarcodeValue
+        wallpaperDominantColors = normalizedSettings.wallpaperDominantColors
+        waveColor = normalizedSettings.waveColor
+        decoration = normalizedSettings.decoration
+        showsBarcodeValue = normalizedSettings.showsBarcodeValue
         wallpaperPreviewImage = snapshot.previewImage
         wallpaperPalettes = snapshot.wallpaperPalettes
         wallpaperStatusText = nil
@@ -322,8 +360,12 @@ final class CarrierEditorModel: ObservableObject {
         wallpaperStatusText = nil
         isAnalyzingWallpaper = false
 
-        if paletteRevision == paletteRevisionAtStart, let firstPalette = result.palettes.first {
-            draftPalette = firstPalette
+        if let firstPalette = result.palettes.first {
+            wallpaperBasePalette = firstPalette
+
+            if paletteRevision == paletteRevisionAtStart {
+                draftPalette = firstPalette
+            }
         }
 
         scheduleSettingsSave()
@@ -334,7 +376,6 @@ final class CarrierEditorModel: ObservableObject {
             return
         }
 
-        wallpaperPalettes = []
         wallpaperStatusText = "無法讀取圖片"
         isAnalyzingWallpaper = false
     }
@@ -359,7 +400,9 @@ actor CarrierAppPipeline {
         let previewImage = usesShowcaseData
             ? WallpaperPreviewStore.showcaseImage()
             : WallpaperPreviewStore.load()
-        let palettes = usesShowcaseData ? BarcodePalette.showcaseOptions : []
+        let palettes = usesShowcaseData
+            ? BarcodePalette.showcaseOptions
+            : WallpaperPaletteGenerator.palettes(from: settings.wallpaperDominantColors)
 
         return CarrierEditorSnapshot(
             settings: settings,
