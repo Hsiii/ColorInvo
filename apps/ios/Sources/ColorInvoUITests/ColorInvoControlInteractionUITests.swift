@@ -14,7 +14,7 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
 
     func testWallpaperControlsStayInteractiveAcrossPaletteAndWaveSequences() {
         launchShowcaseApp()
-        selectDecoration("波浪")
+        selectDecoration("顏料")
         assertCoreControlsHittable()
 
         let operationSequences: [[ControlOperation]] = [
@@ -50,25 +50,22 @@ final class ColorInvoControlInteractionUITests: XCTestCase {
         }
     }
 
-    func testWaveColorControlsOnlyAppearForWaveDecoration() {
+    func testWaveColorControlsStayVisibleAndFollowWaveAvailability() {
         launchShowcaseApp()
 
-        XCTAssertFalse(
-            waveColorButton(at: 0).waitForExistence(timeout: 0.5),
-            "wave colors should stay hidden for the cat decoration"
-        )
-
-        selectDecoration("波浪")
+        let waveColorButton = waveColorButton(at: 0)
         XCTAssertTrue(
-            waveColorButton(at: 0).waitForExistence(timeout: 3),
-            "wave colors should appear with the wave decoration"
+            waveColorButton.waitForExistence(timeout: 3),
+            "wave colors should remain visible for the cat decoration"
         )
+        XCTAssertFalse(waveColorButton.isEnabled, "wave colors should be disabled for cat")
 
-        selectDecoration("貓咪")
-        XCTAssertFalse(
-            waveColorButton(at: 0).waitForExistence(timeout: 1),
-            "wave colors should hide when another decoration is selected"
-        )
+        selectDecoration("顏料")
+        XCTAssertTrue(waveColorButton.isEnabled, "wave colors should enable for wallpaper paint")
+
+        selectDecoration("貓貓")
+        XCTAssertTrue(waveColorButton.exists, "wave colors should remain visible after leaving paint")
+        XCTAssertFalse(waveColorButton.isEnabled, "wave colors should disable after leaving paint")
     }
 
     private func launchShowcaseApp() {

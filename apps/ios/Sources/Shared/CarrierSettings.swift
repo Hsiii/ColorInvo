@@ -43,7 +43,7 @@ struct CarrierSettings: Codable, Equatable, Sendable {
         wallpaperBasePalette: BarcodePalette? = nil,
         wallpaperDominantColors: [RGBAColor] = [],
         waveColor: RGBAColor? = nil,
-        decoration: CarrierDecoration = .wave,
+        decoration: CarrierDecoration = .cat,
         showsBarcodeValue: Bool = true
     ) {
         self.carrierCode = carrierCode
@@ -76,10 +76,10 @@ struct CarrierSettings: Codable, Equatable, Sendable {
             decoration = savedDecoration
         } else if try container.decodeIfPresent(Bool.self, forKey: .showsCat) == true {
             decoration = .cat
-        } else if try container.decodeIfPresent(Bool.self, forKey: .showsWave) == false {
-            decoration = .none
+        } else if let showsWave = try container.decodeIfPresent(Bool.self, forKey: .showsWave) {
+            decoration = showsWave ? .wave : .none
         } else {
-            decoration = .wave
+            decoration = .cat
         }
         showsBarcodeValue = try container.decodeIfPresent(Bool.self, forKey: .showsBarcodeValue)
             ?? true

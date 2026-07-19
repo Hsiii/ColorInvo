@@ -81,7 +81,7 @@ struct ContentView: View {
 
     @ViewBuilder
     private var editorSections: some View {
-        previewEditorSection
+        widgetSection
         carrierSection
         themeSection
     }
@@ -154,14 +154,14 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 12) {
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("桌布配色")
+                    Text("自由條色")
                         .colorInvoText(.heading)
 
                     scanReadinessStatus
                 }
             } else {
                 HStack(alignment: .firstTextBaseline, spacing: 12) {
-                    Text("桌布配色")
+                    Text("自由條色")
                         .colorInvoText(.heading)
 
                     Spacer()
@@ -172,9 +172,7 @@ struct ContentView: View {
 
             wallpaperColorSection
             wallpaperPaletteChoices
-            if model.decoration == .wave {
-                wallpaperWaveColorChoices
-            }
+            wallpaperWaveColorChoices
             paletteFineTuningSection
         }
     }
@@ -185,7 +183,7 @@ struct ContentView: View {
             matching: .images,
             photoLibrary: .shared()
         ) {
-            Label("選擇桌布以產生配色", systemImage: "photo.on.rectangle")
+            Label("使用桌布配色", systemImage: "photo.on.rectangle")
                 .colorInvoText(.control)
                 .foregroundStyle(ColorInvoColor.primary)
                 .multilineTextAlignment(.center)
@@ -229,7 +227,7 @@ struct ContentView: View {
 
     private func paletteButtonRow(_ palettes: [BarcodePalette]) -> some View {
         HStack(spacing: 12) {
-            Text("條碼配色")
+            Text("配色組合")
                 .colorInvoText(.secondary)
 
             Spacer()
@@ -252,7 +250,11 @@ struct ContentView: View {
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
                     .buttonStyle(.plain)
-                    .disabled(palette == nil || model.isAnalyzingWallpaper)
+                    .disabled(
+                        palette == nil
+                            || !model.hasWallpaperColors
+                            || model.isAnalyzingWallpaper
+                    )
                     .accessibilityLabel(
                         palette == nil
                             ? "條碼配色 \(index + 1)，尚未產生"
@@ -304,7 +306,6 @@ struct ContentView: View {
 
             customColorSection
         }
-        .disabled(model.wallpaperBasePalette == nil || model.isAnalyzingWallpaper)
     }
 
     private var customColorSection: some View {
@@ -374,7 +375,7 @@ struct ContentView: View {
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
                     .buttonStyle(.plain)
-                    .disabled(color == nil || model.isAnalyzingWallpaper)
+                    .disabled(color == nil || !model.canSelectWaveColor)
                     .accessibilityLabel(
                         color == nil
                             ? "波浪色彩 \(index + 1)，尚未產生"
@@ -397,6 +398,7 @@ struct ContentView: View {
                 .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
                 .allowsHitTesting(false)
         }
+        .opacity(model.canSelectWaveColor ? 1 : 0.44)
     }
 
     private func compactColorPicker(
@@ -418,55 +420,6 @@ struct ContentView: View {
                     .allowsHitTesting(false)
             }
             .accessibilityIdentifier(identifier)
-    }
-
-    private var previewContentControls: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("預覽內容")
-                .colorInvoText(.secondary)
-
-            VStack(spacing: 0) {
-                Toggle(isOn: showsBarcodeValueBinding) {
-                    Text("顯示載具文字")
-                        .colorInvoText(.control)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .frame(minHeight: 52)
-                .accessibilityIdentifier("showsBarcodeValueToggle")
-
-                Divider()
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("裝飾")
-                        .colorInvoText(.secondary)
-
-                    Picker("裝飾", selection: decorationBinding) {
-                        Text("無").tag(CarrierDecoration.none)
-                        Text("波浪").tag(CarrierDecoration.wave)
-                        Text("貓咪").tag(CarrierDecoration.cat)
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(minHeight: 44)
-                    .accessibilityIdentifier("decorationPicker")
-                }
-                .padding(.vertical, 12)
-            }
-            .padding(.horizontal, 12)
-            .background(ColorInvoColor.surface)
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
-                    .allowsHitTesting(false)
-            }
-        }
-    }
-
-    private var previewEditorSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            widgetSection
-            previewContentControls
-        }
     }
 
     private var showsBarcodeValueBinding: Binding<Bool> {
@@ -495,14 +448,14 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 12) {
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("主畫面預覽")
+                    Text("載具小工具")
                         .colorInvoText(.heading)
 
                     widgetSaveStatus
                 }
             } else {
                 HStack(alignment: .firstTextBaseline, spacing: 12) {
-                    Text("主畫面預覽")
+                    Text("載具小工具")
                         .colorInvoText(.heading)
 
                     Spacer()
@@ -510,6 +463,17 @@ struct ContentView: View {
                     widgetSaveStatus
                 }
             }
+
+            Picker("小工具樣式", selection: decorationBinding) {
+                Text("貓貓").tag(CarrierDecoration.cat)
+                Text("顏料").tag(CarrierDecoration.wave)
+                Text("極簡").tag(CarrierDecoration.none)
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .frame(minHeight: 44)
+            .accessibilityLabel("小工具樣式")
+            .accessibilityIdentifier("decorationPicker")
 
             ZStack {
                 WallpaperPreviewBackground(preview: model.wallpaperPreviewImage)
@@ -536,21 +500,30 @@ struct ContentView: View {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .strokeBorder(.black.opacity(0.10), lineWidth: 1)
             }
+
+            Toggle(isOn: showsBarcodeValueBinding) {
+                Text("顯示載具文字")
+                    .colorInvoText(.control)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.horizontal, 12)
+            .frame(minHeight: 52)
+            .background(ColorInvoColor.surface)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+                    .allowsHitTesting(false)
+            }
+            .accessibilityIdentifier("showsBarcodeValueToggle")
         }
     }
 
     private var widgetSaveStatus: some View {
-        let isReady = model.widgetIsReady
-        let isWarning = !model.isValid || !model.draftPalette.meetsCommercialGuidance
-        let tone: HeaderStatusTone = isWarning ? .warning : isReady ? .success : .neutral
-        let iconName = isWarning
-            ? nil
-            : model.isSavingSettings ? "arrow.triangle.2.circlepath" : nil
-
-        return HeaderStatusLabel(
+        HeaderStatusLabel(
             model.widgetStatusText,
-            tone: tone,
-            systemImage: iconName
+            tone: model.isSavingSettings ? .neutral : .success,
+            systemImage: model.isSavingSettings ? "arrow.triangle.2.circlepath" : nil
         )
     }
 }

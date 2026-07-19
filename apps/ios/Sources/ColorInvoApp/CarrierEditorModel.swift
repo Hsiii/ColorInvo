@@ -19,7 +19,7 @@ final class CarrierEditorModel: ObservableObject {
     @Published private(set) var waveColor: RGBAColor?
     @Published private(set) var wallpaperStatusText: String?
     @Published private(set) var isAnalyzingWallpaper = false
-    @Published private(set) var decoration: CarrierDecoration = .wave
+    @Published private(set) var decoration: CarrierDecoration = .cat
     @Published private(set) var showsBarcodeValue = true
     @Published private(set) var isSavingSettings = false
 
@@ -96,24 +96,18 @@ final class CarrierEditorModel: ObservableObject {
         return draftPalette != wallpaperBasePalette
     }
 
+    var hasWallpaperColors: Bool {
+        wallpaperPreviewImage != nil
+            && !wallpaperPalettes.isEmpty
+            && !wallpaperDominantColors.isEmpty
+    }
+
+    var canSelectWaveColor: Bool {
+        hasWallpaperColors && decoration == .wave && !isAnalyzingWallpaper
+    }
+
     var widgetStatusText: String {
-        if !isValid {
-            return "暫無載具"
-        }
-
-        if isSavingSettings {
-            return "正在自動儲存變更…"
-        }
-
-        if !draftPalette.meetsCommercialGuidance {
-            return "改用適合掃描的配色後會自動儲存"
-        }
-
-        if widgetIsReady {
-            return "小工具已同步"
-        }
-
-        return "準備自動儲存變更…"
+        isSavingSettings ? "儲存中" : "已同步"
     }
 
     var carrierSuffix: String {
