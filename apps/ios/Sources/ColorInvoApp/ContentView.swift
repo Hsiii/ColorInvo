@@ -3,6 +3,7 @@ import SwiftUI
 import UIKit
 
 struct ContentView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @StateObject private var model: CarrierEditorModel
     @State private var themeMode: ThemeEditingMode = .wallpaper
     @FocusState private var carrierFieldFocused: Bool
@@ -89,13 +90,22 @@ struct ContentView: View {
 
     private var carrierSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 12) {
-                Text("手機載具")
-                    .colorInvoText(.heading)
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("手機載具")
+                        .colorInvoText(.heading)
 
-                Spacer()
+                    validationBadge
+                }
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    Text("手機載具")
+                        .colorInvoText(.heading)
 
-                validationBadge
+                    Spacer()
+
+                    validationBadge
+                }
             }
 
             HStack(spacing: 0) {
@@ -139,6 +149,7 @@ struct ContentView: View {
             Text(model.validationText)
                 .colorInvoText(.control)
                 .foregroundStyle(statusColor)
+                .fixedSize(horizontal: false, vertical: true)
         } icon: {
             Image(systemName: model.isValid ? "checkmark.circle.fill" : "exclamationmark.circle")
                 .font(.callout)
@@ -148,14 +159,25 @@ struct ContentView: View {
 
     private var themeSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 12) {
-                Text("主題")
-                    .colorInvoText(.heading)
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("主題")
+                        .colorInvoText(.heading)
 
-                Spacer()
+                    if model.isValid {
+                        scanReadinessStatus
+                    }
+                }
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    Text("主題")
+                        .colorInvoText(.heading)
 
-                if model.isValid {
-                    scanReadinessStatus
+                    Spacer()
+
+                    if model.isValid {
+                        scanReadinessStatus
+                    }
                 }
             }
 
@@ -164,6 +186,7 @@ struct ContentView: View {
                 Text("自訂").tag(ThemeEditingMode.custom)
             }
             .pickerStyle(.segmented)
+            .frame(minHeight: 44)
             .accessibilityIdentifier("themeModePicker")
 
             switch themeMode {
@@ -187,9 +210,10 @@ struct ContentView: View {
             Label("選擇桌布以產生配色", systemImage: "photo.on.rectangle")
                 .colorInvoText(.control)
                 .foregroundStyle(ColorInvoColor.primary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 12)
+                .padding(.vertical, 8)
                 .frame(maxWidth: .infinity, minHeight: 44)
                 .background(ColorInvoColor.primarySoft)
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
@@ -238,6 +262,7 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity)
                 .accessibilityLabel("桌布配色 \(index + 1)")
                 .accessibilityValue(palette == model.draftPalette ? "selected" : "not selected")
+                .accessibilityAddTraits(palette == model.draftPalette ? .isSelected : [])
                 .accessibilityIdentifier("wallpaperPaletteOption.\(index)")
             }
         }
@@ -245,27 +270,43 @@ struct ContentView: View {
     }
 
     private var customColorSection: some View {
-        HStack(spacing: 8) {
-            compactColorPicker(
-                title: "背景",
-                color: Binding(
-                    get: { model.draftPalette.backgroundColor.color },
-                    set: { color in
-                        model.updateBackgroundColor(color)
-                    }
-                )
-            )
-
-            compactColorPicker(
-                title: "條碼",
-                color: Binding(
-                    get: { model.draftPalette.barColor.color },
-                    set: { color in
-                        model.updateBarColor(color)
-                    }
-                )
-            )
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(spacing: 8) {
+                    backgroundColorPicker
+                    barColorPicker
+                }
+            } else {
+                HStack(spacing: 8) {
+                    backgroundColorPicker
+                    barColorPicker
+                }
+            }
         }
+    }
+
+    private var backgroundColorPicker: some View {
+        compactColorPicker(
+            title: "背景",
+            color: Binding(
+                get: { model.draftPalette.backgroundColor.color },
+                set: { color in
+                    model.updateBackgroundColor(color)
+                }
+            )
+        )
+    }
+
+    private var barColorPicker: some View {
+        compactColorPicker(
+            title: "條碼",
+            color: Binding(
+                get: { model.draftPalette.barColor.color },
+                set: { color in
+                    model.updateBarColor(color)
+                }
+            )
+        )
     }
 
     @ViewBuilder
@@ -325,11 +366,9 @@ struct ContentView: View {
 
         return ColorPicker(title, selection: color, supportsOpacity: false)
             .colorInvoText(.control)
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
             .padding(.horizontal, 12)
             .frame(maxWidth: .infinity)
-            .frame(height: 44)
+            .frame(minHeight: 44)
             .background(ColorInvoColor.surface)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .overlay {
@@ -347,8 +386,9 @@ struct ContentView: View {
 
             VStack(spacing: 0) {
                 Toggle(isOn: showsBarcodeValueBinding) {
-                    Label("顯示載具文字", systemImage: "textformat")
+                    Text("顯示載具文字")
                         .colorInvoText(.control)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(minHeight: 52)
                 .accessibilityIdentifier("showsBarcodeValueToggle")
@@ -365,6 +405,7 @@ struct ContentView: View {
                         Text("貓咪").tag(CarrierDecoration.cat)
                     }
                     .pickerStyle(.segmented)
+                    .frame(minHeight: 44)
                     .accessibilityIdentifier("decorationPicker")
                 }
                 .padding(.vertical, 12)
@@ -411,6 +452,7 @@ struct ContentView: View {
             Text(model.draftPalette.meetsCommercialGuidance ? "適合掃描" : "對比不足")
                 .colorInvoText(.secondary)
                 .foregroundStyle(statusColor)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(model.draftPalette.standardMessage)
@@ -508,6 +550,11 @@ private struct WaveColorDot: View {
                         .allowsHitTesting(false)
                 }
         }
+        .overlay(alignment: .topTrailing) {
+            if isSelected {
+                SelectionCheckmark()
+            }
+        }
         .frame(width: 44, height: 44)
         .contentShape(Rectangle())
     }
@@ -554,7 +601,28 @@ private struct PaletteOptionButtonContent: View {
                 )
                 .allowsHitTesting(false)
         }
+        .overlay(alignment: .topTrailing) {
+            if isSelected {
+                SelectionCheckmark()
+                    .padding(8)
+            }
+        }
         .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+private struct SelectionCheckmark: View {
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(ColorInvoColor.primary)
+
+            Image(systemName: "checkmark")
+                .font(.system(size: 8, weight: .bold))
+                .foregroundStyle(.white)
+        }
+        .frame(width: 16, height: 16)
+        .accessibilityHidden(true)
     }
 }
 
