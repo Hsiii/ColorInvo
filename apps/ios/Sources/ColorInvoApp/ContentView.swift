@@ -401,15 +401,15 @@ struct ContentView: View {
 
     private var showsWaveBinding: Binding<Bool> {
         Binding(
-            get: { model.showsWave },
-            set: { model.setShowsWave($0) }
+            get: { model.decoration == .wave },
+            set: { model.setDecoration($0 ? .wave : .none) }
         )
     }
 
     private var showsCatBinding: Binding<Bool> {
         Binding(
-            get: { model.showsCat },
-            set: { model.setShowsCat($0) }
+            get: { model.decoration == .cat },
+            set: { model.setDecoration($0 ? .cat : .none) }
         )
     }
 
@@ -420,11 +420,11 @@ struct ContentView: View {
             visibleItems.append("載具文字")
         }
 
-        if model.showsWave {
+        if model.decoration == .wave {
             visibleItems.append("波浪")
         }
 
-        if model.showsCat {
+        if model.decoration == .cat {
             visibleItems.append("貓咪")
         }
 
@@ -470,9 +470,9 @@ struct ContentView: View {
                         palette: model.draftPalette,
                         dominantColors: model.wallpaperDominantColors,
                         waveColor: model.selectedWaveColor,
-                        showsWave: model.showsWave,
+                        showsWave: model.decoration.showsWave,
                         showsBarcodeValue: model.showsBarcodeValue,
-                        showsCat: model.showsCat
+                        showsCat: model.decoration.showsCat
                     )
                     .aspectRatio(329 / 155, contentMode: .fit)
                     .frame(maxWidth: .infinity)

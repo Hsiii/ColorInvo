@@ -43,9 +43,9 @@ struct CarrierWidgetView: View {
             palette: entry.settings.palette,
             dominantColors: entry.settings.wallpaperDominantColors,
             waveColor: entry.settings.waveColor,
-            showsWave: entry.settings.showsWave,
+            showsWave: entry.settings.decoration.showsWave,
             showsBarcodeValue: entry.settings.showsBarcodeValue,
-            showsCat: entry.settings.showsCat
+            showsCat: entry.settings.decoration.showsCat
         )
         .containerBackground(entry.settings.palette.backgroundColor.color, for: .widget)
     }

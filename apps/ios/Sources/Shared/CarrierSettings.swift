@@ -1,13 +1,26 @@
 import Foundation
 
+enum CarrierDecoration: String, CaseIterable, Codable, Equatable, Sendable {
+    case none
+    case wave
+    case cat
+
+    var showsWave: Bool {
+        self == .wave
+    }
+
+    var showsCat: Bool {
+        self == .cat
+    }
+}
+
 struct CarrierSettings: Codable, Equatable, Sendable {
     var carrierCode: String
     var palette: BarcodePalette
     var wallpaperDominantColors: [RGBAColor]
     var waveColor: RGBAColor?
-    var showsWave: Bool
+    var decoration: CarrierDecoration
     var showsBarcodeValue: Bool
-    var showsCat: Bool
 
     static let empty = CarrierSettings(
         carrierCode: "",
@@ -18,9 +31,8 @@ struct CarrierSettings: Codable, Equatable, Sendable {
         carrierCode: "/AB12345",
         palette: .showcase,
         wallpaperDominantColors: BarcodePalette.showcaseSourceColors,
-        showsWave: false,
+        decoration: .cat,
         showsBarcodeValue: false,
-        showsCat: true
     )
 
     init(
@@ -28,21 +40,19 @@ struct CarrierSettings: Codable, Equatable, Sendable {
         palette: BarcodePalette = .classic,
         wallpaperDominantColors: [RGBAColor] = [],
         waveColor: RGBAColor? = nil,
-        showsWave: Bool = true,
-        showsBarcodeValue: Bool = true,
-        showsCat: Bool = false
+        decoration: CarrierDecoration = .wave,
+        showsBarcodeValue: Bool = true
     ) {
         self.carrierCode = carrierCode
         self.palette = palette
         self.wallpaperDominantColors = Array(wallpaperDominantColors.prefix(3))
         self.waveColor = waveColor
-        self.showsWave = showsWave
+        self.decoration = decoration
         self.showsBarcodeValue = showsBarcodeValue
-        self.showsCat = showsCat
     }
 
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: StoredCodingKeys.self)
 
         carrierCode = try container.decode(String.self, forKey: .carrierCode)
         palette = try container.decodeIfPresent(BarcodePalette.self, forKey: .palette)
@@ -51,12 +61,42 @@ struct CarrierSettings: Codable, Equatable, Sendable {
             .decodeIfPresent([RGBAColor].self, forKey: .wallpaperDominantColors)
             ?? []
         waveColor = try container.decodeIfPresent(RGBAColor.self, forKey: .waveColor)
-        showsWave = try container.decodeIfPresent(Bool.self, forKey: .showsWave)
-            ?? true
+        if let savedDecoration = try container.decodeIfPresent(
+            CarrierDecoration.self,
+            forKey: .decoration
+        ) {
+            decoration = savedDecoration
+        } else if try container.decodeIfPresent(Bool.self, forKey: .showsCat) == true {
+            decoration = .cat
+        } else if try container.decodeIfPresent(Bool.self, forKey: .showsWave) == false {
+            decoration = .none
+        } else {
+            decoration = .wave
+        }
         showsBarcodeValue = try container.decodeIfPresent(Bool.self, forKey: .showsBarcodeValue)
             ?? true
-        showsCat = try container.decodeIfPresent(Bool.self, forKey: .showsCat)
-            ?? false
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: StoredCodingKeys.self)
+
+        try container.encode(carrierCode, forKey: .carrierCode)
+        try container.encode(palette, forKey: .palette)
+        try container.encode(wallpaperDominantColors, forKey: .wallpaperDominantColors)
+        try container.encodeIfPresent(waveColor, forKey: .waveColor)
+        try container.encode(decoration, forKey: .decoration)
+        try container.encode(showsBarcodeValue, forKey: .showsBarcodeValue)
+    }
+
+    private enum StoredCodingKeys: String, CodingKey {
+        case carrierCode
+        case decoration
+        case palette
+        case showsBarcodeValue
+        case showsCat
+        case showsWave
+        case wallpaperDominantColors
+        case waveColor
     }
 }
 
