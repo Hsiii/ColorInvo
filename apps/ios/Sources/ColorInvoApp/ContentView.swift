@@ -204,11 +204,8 @@ struct ContentView: View {
 
     private var wallpaperPaletteChoices: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("條碼配色")
-                .colorInvoText(.secondary)
-
             paletteStatus
-            paletteButtonGrid(model.wallpaperPalettes)
+            paletteButtonRow(model.wallpaperPalettes)
         }
     }
 
@@ -229,36 +226,54 @@ struct ContentView: View {
         }
     }
 
-    private func paletteButtonGrid(_ palettes: [BarcodePalette]) -> some View {
-        HStack(spacing: 8) {
-            ForEach(0..<3, id: \.self) { index in
-                let palette = palettes.indices.contains(index) ? palettes[index] : nil
-                let isSelected = index == model.selectedWallpaperPaletteIndex
+    private func paletteButtonRow(_ palettes: [BarcodePalette]) -> some View {
+        HStack(spacing: 12) {
+            Text("條碼配色")
+                .colorInvoText(.secondary)
 
-                Button {
-                    if let palette {
-                        model.selectPalette(palette)
+            Spacer()
+
+            HStack(spacing: 8) {
+                ForEach(0..<3, id: \.self) { index in
+                    let palette = palettes.indices.contains(index) ? palettes[index] : nil
+                    let isSelected = index == model.selectedWallpaperPaletteIndex
+
+                    Button {
+                        if let palette {
+                            model.selectPalette(palette)
+                        }
+                    } label: {
+                        PaletteColorDot(
+                            palette: palette,
+                            isSelected: isSelected
+                        )
                     }
-                } label: {
-                    PaletteOptionButtonContent(
-                        palette: palette,
-                        isSelected: isSelected
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+                    .buttonStyle(.plain)
+                    .disabled(palette == nil || model.isAnalyzingWallpaper)
+                    .accessibilityLabel(
+                        palette == nil
+                            ? "條碼配色 \(index + 1)，尚未產生"
+                            : "條碼配色 \(index + 1)"
                     )
+                    .accessibilityValue(isSelected ? "selected" : "not selected")
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
+                    .accessibilityIdentifier("wallpaperPaletteOption.\(index)")
                 }
-                .buttonStyle(.plain)
-                .frame(maxWidth: .infinity)
-                .disabled(palette == nil || model.isAnalyzingWallpaper)
-                .accessibilityLabel(
-                    palette == nil
-                        ? "條碼配色 \(index + 1)，尚未產生"
-                        : "條碼配色 \(index + 1)"
-                )
-                .accessibilityValue(isSelected ? "selected" : "not selected")
-                .accessibilityAddTraits(isSelected ? .isSelected : [])
-                .accessibilityIdentifier("wallpaperPaletteOption.\(index)")
             }
         }
-        .frame(height: 88)
+        .padding(.leading, 12)
+        .padding(.trailing, 8)
+        .frame(maxWidth: .infinity)
+        .frame(height: 44)
+        .background(ColorInvoColor.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
+                .allowsHitTesting(false)
+        }
     }
 
     private var paletteFineTuningSection: some View {
@@ -631,60 +646,50 @@ private struct WaveColorDot: View {
     }
 }
 
-private struct PaletteOptionButtonContent: View {
+private struct PaletteColorDot: View {
     let palette: BarcodePalette?
     let isSelected: Bool
 
     var body: some View {
-        VStack(spacing: 8) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(palette?.backgroundColor.color ?? ColorInvoColor.primarySoft)
+        ZStack {
+            Circle()
+                .fill(isSelected ? ColorInvoColor.primarySoft : ColorInvoColor.surface)
+                .frame(width: 40, height: 40)
 
-                if let palette {
-                    Code39BarcodeView(
-                        value: "/A1B2",
-                        barColor: palette.barColor.color,
-                        backgroundColor: palette.backgroundColor.color
-                    )
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 8)
-                } else {
-                    Image(systemName: "barcode")
-                        .font(.title2)
-                        .foregroundStyle(ColorInvoColor.muted)
+            ZStack {
+                Circle()
+                    .fill(palette?.backgroundColor.color ?? ColorInvoColor.surface)
+
+                HStack(spacing: 0) {
+                    Rectangle()
+                        .fill(palette?.barColor.color ?? ColorInvoColor.primarySoft)
+
+                    Color.clear
                 }
             }
-            .frame(maxWidth: .infinity)
-            .aspectRatio(1, contentMode: .fit)
+            .frame(width: 28, height: 28)
+            .clipShape(Circle())
             .overlay {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                Circle()
                     .strokeBorder(ColorInvoColor.hairline, lineWidth: 1)
                     .allowsHitTesting(false)
             }
-
-        }
-        .padding(4)
-        .frame(maxWidth: .infinity, minHeight: 88, alignment: .top)
-        .background {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(isSelected ? ColorInvoColor.primarySoft : .clear)
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(
-                    isSelected ? ColorInvoColor.primary : .clear,
-                    lineWidth: 2
-                )
-                .allowsHitTesting(false)
+            .overlay {
+                Circle()
+                    .strokeBorder(
+                        isSelected ? ColorInvoColor.primary : .clear,
+                        lineWidth: 4
+                    )
+                    .allowsHitTesting(false)
+            }
         }
         .overlay(alignment: .topTrailing) {
             if isSelected {
                 SelectionCheckmark()
-                    .padding(8)
             }
         }
-        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .frame(width: 44, height: 44)
+        .contentShape(Rectangle())
     }
 }
 
