@@ -103,7 +103,8 @@ struct CarrierBarcodePanel: View {
                 CarrierBarcodeWaveShape()
                     .fill(waveFillColor)
                     .frame(height: waveHeight)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
+                    .scaleEffect(y: -1)
+                    .frame(maxHeight: .infinity, alignment: .top)
             }
 
             if showsValue {
