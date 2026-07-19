@@ -14,6 +14,14 @@
 
 > We plan to release this to App Store in the future, hold on tight!
 
+## Run on iOS Simulator
+
+Build ColorInvo, boot and open an available iPhone simulator, install the app, and launch it:
+
+```sh
+bun run simulator
+```
+
 ## Codex simulator screenshots
 
 To send a visible iOS Simulator screenshot in Codex chat, capture the booted simulator and attach the PNG bytes to the chat result instead of linking to a local Mac path:
