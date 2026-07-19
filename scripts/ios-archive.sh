@@ -5,11 +5,11 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/ios-common.sh"
 
 CONFIGURATION="${IOS_CONFIGURATION:-Release}"
 ARCHIVE_PATH="${IOS_ARCHIVE_PATH:-$IOS_ROOT_DIR/build/archive/ColorInvo.xcarchive}"
+
+ios_generate_project
 ios_resolve_release_versions
 MARKETING_VERSION="$IOS_MARKETING_VERSION"
 BUILD_NUMBER="$IOS_BUILD_NUMBER"
-
-ios_generate_project
 ios_require_development_team "signing an iOS archive"
 ios_set_app_store_auth_args
 ios_set_provisioning_args
