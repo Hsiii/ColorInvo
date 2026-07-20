@@ -167,7 +167,7 @@ private struct Composer {
                 title: "提取桌布配色",
                 subtitle: "載具小工具不再破壞桌布氛圍",
                 titleTop: CGFloat(96),
-                subtitleTop: CGFloat(244),
+                subtitleTop: CGFloat(280),
                 alignment: NSTextAlignment.right,
                 titleAccents: [("桌布配色", Artwork.logoYellowText)],
                 subtitleAccents: [("不再破壞桌布氛圍", Artwork.logoBlueText)]
@@ -176,7 +176,7 @@ private struct Composer {
                 panelIndex: 0,
                 title: "選擇額外裝飾",
                 subtitle: "別擔心，貓貓會保留安全可掃範圍",
-                titleTop: CGFloat(2_424),
+                titleTop: CGFloat(2_376),
                 subtitleTop: CGFloat(2_576),
                 alignment: NSTextAlignment.left,
                 titleAccents: [("額外裝飾", Artwork.logoYellowText)],
@@ -187,23 +187,58 @@ private struct Composer {
         for message in messages {
             let panelX = CGFloat(message.panelIndex * Artwork.panelWidth) + Artwork.padding
             let textWidth = CGFloat(Artwork.panelWidth) - Artwork.padding * 2
+            let targetLineWidth = textWidth * 0.85
+            let titleFont = fontFitting(
+                message.title,
+                targetWidth: targetLineWidth,
+                weight: .black,
+                minimumSize: 112,
+                maximumSize: 164
+            )
+            let subtitleFont = fontFitting(
+                message.subtitle,
+                targetWidth: targetLineWidth,
+                weight: .bold,
+                minimumSize: 52,
+                maximumSize: 76
+            )
             drawStyledText(
                 message.title,
-                topRect: CGRect(x: panelX, y: message.titleTop, width: textWidth, height: 144),
-                font: .systemFont(ofSize: 112, weight: .black),
+                topRect: CGRect(x: panelX, y: message.titleTop, width: textWidth, height: 200),
+                font: titleFont,
                 color: Artwork.ink,
                 accents: message.titleAccents,
                 alignment: message.alignment
             )
             drawStyledText(
                 message.subtitle,
-                topRect: CGRect(x: panelX, y: message.subtitleTop, width: textWidth, height: 84),
-                font: .systemFont(ofSize: 52, weight: .bold),
+                topRect: CGRect(x: panelX, y: message.subtitleTop, width: textWidth, height: 100),
+                font: subtitleFont,
                 color: Artwork.muted,
                 accents: message.subtitleAccents,
                 alignment: message.alignment
             )
         }
+    }
+
+    private func fontFitting(
+        _ text: String,
+        targetWidth: CGFloat,
+        weight: NSFont.Weight,
+        minimumSize: CGFloat,
+        maximumSize: CGFloat
+    ) -> NSFont {
+        let referenceSize: CGFloat = 100
+        let referenceFont = NSFont.systemFont(ofSize: referenceSize, weight: weight)
+        let measuredWidth = (text as NSString).size(
+            withAttributes: [.font: referenceFont]
+        ).width
+        let fittedSize = floor(referenceSize * targetWidth / max(1, measuredWidth))
+
+        return .systemFont(
+            ofSize: min(max(fittedSize, minimumSize), maximumSize),
+            weight: weight
+        )
     }
 
     private func drawWidget(image: NSImage, destinationFromTop: CGRect) {
