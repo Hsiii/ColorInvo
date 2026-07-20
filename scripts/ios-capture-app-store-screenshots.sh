@@ -5,7 +5,8 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/ios-common.sh"
 
 CONFIGURATION="${IOS_CONFIGURATION:-Debug}"
 DERIVED_DATA_PATH="${IOS_DERIVED_DATA_PATH:-$IOS_ROOT_DIR/build/ScreenshotDerivedData}"
-OUTPUT_DIR="${IOS_SCREENSHOT_OUTPUT_DIR:-$IOS_ROOT_DIR/assets/app-store/screenshots}"
+CAPTURE_DIR="${IOS_SCREENSHOT_CAPTURE_DIR:-$IOS_ROOT_DIR/build/AppStoreScreenshotCaptures}"
+OUTPUT_DIR="${IOS_SCREENSHOT_OUTPUT_DIR:-$IOS_ROOT_DIR/assets/screenshots}"
 DEVICE_NAME="${IOS_SCREENSHOT_DEVICE_NAME:-ColorInvo 14 Plus Screenshots}"
 DEVICE_TYPE="${IOS_SCREENSHOT_DEVICE_TYPE:-com.apple.CoreSimulator.SimDeviceType.iPhone-14-Plus}"
 RUNTIME="${IOS_SCREENSHOT_RUNTIME:-}"
@@ -90,10 +91,17 @@ launch_for_screenshot() {
                 xcrun simctl launch --terminate-running-process "$device_id" "$IOS_BUNDLE_ID_VALUE" \
                 --showcase-data >/dev/null
             ;;
-        widget)
+        widget-cat|widget-wave|widget-plain)
+            local decoration
+            decoration="${target#widget-}"
+            if [[ "$decoration" == "plain" ]]; then
+                decoration="none"
+            fi
+
             SIMCTL_CHILD_COLORINVO_SHOWCASE_DATA=1 \
                 SIMCTL_CHILD_COLORINVO_SHOWCASE_WALLPAPER_PATH="$SCREENSHOT_WALLPAPER_CONTAINER_PATH" \
                 SIMCTL_CHILD_COLORINVO_SCREENSHOT_TARGET=widget \
+                SIMCTL_CHILD_COLORINVO_SHOWCASE_DECORATION="$decoration" \
                 xcrun simctl launch --terminate-running-process "$device_id" "$IOS_BUNDLE_ID_VALUE" \
                 --showcase-data --screenshot-widget >/dev/null
             ;;
@@ -122,7 +130,7 @@ if [[ "$CONFIGURATION" != "Debug" ]]; then
     ios_die "Screenshot capture requires IOS_CONFIGURATION=Debug."
 fi
 
-mkdir -p "$OUTPUT_DIR"
+mkdir -p "$CAPTURE_DIR" "$OUTPUT_DIR"
 
 if [[ -z "$RUNTIME" ]]; then
     RUNTIME="$(latest_ios_runtime)"
@@ -160,19 +168,42 @@ xcrun simctl status_bar "$DEVICE_ID" override \
     --batteryState charged \
     --batteryLevel 100 >/dev/null
 
-MAIN_OUTPUT="$OUTPUT_DIR/colorinvo-iphone-6-5-main.png"
-WIDGET_OUTPUT="$OUTPUT_DIR/colorinvo-iphone-6-5-widget.png"
+MAIN_CAPTURE="$CAPTURE_DIR/colorinvo-iphone-6-5-main.png"
+CAT_CAPTURE="$CAPTURE_DIR/colorinvo-iphone-6-5-widget-cat.png"
+WAVE_CAPTURE="$CAPTURE_DIR/colorinvo-iphone-6-5-widget-wave.png"
+PLAIN_CAPTURE="$CAPTURE_DIR/colorinvo-iphone-6-5-widget-plain.png"
 
-echo "Capturing main screenshot..."
+echo "Capturing wallpaper palette source..."
 launch_for_screenshot "$DEVICE_ID" main
 sleep 7
-capture_png "$DEVICE_ID" "$MAIN_OUTPUT"
+capture_png "$DEVICE_ID" "$MAIN_CAPTURE"
 
-echo "Capturing widget help screenshot..."
-launch_for_screenshot "$DEVICE_ID" widget
+echo "Capturing cat decoration source..."
+launch_for_screenshot "$DEVICE_ID" widget-cat
 sleep 4
-capture_png "$DEVICE_ID" "$WIDGET_OUTPUT"
+capture_png "$DEVICE_ID" "$CAT_CAPTURE"
 
-echo "Captured 6.5-inch ASC screenshots:"
-echo "  $MAIN_OUTPUT"
-echo "  $WIDGET_OUTPUT"
+echo "Capturing paint decoration source..."
+launch_for_screenshot "$DEVICE_ID" widget-wave
+sleep 4
+capture_png "$DEVICE_ID" "$WAVE_CAPTURE"
+
+echo "Capturing minimal widget source..."
+launch_for_screenshot "$DEVICE_ID" widget-plain
+sleep 4
+capture_png "$DEVICE_ID" "$PLAIN_CAPTURE"
+
+echo "Composing App Store screenshots..."
+swift "$IOS_ROOT_DIR/scripts/ios-compose-app-store-screenshots.swift" \
+    --main "$MAIN_CAPTURE" \
+    --cat "$CAT_CAPTURE" \
+    --wave "$WAVE_CAPTURE" \
+    --plain "$PLAIN_CAPTURE" \
+    --cat-artwork "$IOS_ROOT_DIR/apps/ios/Resources/Shared/Assets.xcassets/CatBarcode.imageset/cat.png" \
+    --cat-details-artwork "$IOS_ROOT_DIR/apps/ios/Resources/Shared/Assets.xcassets/CatBarcodeDetails.imageset/details.png" \
+    --output-dir "$OUTPUT_DIR"
+
+echo "Generated connected 6.5-inch App Store screenshots:"
+echo "  $OUTPUT_DIR/colorinvo-iphone-6-5-01-wallpaper-palette.png"
+echo "  $OUTPUT_DIR/colorinvo-iphone-6-5-02-decorations.png"
+echo "  $OUTPUT_DIR/colorinvo-iphone-6-5-03-scanner-widget.png"
