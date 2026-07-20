@@ -168,7 +168,7 @@ private struct Composer {
                 titleTop: CGFloat(2_430),
                 subtitleTop: CGFloat(2_556),
                 titleAccents: [("桌布配色", Artwork.logoYellowText)],
-                subtitleAccents: []
+                subtitleAccents: [("不再破壞桌布氛圍", Artwork.logoBlueText)]
             ),
             (
                 title: "選擇額外裝飾",

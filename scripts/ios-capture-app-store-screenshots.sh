@@ -90,7 +90,7 @@ launch_for_screenshot() {
             local color_variant
             decoration="${target#widget-}"
             if [[ "$decoration" == "wave" ]]; then
-                color_variant="yellow"
+                color_variant="orange"
             else
                 color_variant="blue"
             fi
