@@ -163,50 +163,45 @@ private struct Composer {
     private func drawMessages() {
         let messages = [
             (
+                panelIndex: 2,
                 title: "提取桌布配色",
                 subtitle: "載具小工具不再破壞桌布氛圍",
-                titleTop: CGFloat(2_430),
-                subtitleTop: CGFloat(2_556),
+                titleTop: CGFloat(96),
+                subtitleTop: CGFloat(244),
+                alignment: NSTextAlignment.right,
                 titleAccents: [("桌布配色", Artwork.logoYellowText)],
                 subtitleAccents: [("不再破壞桌布氛圍", Artwork.logoBlueText)]
             ),
             (
+                panelIndex: 0,
                 title: "選擇額外裝飾",
                 subtitle: "別擔心，貓貓會保留安全可掃範圍",
-                titleTop: CGFloat(1_320),
-                subtitleTop: CGFloat(1_440),
+                titleTop: CGFloat(2_424),
+                subtitleTop: CGFloat(2_576),
+                alignment: NSTextAlignment.left,
                 titleAccents: [("額外裝飾", Artwork.logoYellowText)],
                 subtitleAccents: [("安全可掃", Artwork.logoBlueText)]
             ),
-            (
-                title: "好看，也好掃",
-                subtitle: "配色遵循商用反射率規範，保證能掃",
-                titleTop: CGFloat(96),
-                subtitleTop: CGFloat(222),
-                titleAccents: [
-                    ("好看", Artwork.logoYellowText),
-                    ("好掃", Artwork.logoBlueText),
-                ],
-                subtitleAccents: [("商用反射率規範", Artwork.logoBlueText)]
-            ),
         ]
 
-        for (index, message) in messages.enumerated() {
-            let panelX = CGFloat(index * Artwork.panelWidth) + Artwork.padding
+        for message in messages {
+            let panelX = CGFloat(message.panelIndex * Artwork.panelWidth) + Artwork.padding
             let textWidth = CGFloat(Artwork.panelWidth) - Artwork.padding * 2
             drawStyledText(
                 message.title,
-                topRect: CGRect(x: panelX, y: message.titleTop, width: textWidth, height: 112),
-                font: .systemFont(ofSize: 88, weight: .black),
+                topRect: CGRect(x: panelX, y: message.titleTop, width: textWidth, height: 144),
+                font: .systemFont(ofSize: 112, weight: .black),
                 color: Artwork.ink,
-                accents: message.titleAccents
+                accents: message.titleAccents,
+                alignment: message.alignment
             )
             drawStyledText(
                 message.subtitle,
-                topRect: CGRect(x: panelX, y: message.subtitleTop, width: textWidth, height: 72),
-                font: .systemFont(ofSize: 44, weight: .semibold),
+                topRect: CGRect(x: panelX, y: message.subtitleTop, width: textWidth, height: 84),
+                font: .systemFont(ofSize: 52, weight: .bold),
                 color: Artwork.muted,
-                accents: message.subtitleAccents
+                accents: message.subtitleAccents,
+                alignment: message.alignment
             )
         }
     }
@@ -250,10 +245,11 @@ private struct Composer {
         topRect: CGRect,
         font: NSFont,
         color: NSColor,
-        accents: [(String, NSColor)]
+        accents: [(String, NSColor)],
+        alignment: NSTextAlignment
     ) {
         let paragraph = NSMutableParagraphStyle()
-        paragraph.alignment = .left
+        paragraph.alignment = alignment
         paragraph.lineBreakMode = .byTruncatingTail
         let attributed = NSMutableAttributedString(
             string: text,
