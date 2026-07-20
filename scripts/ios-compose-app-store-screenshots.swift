@@ -14,7 +14,7 @@ private enum Artwork {
     static let ink = NSColor(calibratedRed: 0.035, green: 0.102, blue: 0.180, alpha: 1)
     static let muted = NSColor(calibratedRed: 0.220, green: 0.275, blue: 0.330, alpha: 1)
     static let logoBlueText = NSColor(calibratedRed: 0.020, green: 0.470, blue: 0.650, alpha: 1)
-    static let logoOrangeText = NSColor(calibratedRed: 0.770, green: 0.250, blue: 0.105, alpha: 1)
+    static let logoYellowText = NSColor(calibratedRed: 0.640, green: 0.410, blue: 0.000, alpha: 1)
 }
 
 private struct Arguments {
@@ -167,16 +167,16 @@ private struct Composer {
                 subtitle: "載具小工具不再破壞桌布氛圍",
                 titleTop: CGFloat(2_430),
                 subtitleTop: CGFloat(2_556),
-                titleAccents: [("桌布配色", Artwork.logoOrangeText)],
-                subtitleAccents: [("小工具", Artwork.logoOrangeText)]
+                titleAccents: [("桌布配色", Artwork.logoYellowText)],
+                subtitleAccents: []
             ),
             (
-                title: "選擇裝飾",
+                title: "選擇額外裝飾",
                 subtitle: "別擔心，貓貓會保留安全可掃範圍",
                 titleTop: CGFloat(1_260),
                 subtitleTop: CGFloat(1_380),
-                titleAccents: [("裝飾", Artwork.logoOrangeText)],
-                subtitleAccents: [("貓貓", Artwork.logoBlueText)]
+                titleAccents: [("額外裝飾", Artwork.logoYellowText)],
+                subtitleAccents: [("安全可掃", Artwork.logoBlueText)]
             ),
             (
                 title: "好看，也好掃",
@@ -184,10 +184,10 @@ private struct Composer {
                 titleTop: CGFloat(96),
                 subtitleTop: CGFloat(222),
                 titleAccents: [
-                    ("好看", Artwork.logoOrangeText),
+                    ("好看", Artwork.logoYellowText),
                     ("好掃", Artwork.logoBlueText),
                 ],
-                subtitleAccents: [("反射率規範", Artwork.logoBlueText)]
+                subtitleAccents: [("商用反射率規範", Artwork.logoBlueText)]
             ),
         ]
 
