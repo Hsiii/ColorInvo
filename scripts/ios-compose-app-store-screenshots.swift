@@ -12,7 +12,9 @@ private enum Artwork {
 
     static let background = NSColor(calibratedRed: 0.992, green: 0.996, blue: 1, alpha: 1)
     static let ink = NSColor(calibratedRed: 0.035, green: 0.102, blue: 0.180, alpha: 1)
-    static let muted = NSColor(calibratedRed: 0.310, green: 0.365, blue: 0.420, alpha: 1)
+    static let muted = NSColor(calibratedRed: 0.220, green: 0.275, blue: 0.330, alpha: 1)
+    static let logoBlueText = NSColor(calibratedRed: 0.020, green: 0.470, blue: 0.650, alpha: 1)
+    static let logoOrangeText = NSColor(calibratedRed: 0.770, green: 0.250, blue: 0.105, alpha: 1)
 }
 
 private struct Arguments {
@@ -100,19 +102,19 @@ private struct Composer {
 
         drawMessages()
 
-        let widgetWidth: CGFloat = 2_100
-        let widgetHeight: CGFloat = 990
+        let widgetWidth: CGFloat = 2_376
+        let widgetHeight: CGFloat = 1_120
         drawWidget(
-            image: catCapture,
+            image: waveCapture,
             destinationFromTop: CGRect(
                 x: Artwork.padding,
-                y: 560,
+                y: Artwork.padding,
                 width: widgetWidth,
                 height: widgetHeight
             )
         )
         drawWidget(
-            image: waveCapture,
+            image: catCapture,
             destinationFromTop: CGRect(
                 x: CGFloat(Artwork.width) - Artwork.padding - widgetWidth,
                 y: CGFloat(Artwork.height) - Artwork.padding - widgetHeight,
@@ -160,25 +162,51 @@ private struct Composer {
 
     private func drawMessages() {
         let messages = [
-            ("從桌布提取配色", "載具融入桌布色調，出示不突兀"),
-            ("貓貓或顏料水滴", "兩種裝飾，都保留完整條碼"),
-            ("好看，也好掃", "配色遵循商業掃描規範，桌面直接出示"),
+            (
+                title: "提取桌布配色",
+                subtitle: "載具小工具不再破壞桌布氛圍",
+                titleTop: CGFloat(2_430),
+                subtitleTop: CGFloat(2_556),
+                titleAccents: [("桌布配色", Artwork.logoOrangeText)],
+                subtitleAccents: [("小工具", Artwork.logoOrangeText)]
+            ),
+            (
+                title: "選擇裝飾",
+                subtitle: "別擔心，貓貓會保留安全可掃範圍",
+                titleTop: CGFloat(1_260),
+                subtitleTop: CGFloat(1_380),
+                titleAccents: [("裝飾", Artwork.logoOrangeText)],
+                subtitleAccents: [("貓貓", Artwork.logoBlueText)]
+            ),
+            (
+                title: "好看，也好掃",
+                subtitle: "配色遵循商用反射率規範，保證能掃",
+                titleTop: CGFloat(96),
+                subtitleTop: CGFloat(222),
+                titleAccents: [
+                    ("好看", Artwork.logoOrangeText),
+                    ("好掃", Artwork.logoBlueText),
+                ],
+                subtitleAccents: [("反射率規範", Artwork.logoBlueText)]
+            ),
         ]
 
         for (index, message) in messages.enumerated() {
             let panelX = CGFloat(index * Artwork.panelWidth) + Artwork.padding
             let textWidth = CGFloat(Artwork.panelWidth) - Artwork.padding * 2
-            drawText(
-                message.0,
-                topRect: CGRect(x: panelX, y: Artwork.padding, width: textWidth, height: 104),
-                font: .systemFont(ofSize: 72, weight: .bold),
-                color: Artwork.ink
+            drawStyledText(
+                message.title,
+                topRect: CGRect(x: panelX, y: message.titleTop, width: textWidth, height: 112),
+                font: .systemFont(ofSize: 88, weight: .black),
+                color: Artwork.ink,
+                accents: message.titleAccents
             )
-            drawText(
-                message.1,
-                topRect: CGRect(x: panelX, y: 220, width: textWidth, height: 64),
-                font: .systemFont(ofSize: 36, weight: .medium),
-                color: Artwork.muted
+            drawStyledText(
+                message.subtitle,
+                topRect: CGRect(x: panelX, y: message.subtitleTop, width: textWidth, height: 72),
+                font: .systemFont(ofSize: 44, weight: .semibold),
+                color: Artwork.muted,
+                accents: message.subtitleAccents
             )
         }
     }
@@ -217,16 +245,17 @@ private struct Composer {
         NSGraphicsContext.restoreGraphicsState()
     }
 
-    private func drawText(
+    private func drawStyledText(
         _ text: String,
         topRect: CGRect,
         font: NSFont,
-        color: NSColor
+        color: NSColor,
+        accents: [(String, NSColor)]
     ) {
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = .left
         paragraph.lineBreakMode = .byTruncatingTail
-        let attributed = NSAttributedString(
+        let attributed = NSMutableAttributedString(
             string: text,
             attributes: [
                 .font: font,
@@ -234,6 +263,15 @@ private struct Composer {
                 .paragraphStyle: paragraph,
             ]
         )
+
+        for accent in accents {
+            let range = (text as NSString).range(of: accent.0)
+            guard range.location != NSNotFound else {
+                continue
+            }
+            attributed.addAttribute(.foregroundColor, value: accent.1, range: range)
+        }
+
         attributed.draw(in: rectFromTop(topRect))
     }
 
