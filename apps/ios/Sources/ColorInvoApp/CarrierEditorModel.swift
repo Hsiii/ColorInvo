@@ -404,6 +404,12 @@ actor CarrierAppPipeline {
         if let showcaseDecoration = ColorInvoRuntime.showcaseDecoration {
             settings.decoration = showcaseDecoration
         }
+        if let showcaseColorVariant = ColorInvoRuntime.showcaseColorVariant {
+            settings.palette = showcaseColorVariant.palette
+            settings.wallpaperBasePalette = showcaseColorVariant.palette
+            settings.wallpaperDominantColors = showcaseColorVariant.sourceColors
+            settings.waveColor = showcaseColorVariant.waveColor
+        }
         let previewImage = usesShowcaseData
             ? WallpaperPreviewStore.showcaseImage()
             : WallpaperPreviewStore.load()

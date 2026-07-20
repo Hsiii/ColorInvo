@@ -87,12 +87,19 @@ launch_for_screenshot() {
     case "$target" in
         widget-cat|widget-wave)
             local decoration
+            local color_variant
             decoration="${target#widget-}"
+            if [[ "$decoration" == "wave" ]]; then
+                color_variant="orange"
+            else
+                color_variant="blue"
+            fi
 
             SIMCTL_CHILD_COLORINVO_SHOWCASE_DATA=1 \
                 SIMCTL_CHILD_COLORINVO_SHOWCASE_WALLPAPER_PATH="$SCREENSHOT_WALLPAPER_CONTAINER_PATH" \
                 SIMCTL_CHILD_COLORINVO_SCREENSHOT_TARGET=widget \
                 SIMCTL_CHILD_COLORINVO_SHOWCASE_DECORATION="$decoration" \
+                SIMCTL_CHILD_COLORINVO_SHOWCASE_COLOR_VARIANT="$color_variant" \
                 xcrun simctl launch --terminate-running-process "$device_id" "$IOS_BUNDLE_ID_VALUE" \
                 --showcase-data --screenshot-widget >/dev/null
             ;;

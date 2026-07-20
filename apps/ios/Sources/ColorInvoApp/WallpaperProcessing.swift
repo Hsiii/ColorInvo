@@ -257,4 +257,48 @@ enum ColorInvoRuntime {
 
         return CarrierDecoration(rawValue: rawValue)
     }
+
+    static var showcaseColorVariant: ShowcaseColorVariant? {
+        guard
+            let rawValue = ProcessInfo.processInfo.environment[
+                "COLORINVO_SHOWCASE_COLOR_VARIANT"
+            ]
+        else {
+            return nil
+        }
+
+        return ShowcaseColorVariant(rawValue: rawValue)
+    }
+}
+
+enum ShowcaseColorVariant: String {
+    case blue
+    case orange
+
+    var palette: BarcodePalette {
+        switch self {
+        case .blue:
+            .showcaseLogoBlue
+        case .orange:
+            .showcaseLogoOrange
+        }
+    }
+
+    var sourceColors: [RGBAColor] {
+        switch self {
+        case .blue:
+            return [BarcodePalette.logoBlue]
+        case .orange:
+            return [BarcodePalette.logoOrange]
+        }
+    }
+
+    var waveColor: RGBAColor? {
+        switch self {
+        case .blue:
+            return nil
+        case .orange:
+            return BarcodePalette.logoOrange
+        }
+    }
 }
