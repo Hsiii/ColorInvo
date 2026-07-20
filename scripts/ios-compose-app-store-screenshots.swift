@@ -173,8 +173,8 @@ private struct Composer {
             (
                 title: "選擇額外裝飾",
                 subtitle: "別擔心，貓貓會保留安全可掃範圍",
-                titleTop: CGFloat(1_260),
-                subtitleTop: CGFloat(1_380),
+                titleTop: CGFloat(1_320),
+                subtitleTop: CGFloat(1_440),
                 titleAccents: [("額外裝飾", Artwork.logoYellowText)],
                 subtitleAccents: [("安全可掃", Artwork.logoBlueText)]
             ),

@@ -97,7 +97,7 @@ struct BarcodePalette: Codable, Equatable, Identifiable, Sendable {
 
     static let showcaseLogoOrange = BarcodePalette(
         name: "標誌橘",
-        barColor: RGBAColor(hex: 0x493800),
+        barColor: RGBAColor(hex: 0x222222),
         backgroundColor: RGBAColor(hex: 0xFFE4D9)
     )
 
