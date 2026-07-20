@@ -245,4 +245,16 @@ enum ColorInvoRuntime {
         ProcessInfo.processInfo.environment["COLORINVO_SHOWCASE_DATA"] == "1"
             || ProcessInfo.processInfo.arguments.contains("--showcase-data")
     }
+
+    static var showcaseDecoration: CarrierDecoration? {
+        guard
+            let rawValue = ProcessInfo.processInfo.environment[
+                "COLORINVO_SHOWCASE_DECORATION"
+            ]
+        else {
+            return nil
+        }
+
+        return CarrierDecoration(rawValue: rawValue)
+    }
 }

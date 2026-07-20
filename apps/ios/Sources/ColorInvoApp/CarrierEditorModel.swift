@@ -400,7 +400,10 @@ struct WallpaperPipelineResult: Sendable {
 actor CarrierAppPipeline {
     func loadInitialSnapshot() -> CarrierEditorSnapshot {
         let usesShowcaseData = ColorInvoRuntime.showcaseDataEnabled
-        let settings = usesShowcaseData ? CarrierSettings.showcase : CarrierStore.load()
+        var settings = usesShowcaseData ? CarrierSettings.showcase : CarrierStore.load()
+        if let showcaseDecoration = ColorInvoRuntime.showcaseDecoration {
+            settings.decoration = showcaseDecoration
+        }
         let previewImage = usesShowcaseData
             ? WallpaperPreviewStore.showcaseImage()
             : WallpaperPreviewStore.load()
