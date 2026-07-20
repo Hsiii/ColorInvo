@@ -95,10 +95,10 @@ struct BarcodePalette: Codable, Equatable, Identifiable, Sendable {
         backgroundColor: RGBAColor(hex: 0xBFEAFF)
     )
 
-    static let showcaseLogoOrange = BarcodePalette(
-        name: "標誌橘",
+    static let showcaseLogoYellow = BarcodePalette(
+        name: "標誌黃",
         barColor: RGBAColor(hex: 0x063F52),
-        backgroundColor: RGBAColor(hex: 0xFFE4D9)
+        backgroundColor: RGBAColor(hex: 0xFFF3D1)
     )
 
     static let showcaseOptions = [
@@ -122,7 +122,7 @@ struct BarcodePalette: Codable, Equatable, Identifiable, Sendable {
     ]
 
     static let logoBlue = RGBAColor(hex: 0x70D6FF)
-    static let logoOrange = RGBAColor(hex: 0xFF9770)
+    static let logoDarkYellow = RGBAColor(hex: 0xD09A00)
 }
 
 struct RGBAColor: Codable, Equatable, Sendable {

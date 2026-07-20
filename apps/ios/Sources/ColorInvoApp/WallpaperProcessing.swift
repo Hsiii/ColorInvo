@@ -273,14 +273,14 @@ enum ColorInvoRuntime {
 
 enum ShowcaseColorVariant: String {
     case blue
-    case orange
+    case yellow
 
     var palette: BarcodePalette {
         switch self {
         case .blue:
             .showcaseLogoBlue
-        case .orange:
-            .showcaseLogoOrange
+        case .yellow:
+            .showcaseLogoYellow
         }
     }
 
@@ -288,8 +288,8 @@ enum ShowcaseColorVariant: String {
         switch self {
         case .blue:
             return [BarcodePalette.logoBlue]
-        case .orange:
-            return [BarcodePalette.logoOrange]
+        case .yellow:
+            return [BarcodePalette.logoDarkYellow]
         }
     }
 
@@ -297,8 +297,8 @@ enum ShowcaseColorVariant: String {
         switch self {
         case .blue:
             return nil
-        case .orange:
-            return BarcodePalette.logoOrange
+        case .yellow:
+            return BarcodePalette.logoDarkYellow
         }
     }
 }
