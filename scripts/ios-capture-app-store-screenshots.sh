@@ -85,18 +85,9 @@ launch_for_screenshot() {
     xcrun simctl terminate "$device_id" "$IOS_BUNDLE_ID_VALUE" >/dev/null 2>&1 || true
 
     case "$target" in
-        main)
-            SIMCTL_CHILD_COLORINVO_SHOWCASE_DATA=1 \
-                SIMCTL_CHILD_COLORINVO_SHOWCASE_WALLPAPER_PATH="$SCREENSHOT_WALLPAPER_CONTAINER_PATH" \
-                xcrun simctl launch --terminate-running-process "$device_id" "$IOS_BUNDLE_ID_VALUE" \
-                --showcase-data >/dev/null
-            ;;
-        widget-cat|widget-wave|widget-plain)
+        widget-cat|widget-wave)
             local decoration
             decoration="${target#widget-}"
-            if [[ "$decoration" == "plain" ]]; then
-                decoration="none"
-            fi
 
             SIMCTL_CHILD_COLORINVO_SHOWCASE_DATA=1 \
                 SIMCTL_CHILD_COLORINVO_SHOWCASE_WALLPAPER_PATH="$SCREENSHOT_WALLPAPER_CONTAINER_PATH" \
@@ -168,15 +159,8 @@ xcrun simctl status_bar "$DEVICE_ID" override \
     --batteryState charged \
     --batteryLevel 100 >/dev/null
 
-MAIN_CAPTURE="$CAPTURE_DIR/colorinvo-iphone-6-5-main.png"
 CAT_CAPTURE="$CAPTURE_DIR/colorinvo-iphone-6-5-widget-cat.png"
 WAVE_CAPTURE="$CAPTURE_DIR/colorinvo-iphone-6-5-widget-wave.png"
-PLAIN_CAPTURE="$CAPTURE_DIR/colorinvo-iphone-6-5-widget-plain.png"
-
-echo "Capturing wallpaper palette source..."
-launch_for_screenshot "$DEVICE_ID" main
-sleep 7
-capture_png "$DEVICE_ID" "$MAIN_CAPTURE"
 
 echo "Capturing cat decoration source..."
 launch_for_screenshot "$DEVICE_ID" widget-cat
@@ -188,19 +172,10 @@ launch_for_screenshot "$DEVICE_ID" widget-wave
 sleep 4
 capture_png "$DEVICE_ID" "$WAVE_CAPTURE"
 
-echo "Capturing minimal widget source..."
-launch_for_screenshot "$DEVICE_ID" widget-plain
-sleep 4
-capture_png "$DEVICE_ID" "$PLAIN_CAPTURE"
-
 echo "Composing App Store screenshots..."
 swift "$IOS_ROOT_DIR/scripts/ios-compose-app-store-screenshots.swift" \
-    --main "$MAIN_CAPTURE" \
     --cat "$CAT_CAPTURE" \
     --wave "$WAVE_CAPTURE" \
-    --plain "$PLAIN_CAPTURE" \
-    --cat-artwork "$IOS_ROOT_DIR/apps/ios/Resources/Shared/Assets.xcassets/CatBarcode.imageset/cat.png" \
-    --cat-details-artwork "$IOS_ROOT_DIR/apps/ios/Resources/Shared/Assets.xcassets/CatBarcodeDetails.imageset/details.png" \
     --output-dir "$OUTPUT_DIR"
 
 echo "Generated connected 6.5-inch App Store screenshots:"
