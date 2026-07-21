@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">ColorInvo</string>
+    <string name="widget_title">Carrier widget</string>
+    <string name="carrier_title">Mobile carrier</string>
+    <string name="palette_title">Barcode colors</string>
+    <string name="synced">Synced</string>
+    <string name="saving">Saving</string>
+    <string name="valid_format">Valid format</string>
+    <string name="invalid_format">Invalid format</string>
+    <string name="scan_ready">Scanner-ready</string>
+    <string name="low_contrast">Low contrast</string>
+    <string name="show_carrier_value">Show carrier text</string>
+    <string name="import_wallpaper">Import wallpaper</string>
+    <string name="analyzing_wallpaper">Analyzing wallpaper…</string>
+    <string name="wallpaper_error">Couldn’t read this image.</string>
+    <string name="wallpaper_colors">Wallpaper colors</string>
+    <string name="background_color">Background</string>
+    <string name="bar_color">Bars</string>
+    <string name="decoration_cat">Cat</string>
+    <string name="decoration_wave">Paint</string>
+    <string name="decoration_none">Minimal</string>
+    <string name="widget_description">Your Taiwan mobile invoice carrier barcode</string>
+</resources>

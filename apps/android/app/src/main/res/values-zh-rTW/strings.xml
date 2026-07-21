@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">ColorInvo</string>
+    <string name="widget_title">載具小工具</string>
+    <string name="carrier_title">手機載具</string>
+    <string name="palette_title">自由條色</string>
+    <string name="synced">已同步</string>
+    <string name="saving">儲存中</string>
+    <string name="valid_format">格式符合</string>
+    <string name="invalid_format">格式不符</string>
+    <string name="scan_ready">適合掃描</string>
+    <string name="low_contrast">對比不足</string>
+    <string name="show_carrier_value">顯示載具文字</string>
+    <string name="import_wallpaper">匯入桌布</string>
+    <string name="analyzing_wallpaper">正在分析桌布…</string>
+    <string name="wallpaper_error">無法讀取圖片</string>
+    <string name="wallpaper_colors">桌布配色</string>
+    <string name="background_color">背景</string>
+    <string name="bar_color">條碼</string>
+    <string name="decoration_cat">貓貓</string>
+    <string name="decoration_wave">顏料</string>
+    <string name="decoration_none">極簡</string>
+    <string name="widget_description">台灣手機載具條碼</string>
+</resources>
