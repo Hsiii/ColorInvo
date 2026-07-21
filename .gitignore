@@ -12,3 +12,9 @@ xcuserdata/
 .env
 .env.local
 *.local
+apps/android/.gradle/
+apps/android/local.properties
+apps/android/**/build/
+apps/android/keystore.properties
+*.jks
+*.keystore
