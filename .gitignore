@@ -16,5 +16,6 @@ apps/android/.gradle/
 apps/android/local.properties
 apps/android/**/build/
 apps/android/keystore.properties
+apps/android/play-service-account.json
 *.jks
 *.keystore

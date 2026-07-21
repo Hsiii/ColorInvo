@@ -1,0 +1,1 @@
+Initial Android release with wallpaper palettes, scanner guidance, and a home-screen carrier widget.

@@ -1,0 +1,21 @@
+default_platform(:android)
+
+platform :android do
+  desc "Upload a signed ColorInvo bundle and Play listing"
+  lane :upload do
+    service_account = ENV.fetch("PLAY_SERVICE_ACCOUNT_JSON")
+    bundle_path = ENV.fetch("ANDROID_AAB_PATH")
+    track = ENV.fetch("PLAY_TRACK", "internal")
+
+    supply(
+      package_name: ENV.fetch("ANDROID_PACKAGE_NAME", "dev.hsichen.colorinvo"),
+      aab: bundle_path,
+      json_key: service_account,
+      track: track,
+      release_status: ENV.fetch("PLAY_RELEASE_STATUS", "completed"),
+      metadata_path: File.expand_path("../play", __dir__),
+      skip_upload_images: ENV.fetch("PLAY_UPLOAD_IMAGES", "false") != "true",
+      skip_upload_screenshots: ENV.fetch("PLAY_UPLOAD_SCREENSHOTS", "false") != "true"
+    )
+  end
+end

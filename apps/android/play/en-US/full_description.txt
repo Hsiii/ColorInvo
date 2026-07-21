@@ -1,0 +1,9 @@
+ColorInvo keeps your Taiwan mobile invoice carrier barcode close at hand and makes it feel at home on your phone.
+
+• Add your mobile carrier code once and access it from a home-screen widget.
+• Import a wallpaper to create coordinated barcode color palettes.
+• Fine-tune the background and bar colors with clear scanner-readiness guidance.
+• Choose cat, paint, or minimal widget decoration.
+• Keep the carrier text visible or use a cleaner barcode-only layout.
+
+ColorInvo stores your carrier and color choices on your device. Imported wallpapers are analyzed locally and are not uploaded.
