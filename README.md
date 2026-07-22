@@ -14,6 +14,12 @@
 
 > We plan to release this to App Store in the future, hold on tight!
 
+## Web deployment
+
+The root `vercel.json` is the single deployment definition. Vercel installs the
+`apps/web` workspace, runs the root `web:build` script, and publishes the static
+export from `apps/web/dist`. Do not add a second config under `apps/web`.
+
 ## Run on iOS Simulator
 
 Build ColorInvo, boot and open an available iPhone simulator, install the app, and launch it:
