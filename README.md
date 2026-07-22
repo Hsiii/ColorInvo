@@ -43,6 +43,12 @@ bun run android:test:device
 
 See the [complete Play Console checklist](apps/android/PLAY_RELEASE.md) for one-time setup, policy declarations, store artwork, and CI secrets.
 
+## Web deployment
+
+The root `vercel.json` is the single deployment definition. Vercel installs the
+`apps/web` workspace, runs the root `web:build` script, and publishes the static
+export from `apps/web/dist`. Do not add a second config under `apps/web`.
+
 ## Run on iOS Simulator
 
 Build ColorInvo, boot and open an available iPhone simulator, install the app, and launch it:
